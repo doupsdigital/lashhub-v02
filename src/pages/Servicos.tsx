@@ -15,6 +15,7 @@ import {
   HelpCircle
 } from 'lucide-react';
 import type { CategoriaServico, Servico, VariacaoServico } from '../types';
+import { registrarLog } from '../utils/log';
 
 // Extend types to include relations
 interface VariacaoInput {
@@ -106,20 +107,7 @@ export default function Servicos() {
     setTimeout(() => setErrorMessage(null), 5000);
   };
 
-  // Helper log action
-  const logAction = async (acao: 'criou' | 'editou' | 'excluiu', entidade: string, entidadeId: string, descricao: string) => {
-    try {
-      await supabase.from('logs').insert({
-        usuario_nome: 'Dra. Amanda Rosa', // Usuário ativo mockado
-        acao,
-        entidade,
-        entidade_id: entidadeId,
-        descricao
-      });
-    } catch (err) {
-      console.error('Erro ao gerar log:', err);
-    }
-  };
+
 
   // CATEGORIA ACTIONS
   const handleOpenCategoriaModal = (cat: CategoriaServico | null = null) => {
@@ -146,7 +134,7 @@ export default function Servicos() {
           .eq('id', editingCategoria.id);
 
         if (error) throw error;
-        await logAction('editou', 'categoria', editingCategoria.id, `Editou categoria de serviço "${categoriaNome}"`);
+        await registrarLog('editou', 'categoria', editingCategoria.id, `Editou categoria de serviço "${categoriaNome}"`);
       } else {
         // Create Categoria
         const { data, error } = await supabase
@@ -157,7 +145,7 @@ export default function Servicos() {
 
         if (error) throw error;
         if (data) {
-          await logAction('criou', 'categoria', data.id, `Criou categoria de serviço "${categoriaNome}"`);
+          await registrarLog('criou', 'categoria', data.id, `Criou categoria de serviço "${categoriaNome}"`);
         }
       }
       setIsCategoriaModalOpen(false);
@@ -177,7 +165,7 @@ export default function Servicos() {
         .eq('id', cat.id);
 
       if (error) throw error;
-      await logAction(
+      await registrarLog(
         'editou', 
         'categoria', 
         cat.id, 
@@ -206,7 +194,7 @@ export default function Servicos() {
         .eq('id', cat.id);
 
       if (error) throw error;
-      await logAction('excluiu', 'categoria', cat.id, `Excluiu categoria de serviço "${cat.nome}"`);
+      await registrarLog('excluiu', 'categoria', cat.id, `Excluiu categoria de serviço "${cat.nome}"`);
       fetchData();
     } catch (err) {
       console.error(err);
@@ -280,7 +268,7 @@ export default function Servicos() {
 
         if (error) throw error;
         servicoId = editingServico.id;
-        await logAction('editou', 'servico', servicoId, `Editou serviço "${servicoNome}"`);
+        await registrarLog('editou', 'servico', servicoId, `Editou serviço "${servicoNome}"`);
       } else {
         // Create Service
         const { data, error } = await supabase
@@ -297,7 +285,7 @@ export default function Servicos() {
         if (error) throw error;
         if (!data) throw new Error('Falha ao criar serviço');
         servicoId = data.id;
-        await logAction('criou', 'servico', servicoId, `Criou serviço "${servicoNome}"`);
+        await registrarLog('criou', 'servico', servicoId, `Criou serviço "${servicoNome}"`);
       }
 
       // Handle Variations
@@ -342,7 +330,7 @@ export default function Servicos() {
         .eq('id', serv.id);
 
       if (error) throw error;
-      await logAction(
+      await registrarLog(
         'editou', 
         'servico', 
         serv.id, 
@@ -389,7 +377,7 @@ export default function Servicos() {
 
       if (delError) throw delError;
 
-      await logAction('excluiu', 'servico', serv.id, `Excluiu serviço "${serv.nome}"`);
+      await registrarLog('excluiu', 'servico', serv.id, `Excluiu serviço "${serv.nome}"`);
       fetchData();
     } catch (err) {
       console.error(err);

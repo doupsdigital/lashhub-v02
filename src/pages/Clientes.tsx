@@ -12,6 +12,7 @@ import {
   Filter
 } from 'lucide-react';
 import type { Cliente } from '../types';
+import { registrarLog } from '../utils/log';
 
 interface ClienteWithAttendances extends Cliente {
   atendimentos?: { data_atendimento: string }[];
@@ -82,20 +83,7 @@ export default function Clientes() {
     setTimeout(() => setErrorMessage(null), 5000);
   };
 
-  // Helper log action
-  const logAction = async (acao: 'criou' | 'editou' | 'excluiu', entidade: string, entidadeId: string, descricao: string) => {
-    try {
-      await supabase.from('logs').insert({
-        usuario_nome: 'Dra. Amanda Rosa', // Mocked active user
-        acao,
-        entidade,
-        entidade_id: entidadeId,
-        descricao
-      });
-    } catch (err) {
-      console.error('Erro ao gerar log:', err);
-    }
-  };
+
 
   // Helper to determine date ranges for filter on created_at
   const getPeriodInterval = (period: string) => {
@@ -202,7 +190,7 @@ export default function Clientes() {
       if (insertError) throw insertError;
       if (!newClient) throw new Error('Erro ao salvar cliente.');
 
-      await logAction('criou', 'cliente', newClient.id, `Cadastrou o cliente "${nome} ${sobrenome}"`);
+      await registrarLog('criou', 'cliente', newClient.id, `Cadastrou o cliente "${nome} ${sobrenome}"`);
       setIsModalOpen(false);
       fetchData();
     } catch (err) {

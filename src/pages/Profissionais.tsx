@@ -13,6 +13,7 @@ import {
   UserCheck
 } from 'lucide-react';
 import type { Profissional, HorarioProfissional } from '../types';
+import { registrarLog } from '../utils/log';
 
 interface HorarioDia {
   ativo: boolean;
@@ -85,20 +86,7 @@ export default function Profissionais() {
     setTimeout(() => setErrorMessage(null), 5000);
   };
 
-  // Helper log action
-  const logAction = async (acao: 'criou' | 'editou' | 'excluiu', entidade: string, entidadeId: string, descricao: string) => {
-    try {
-      await supabase.from('logs').insert({
-        usuario_nome: 'Dra. Amanda Rosa', // Mocked active user
-        acao,
-        entidade,
-        entidade_id: entidadeId,
-        descricao
-      });
-    } catch (err) {
-      console.error('Erro ao gerar log:', err);
-    }
-  };
+
 
   const handleOpenModal = (prof: ProfissionalWithHorarios | null = null) => {
     if (prof) {
@@ -201,7 +189,7 @@ export default function Profissionais() {
 
         if (error) throw error;
         profissionalId = editingProfissional.id;
-        await logAction('editou', 'profissional', profissionalId, `Editou dados de "${nome} ${sobrenome}"`);
+        await registrarLog('editou', 'profissional', profissionalId, `Editou dados de "${nome} ${sobrenome}"`);
       } else {
         // Create professional
         const { data, error } = await supabase
@@ -213,7 +201,7 @@ export default function Profissionais() {
         if (error) throw error;
         if (!data) throw new Error('Falha ao criar profissional.');
         profissionalId = data.id;
-        await logAction('criou', 'profissional', profissionalId, `Cadastrou profissional "${nome} ${sobrenome}"`);
+        await registrarLog('criou', 'profissional', profissionalId, `Cadastrou profissional "${nome} ${sobrenome}"`);
       }
 
       // Sync schedule: delete previous and insert new active ones
@@ -252,7 +240,7 @@ export default function Profissionais() {
         .eq('id', prof.id);
 
       if (error) throw error;
-      await logAction(
+      await registrarLog(
         'editou', 
         'profissional', 
         prof.id, 
@@ -290,7 +278,7 @@ export default function Profissionais() {
 
       if (delError) throw delError;
 
-      await logAction('excluiu', 'profissional', prof.id, `Excluiu profissional "${prof.nome} ${prof.sobrenome}"`);
+      await registrarLog('excluiu', 'profissional', prof.id, `Excluiu profissional "${prof.nome} ${prof.sobrenome}"`);
       fetchData();
     } catch (err) {
       console.error(err);

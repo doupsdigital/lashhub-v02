@@ -26,6 +26,7 @@ import type {
   VariacaoServico,
   HorarioProfissional
 } from '../types';
+import { registrarLog } from '../utils/log';
 
 interface AgendamentoServicoInput {
   servico_id: string;
@@ -210,20 +211,7 @@ export default function Agendamentos() {
     return () => clearTimeout(delayDebounce);
   }, [clientSearchQuery]);
 
-  // Log audit action helper
-  const logAction = async (acao: 'criou' | 'editou' | 'excluiu', entidade: string, entidadeId: string, descricao: string) => {
-    try {
-      await supabase.from('logs').insert({
-        usuario_nome: 'Dra. Amanda Rosa', // Mocked user
-        acao,
-        entidade,
-        entidade_id: entidadeId,
-        descricao
-      });
-    } catch (err) {
-      console.error('Erro ao registrar log:', err);
-    }
-  };
+
 
   // Date helper functions
   const getStartOfWeek = (d: Date) => {
@@ -558,7 +546,7 @@ export default function Agendamentos() {
           .delete()
           .eq('agendamento_id', apptId);
 
-        await logAction('editou', 'agendamento', apptId, `Editou agendamento de "${clientName}" com "${profName}"`);
+        await registrarLog('editou', 'agendamento', apptId, `Editou agendamento de "${clientName}" com "${profName}"`);
       } else {
         // Create agendamento (Header)
         const { data: apptResult, error: apptError } = await supabase
@@ -578,7 +566,7 @@ export default function Agendamentos() {
         if (!apptResult) throw new Error('Falha ao criar cabeçalho do agendamento.');
         apptId = apptResult.id;
 
-        await logAction('criou', 'agendamento', apptId, `Criou agendamento para a cliente "${clientName}" com a profissional "${profName}"`);
+        await registrarLog('criou', 'agendamento', apptId, `Criou agendamento para a cliente "${clientName}" com a profissional "${profName}"`);
       }
 
       // 5. Inserir Agendamento Serviços
@@ -620,7 +608,7 @@ export default function Agendamentos() {
       if (error) throw error;
 
       const clientName = appt.cliente ? `${appt.cliente.nome} ${appt.cliente.sobrenome}` : 'Cliente';
-      await logAction(
+      await registrarLog(
         'editou', 
         'agendamento', 
         appt.id, 
@@ -648,7 +636,7 @@ export default function Agendamentos() {
       if (error) throw error;
 
       const clientName = appt.cliente ? `${appt.cliente.nome} ${appt.cliente.sobrenome}` : 'Cliente';
-      await logAction('excluiu', 'agendamento', appt.id, `Excluiu permanentemente agendamento de "${clientName}"`);
+      await registrarLog('excluiu', 'agendamento', appt.id, `Excluiu permanentemente agendamento de "${clientName}"`);
 
       setIsDetailOpen(false);
       showTemporarySuccess('Agendamento excluído com sucesso!');

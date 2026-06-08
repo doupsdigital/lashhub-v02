@@ -17,6 +17,7 @@ import {
   Calendar
 } from 'lucide-react';
 import type { Cliente, Atendimento, Servico, VariacaoServico, Profissional } from '../types';
+import { registrarLog } from '../utils/log';
 
 interface AtendimentoWithRelations extends Atendimento {
   servicos?: { nome: string };
@@ -83,20 +84,7 @@ export default function PerfilCliente() {
     setTimeout(() => setSuccessMessage(null), 4000);
   };
 
-  // Helper log action
-  const logAction = async (acao: 'criou' | 'editou' | 'excluiu', entidade: string, entidadeId: string, descricao: string) => {
-    try {
-      await supabase.from('logs').insert({
-        usuario_nome: 'Dra. Amanda Rosa', // Mocked active user
-        acao,
-        entidade,
-        entidade_id: entidadeId,
-        descricao
-      });
-    } catch (err) {
-      console.error('Erro ao gerar log:', err);
-    }
-  };
+
 
   const fetchClienteData = async () => {
     if (!id) return;
@@ -189,7 +177,7 @@ export default function PerfilCliente() {
         .eq('id', cliente.id);
 
       if (error) throw error;
-      await logAction('editou', 'cliente', cliente.id, `${newStatus ? 'Ativou' : 'Desativou'} cliente "${cliente.nome} ${cliente.sobrenome}"`);
+      await registrarLog('editou', 'cliente', cliente.id, `${newStatus ? 'Ativou' : 'Desativou'} cliente "${cliente.nome} ${cliente.sobrenome}"`);
       setCliente(prev => prev ? { ...prev, ativo: newStatus } : null);
       showTemporarySuccess(`Status alterado para ${newStatus ? 'Ativo' : 'Inativo'}.`);
     } catch (err) {
@@ -231,7 +219,7 @@ export default function PerfilCliente() {
         throw error;
       }
 
-      await logAction('editou', 'cliente', cliente.id, `Editou dados pessoais de "${nome} ${sobrenome}"`);
+      await registrarLog('editou', 'cliente', cliente.id, `Editou dados pessoais de "${nome} ${sobrenome}"`);
       showTemporarySuccess('Dados pessoais atualizados com sucesso!');
       setCliente(prev => prev ? { ...prev, nome, sobrenome, whatsapp, email, data_nascimento: dataNascimento, cpf, endereco, como_conheceu: comoConheceu } : null);
     } catch (err: any) {
@@ -264,7 +252,7 @@ export default function PerfilCliente() {
 
       if (error) throw error;
 
-      await logAction('editou', 'cliente', cliente.id, `Atualizou a ficha clínica (anamnese) de "${cliente.nome} ${cliente.sobrenome}"`);
+      await registrarLog('editou', 'cliente', cliente.id, `Atualizou a ficha clínica (anamnese) de "${cliente.nome} ${cliente.sobrenome}"`);
       showTemporarySuccess('Ficha clínica (anamnese) atualizada com sucesso!');
     } catch (err) {
       console.error(err);
@@ -358,7 +346,7 @@ export default function PerfilCliente() {
 
       if (error) throw error;
 
-      await logAction(
+      await registrarLog(
         'criou', 
         'atendimento', 
         data.id, 
