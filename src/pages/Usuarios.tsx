@@ -13,8 +13,10 @@ import {
 } from 'lucide-react';
 import type { Usuario } from '../types';
 import { registrarLog } from '../utils/log';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function Usuarios() {
+  const { isAdmin } = useAuth();
   const [usuarios, setUsuarios] = useState<Usuario[]>([]);
   const [loading, setLoading] = useState(true);
   
@@ -179,13 +181,15 @@ export default function Usuarios() {
           <h2 className="font-title font-semibold text-2xl text-text-primary">Usuários</h2>
           <p className="text-xs text-text-secondary mt-0.5">Gerencie os usuários com acesso ao CRM da clínica.</p>
         </div>
-        <button
-          onClick={handleOpenModal}
-          className="flex items-center justify-center gap-1.5 px-4 py-2.5 bg-rose-600 hover:bg-rose-800 text-white rounded-lg text-sm font-semibold transition-colors cursor-pointer"
-        >
-          <Plus className="w-4 h-4" />
-          Adicionar Usuário
-        </button>
+        {isAdmin && (
+          <button
+            onClick={handleOpenModal}
+            className="flex items-center justify-center gap-1.5 px-4 py-2.5 bg-rose-600 hover:bg-rose-800 text-white rounded-lg text-sm font-semibold transition-colors cursor-pointer"
+          >
+            <Plus className="w-4 h-4" />
+            Adicionar Usuário
+          </button>
+        )}
       </div>
 
       {/* Main List Area */}

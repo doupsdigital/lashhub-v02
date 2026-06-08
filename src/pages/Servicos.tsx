@@ -17,6 +17,7 @@ import {
 import type { CategoriaServico, Servico, VariacaoServico } from '../types';
 import { registrarLog } from '../utils/log';
 import ConfirmModal from '../components/common/ConfirmModal';
+import { useAuth } from '../contexts/AuthContext';
 
 // Extend types to include relations
 interface VariacaoInput {
@@ -36,6 +37,7 @@ interface CategoriaWithRelations extends CategoriaServico {
 }
 
 export default function Servicos() {
+  const { isAdmin } = useAuth();
   const [categorias, setCategorias] = useState<CategoriaWithRelations[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -556,21 +558,23 @@ export default function Servicos() {
                     <Power className="w-4 h-4" />
                   </button>
 
-                  <div className="relative group">
-                    <button
-                      onClick={() => handleDeleteCategoria(cat)}
-                      disabled={cat.servicos.length > 0}
-                      className={`p-1.5 rounded transition-colors cursor-pointer ${cat.servicos.length > 0 ? 'text-text-muted cursor-not-allowed' : 'text-red-500 hover:bg-red-50'}`}
-                      title={cat.servicos.length > 0 ? '' : 'Excluir Categoria'}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                    {cat.servicos.length > 0 && (
-                      <div className="absolute right-0 bottom-full mb-2 hidden group-hover:block w-48 p-2 bg-text-primary text-white text-[11px] rounded shadow-lg z-10 font-sans leading-relaxed">
-                        Não é permitido excluir uma categoria com serviços vinculados. Desative-a em vez disso.
-                      </div>
-                    )}
-                  </div>
+                  {isAdmin && (
+                    <div className="relative group">
+                      <button
+                        onClick={() => handleDeleteCategoria(cat)}
+                        disabled={cat.servicos.length > 0}
+                        className={`p-1.5 rounded transition-colors cursor-pointer ${cat.servicos.length > 0 ? 'text-text-muted cursor-not-allowed' : 'text-red-500 hover:bg-red-50'}`}
+                        title={cat.servicos.length > 0 ? '' : 'Excluir Categoria'}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                      {cat.servicos.length > 0 && (
+                        <div className="absolute right-0 bottom-full mb-2 hidden group-hover:block w-48 p-2 bg-text-primary text-white text-[11px] rounded shadow-lg z-10 font-sans leading-relaxed">
+                          Não é permitido excluir uma categoria com serviços vinculados. Desative-a em vez disso.
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -645,13 +649,15 @@ export default function Servicos() {
                           <Power className="w-4 h-4" />
                         </button>
 
-                        <button
-                          onClick={() => handleDeleteServico(serv)}
-                          className="p-1.5 text-red-500 hover:bg-red-50 rounded transition-colors cursor-pointer"
-                          title="Excluir Serviço"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
+                        {isAdmin && (
+                          <button
+                            onClick={() => handleDeleteServico(serv)}
+                            className="p-1.5 text-red-500 hover:bg-red-50 rounded transition-colors cursor-pointer"
+                            title="Excluir Serviço"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        )}
                       </div>
                     </div>
                   ))}

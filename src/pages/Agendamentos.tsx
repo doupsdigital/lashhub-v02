@@ -28,6 +28,7 @@ import type {
 } from '../types';
 import { registrarLog } from '../utils/log';
 import ConfirmModal from '../components/common/ConfirmModal';
+import { useAuth } from '../contexts/AuthContext';
 
 interface AgendamentoServicoInput {
   servico_id: string;
@@ -60,6 +61,7 @@ const DIAS_SEMANA = [
 ];
 
 export default function Agendamentos() {
+  const { isAdmin } = useAuth();
   const [viewMode, setViewMode] = useState<'mensal' | 'semanal' | 'diaria'>('semanal');
   const [currentDate, setCurrentDate] = useState<Date>(() => {
     const d = new Date();
@@ -1237,14 +1239,16 @@ export default function Agendamentos() {
                   </p>
                 )}
 
-                {/* Delete button (Always active) */}
-                <button
-                  onClick={() => handleDeleteAppointment(selectedAppt)}
-                  className="flex items-center justify-center gap-1.5 py-2 w-full border border-border hover:bg-red-50 hover:text-red-600 text-text-secondary rounded-lg text-xs font-semibold cursor-pointer"
-                >
-                  <Trash2 className="w-4 h-4" />
-                  Excluir permanentemente
-                </button>
+                {/* Delete button (Admin only) */}
+                {isAdmin && (
+                  <button
+                    onClick={() => handleDeleteAppointment(selectedAppt)}
+                    className="flex items-center justify-center gap-1.5 py-2 w-full border border-border hover:bg-red-50 hover:text-red-600 text-text-secondary rounded-lg text-xs font-semibold cursor-pointer"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    Excluir permanentemente
+                  </button>
+                )}
               </div>
             </div>
           </div>

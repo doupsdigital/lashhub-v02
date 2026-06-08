@@ -15,6 +15,7 @@ import {
 import type { Profissional, HorarioProfissional } from '../types';
 import { registrarLog } from '../utils/log';
 import ConfirmModal from '../components/common/ConfirmModal';
+import { useAuth } from '../contexts/AuthContext';
 
 interface HorarioDia {
   ativo: boolean;
@@ -37,6 +38,7 @@ const DIAS_SEMANA = [
 ];
 
 export default function Profissionais() {
+  const { isAdmin } = useAuth();
   const [profissionais, setProfissionais] = useState<ProfissionalWithHorarios[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -438,19 +440,21 @@ export default function Profissionais() {
                     <Power className="w-4 h-4" />
                   </button>
 
-                  <div className="relative group">
-                    <button
-                      onClick={() => handleDelete(prof)}
-                      className="p-1.5 text-red-500 hover:bg-red-50 rounded transition-colors cursor-pointer"
-                      title="Excluir Profissional"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                    {/* Tooltip trigger handles verification error, but let's have a help text */}
-                    <div className="absolute right-0 bottom-full mb-2 hidden group-hover:block w-48 p-2 bg-text-primary text-white text-[11px] rounded shadow-lg z-10 font-sans leading-relaxed">
-                      Não é permitido excluir profissionais com agendamentos futuros. Desative-a em vez disso.
+                  {isAdmin && (
+                    <div className="relative group">
+                      <button
+                        onClick={() => handleDelete(prof)}
+                        className="p-1.5 text-red-500 hover:bg-red-50 rounded transition-colors cursor-pointer"
+                        title="Excluir Profissional"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                      {/* Tooltip trigger handles verification error, but let's have a help text */}
+                      <div className="absolute right-0 bottom-full mb-2 hidden group-hover:block w-48 p-2 bg-text-primary text-white text-[11px] rounded shadow-lg z-10 font-sans leading-relaxed">
+                        Não é permitido excluir profissionais com agendamentos futuros. Desative-a em vez disso.
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               </div>
             );

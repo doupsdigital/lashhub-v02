@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import PrivateRoute from './components/common/PrivateRoute';
+import AdminRoute from './components/common/AdminRoute';
 import Layout from './components/layout/Layout';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
@@ -35,9 +36,9 @@ export default function App() {
             <Route path="servicos" element={<Servicos />} />
             <Route path="profissionais" element={<Profissionais />} />
             <Route path="agendamentos" element={<Agendamentos />} />
-            <Route path="usuarios" element={<Usuarios />} />
-            <Route path="logs" element={<Logs />} />
             <Route path="configuracoes" element={<Configuracoes />} />
+            <Route path="usuarios" element={<AdminRoute><Usuarios /></AdminRoute>} />
+            <Route path="logs" element={<AdminRoute><Logs /></AdminRoute>} />
           </Route>
           
           <Route path="*" element={<Navigate to="/dashboard" replace />} />

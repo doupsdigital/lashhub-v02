@@ -24,7 +24,7 @@ interface SidebarProps {
 
 export default function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }: SidebarProps) {
   const navigate = useNavigate();
-  const { profile, user, signOut } = useAuth();
+  const { profile, user, signOut, isAdmin } = useAuth();
 
   const handleSignOut = async () => {
     await signOut();
@@ -55,8 +55,8 @@ export default function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobile
 
   const systemItems = [
     { name: 'Configurações', path: '/configuracoes', icon: Settings },
-    { name: 'Usuários', path: '/usuarios', icon: Shield },
-    { name: 'Logs', path: '/logs', icon: List },
+    ...(isAdmin ? [{ name: 'Usuários', path: '/usuarios', icon: Shield }] : []),
+    ...(isAdmin ? [{ name: 'Logs', path: '/logs', icon: List }] : []),
   ];
 
   const renderNavItems = (items: typeof menuItems) => {

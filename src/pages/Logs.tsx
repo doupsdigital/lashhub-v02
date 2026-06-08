@@ -14,6 +14,7 @@ import type { Log } from '../types';
 type PeriodType = 'hoje' | 'ontem' | '7dias' | 'esteMes' | 'mesPassado' | 'esteAno' | 'personalizado';
 type ActionType = 'todos' | 'criou' | 'editou' | 'excluiu';
 
+
 const formatDateStr = (date: Date) => {
   const y = date.getFullYear();
   const m = String(date.getMonth() + 1).padStart(2, '0');
