@@ -16,7 +16,7 @@ import {
   Power,
   Calendar
 } from 'lucide-react';
-import type { Cliente, Atendimento, Servico, VariacaoServico, Profissional } from '../types';
+import type { Cliente, Atendimento, Servico, VariacaoServico } from '../types';
 import { registrarLog } from '../utils/log';
 
 interface AtendimentoWithRelations extends Atendimento {
@@ -37,7 +37,7 @@ export default function PerfilCliente() {
   const [cliente, setCliente] = useState<Cliente | null>(null);
   const [atendimentos, setAtendimentos] = useState<AtendimentoWithRelations[]>([]);
   const [servicos, setServicos] = useState<ServicoWithVariations[]>([]);
-  const [profissionais, setProfissionais] = useState<Profissional[]>([]);
+  const [profissionais, setProfissionais] = useState<{ id: string; nome: string; sobrenome?: string }[]>([]);
   
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -291,7 +291,7 @@ export default function PerfilCliente() {
     } else {
       // No variations: Clear variation ID and set standard price
       setAtendimentoVariacaoId('');
-      setAtendimentoValor(Number(service.valor_padrao));
+      setAtendimentoValor(Number(service.valor));
     }
   };
 
@@ -392,7 +392,7 @@ export default function PerfilCliente() {
     );
   }
 
-  const initials = `${cliente.nome[0] || ''}${cliente.sobrenome[0] || ''}`.toUpperCase();
+  const initials = `${cliente.nome[0] || ''}${(cliente.sobrenome || '')[0] || ''}`.toUpperCase();
   const selectedService = servicos.find(s => s.id === atendimentoServicoId);
 
   return (

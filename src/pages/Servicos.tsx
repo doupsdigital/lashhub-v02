@@ -229,9 +229,9 @@ export default function Servicos() {
     if (serv) {
       setEditingServico(serv);
       setServicoNome(serv.nome);
-      setServicoCategoriaId(serv.categoria_id);
+      setServicoCategoriaId(serv.categoria_id ?? '');
       setServicoDuracao(serv.duracao_minutos);
-      setServicoValor(Number(serv.valor_padrao));
+      setServicoValor(Number(serv.valor));
       setServicoVariacoes(
         (serv.variacoes_servico || []).map(v => ({
           id: v.id,
@@ -608,7 +608,7 @@ export default function Servicos() {
                           </span>
                           <span className="flex items-center gap-1.5">
                             <Coins className="w-3.5 h-3.5 text-text-muted" />
-                            R$ {Number(serv.valor_padrao).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                            R$ {Number(serv.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                           </span>
                           {serv.variacoes_servico && serv.variacoes_servico.length > 0 && (
                             <span className="bg-gold-light/40 text-gold text-[10px] font-medium px-2 py-0.5 rounded border border-gold-light/60">

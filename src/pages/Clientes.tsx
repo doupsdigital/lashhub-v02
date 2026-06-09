@@ -217,7 +217,7 @@ export default function Clientes() {
     const fullName = `${client.nome} ${client.sobrenome}`.toLowerCase();
     const searchMatch = 
       fullName.includes(searchTerm.toLowerCase()) || 
-      client.whatsapp.includes(searchTerm);
+      (client.whatsapp || '').includes(searchTerm);
 
     // 2. Status filter
     const statusMatch = 
@@ -374,7 +374,7 @@ export default function Clientes() {
               </thead>
               <tbody className="divide-y divide-border">
                 {paginatedClientes.map(client => {
-                  const initials = `${client.nome[0] || ''}${client.sobrenome[0] || ''}`.toUpperCase();
+                  const initials = `${client.nome[0] || ''}${(client.sobrenome || '')[0] || ''}`.toUpperCase();
                   const lastAttendance = getLastAttendanceDate(client);
                   
                   return (

@@ -18,14 +18,25 @@ import {
   CheckCircle,
   XCircle
 } from 'lucide-react';
-import type { 
-  Agendamento, 
-  Cliente, 
-  Profissional, 
-  Servico, 
+import type {
+  Agendamento,
+  Cliente,
+  Servico,
   VariacaoServico,
-  HorarioProfissional
 } from '../types';
+
+// Tipos legados mantidos localmente até refatoração completa desta página
+interface ProfissionalLegado {
+  id: string;
+  nome: string;
+  sobrenome?: string;
+  ativo?: boolean;
+}
+interface HorarioProfissionalLegado {
+  dia_semana: number;
+  hora_inicio: string;
+  hora_fim: string;
+}
 import { registrarLog } from '../utils/log';
 import ConfirmModal from '../components/common/ConfirmModal';
 import { useAuth } from '../contexts/AuthContext';
@@ -38,7 +49,8 @@ interface AgendamentoServicoInput {
   valor: number;
 }
 
-interface AgendamentoWithRelations extends Omit<Agendamento, 'cliente' | 'profissional'> {
+interface AgendamentoWithRelations extends Omit<Agendamento, 'cliente'> {
+  profissional_id?: string; // legado — campo removido do novo schema
   cliente?: { id: string; nome: string; sobrenome: string; whatsapp: string };
   profissional?: { id: string; nome: string; sobrenome: string };
   agendamento_servicos?: {
@@ -72,8 +84,8 @@ export default function Agendamentos() {
   const [selectedProfId, setSelectedProfId] = useState<string>('todos');
 
   // Database Data States
-  const [profissionais, setProfissionais] = useState<Profissional[]>([]);
-  const [activeProfissionaisWithHours, setActiveProfissionaisWithHours] = useState<(Profissional & { horarios_profissional?: HorarioProfissional[] })[]>([]);
+  const [profissionais, setProfissionais] = useState<ProfissionalLegado[]>([]);
+  const [activeProfissionaisWithHours, setActiveProfissionaisWithHours] = useState<(ProfissionalLegado & { horarios_profissional?: HorarioProfissionalLegado[] })[]>([]);
   const [servicos, setServicos] = useState<(Servico & { variacoes_servico?: VariacaoServico[] })[]>([]);
   const [agendamentos, setAgendamentos] = useState<AgendamentoWithRelations[]>([]);
   
@@ -333,7 +345,7 @@ export default function Agendamentos() {
       } as Cliente);
     }
 
-    setFormProfId(appt.profissional_id);
+    setFormProfId(appt.profissional_id ?? '');
     setFormObs(appt.observacoes || '');
     setFormDuracao(appt.duracao_minutos);
 
@@ -381,7 +393,7 @@ export default function Agendamentos() {
         variacao_id: firstVar ? firstVar.id : '',
         nome: serv.nome,
         duracao: serv.duracao_minutos,
-        valor: firstVar ? Number(firstVar.valor) : Number(serv.valor_padrao)
+        valor: firstVar ? Number(firstVar.valor) : Number(serv.valor)
       };
     } else {
       delete updated[serv.id];
@@ -729,7 +741,7 @@ export default function Agendamentos() {
     if (!prof || !prof.horarios_profissional) return false;
 
     const dayOfWeek = date.getDay();
-    const sched = prof.horarios_profissional.find(h => h.dia_semana === dayOfWeek);
+    const sched = prof.horarios_profissional.find((h: HorarioProfissionalLegado) => h.dia_semana === dayOfWeek);
     if (!sched) return false;
 
     const hourStr = `${hour.toString().padStart(2, '0')}:00:00`;
@@ -921,7 +933,7 @@ export default function Agendamentos() {
                       const top = (startHourVal - startHour) * 50;
                       const height = (appt.duracao_minutos / 60) * 50;
 
-                      const colors = getProfColorStyles(appt.profissional_id, appt.status);
+                      const colors = getProfColorStyles(appt.profissional_id ?? '', appt.status);
                       
                       return (
                         <div
@@ -1005,7 +1017,7 @@ export default function Agendamentos() {
                   const top = (startHourVal - startHour) * 50;
                   const height = (appt.duracao_minutos / 60) * 50;
 
-                  const colors = getProfColorStyles(appt.profissional_id, appt.status);
+                  const colors = getProfColorStyles(appt.profissional_id ?? '', appt.status);
 
                   return (
                     <div
@@ -1071,7 +1083,7 @@ export default function Agendamentos() {
 
                   <div className="flex-1 overflow-y-auto space-y-1 mt-1.5">
                     {dayAppts.slice(0, 3).map(appt => {
-                      const colors = getProfColorStyles(appt.profissional_id, appt.status);
+                      const colors = getProfColorStyles(appt.profissional_id ?? '', appt.status);
                       return (
                         <div 
                           key={appt.id} 
@@ -1287,7 +1299,7 @@ export default function Agendamentos() {
                   <div className="flex items-center justify-between bg-rose-50 border border-rose-200 rounded-lg p-2.5">
                     <div className="flex items-center gap-2">
                       <div className="w-7 h-7 rounded-full bg-rose-200 text-rose-800 flex items-center justify-center font-bold text-xs">
-                        {selectedCliente.nome[0]}{selectedCliente.sobrenome[0]}
+                        {selectedCliente.nome[0]}{(selectedCliente.sobrenome || '')[0]}
                       </div>
                       <div>
                         <p className="text-xs font-bold text-text-primary">{selectedCliente.nome} {selectedCliente.sobrenome}</p>
@@ -1419,7 +1431,7 @@ export default function Agendamentos() {
                             />
                             <div className="text-xs">
                               <p className="font-bold text-text-primary">{srv.nome}</p>
-                              <p className="text-[10px] text-text-secondary mt-0.5">{srv.duracao_minutos} min • R$ {Number(srv.valor_padrao).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                              <p className="text-[10px] text-text-secondary mt-0.5">{srv.duracao_minutos} min • R$ {Number(srv.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                             </div>
                           </label>
 

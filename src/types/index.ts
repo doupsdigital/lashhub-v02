@@ -13,6 +13,7 @@ export interface CategoriaServico {
   nome: string;
   descricao?: string | null;
   ordem: number;
+  ativo?: boolean; // campo legado — não existe no novo schema
   created_at?: string;
 }
 
@@ -67,6 +68,11 @@ export interface Cliente {
   medicamentos?: string | null;
   doencas_cronicas?: string | null;
   gestante: boolean;
+  // campos legados — não existem no novo schema
+  ativo?: boolean;
+  como_conheceu?: string | null;
+  tipo_pele?: string | null;
+  restricoes?: string | null;
   created_at?: string;
 }
 
