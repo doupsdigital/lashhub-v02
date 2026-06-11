@@ -628,6 +628,7 @@ export default function Agendamentos() {
             `Alterou status do agendamento de "${clientName}" para "${newStatus}"`
           );
 
+          setIsDetailOpen(false);
           showTemporarySuccess(`Agendamento cancelado!`);
           fetchAppointments();
         } catch (err) {
