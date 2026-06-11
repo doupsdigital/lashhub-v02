@@ -90,8 +90,10 @@ export default function Configuracoes() {
         setAntecedenciaHoras(data.antecedencia_cancelamento_horas ?? 24);
         setMensagemPosAgendamento(data.mensagem_pos_agendamento || '');
         setPaletaCores(data.paleta_cores || 'rosa_rose');
-        setModoEscuro(!!data.modo_escuro);
       }
+      
+      const cachedDarkMode = localStorage.getItem('app_theme_dark_mode') === 'true';
+      setModoEscuro(cachedDarkMode);
       setLoadingNegocio(false);
     }
     loadNegocio();
@@ -286,12 +288,21 @@ export default function Configuracoes() {
           antecedencia_cancelamento_horas: antecedenciaHoras,
           mensagem_pos_agendamento: mensagemPosAgendamento.trim(),
           paleta_cores: paletaCores,
-          modo_escuro: modoEscuro,
         })
         .eq('id', configuracaoId);
 
       if (error) throw error;
       setNegocioSuccess('Configurações salvas com sucesso!');
+      
+      // Notificar layouts sobre a atualização do nome e logotipo em tempo real
+      window.dispatchEvent(
+        new CustomEvent('business-config-updated', {
+          detail: {
+            nome_negocio: nomeNegocio.trim(),
+            logo_url: logoUrl,
+          },
+        })
+      );
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Erro ao salvar configurações.';
       setNegocioError(msg);

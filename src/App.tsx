@@ -33,13 +33,13 @@ export default function App() {
       try {
         const { data, error } = await supabase
           .from('configuracao_negocio')
-          .select('paleta_cores, modo_escuro')
+          .select('paleta_cores')
           .maybeSingle();
         
         if (!error && data) {
           const dbPalette = data.paleta_cores || 'rosa_rose';
-          const dbDarkMode = !!data.modo_escuro;
-          applyPalette(dbPalette, dbDarkMode);
+          const cachedDarkMode = localStorage.getItem('app_theme_dark_mode') === 'true';
+          applyPalette(dbPalette, cachedDarkMode);
         }
       } catch (err) {
         console.error('Erro ao sincronizar tema:', err);

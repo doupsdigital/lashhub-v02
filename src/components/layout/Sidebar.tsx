@@ -40,6 +40,18 @@ export default function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobile
       });
   }, []);
 
+  useEffect(() => {
+    const handleUpdate = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      if (detail) {
+        if (detail.nome_negocio !== undefined) setBusinessName(detail.nome_negocio);
+        if (detail.logo_url !== undefined) setLogoUrl(detail.logo_url);
+      }
+    };
+    window.addEventListener('business-config-updated', handleUpdate);
+    return () => window.removeEventListener('business-config-updated', handleUpdate);
+  }, []);
+
   const handleSignOut = async () => {
     await signOut();
     navigate('/login', { replace: true });
