@@ -18,7 +18,7 @@ import {
   HeartPulse,
   ShieldAlert
 } from 'lucide-react';
-import type { Cliente, Atendimento, Servico, VariacaoServico } from '../types';
+import type { Cliente, Servico, VariacaoServico } from '../types';
 import { registrarLog } from '../utils/log';
 
 interface AtendimentoWithRelations {

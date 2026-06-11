@@ -127,8 +127,6 @@ export default function Dashboard() {
       const { start, end } = getPeriodDates(period, customStartDate, customEndDate);
       const startIso = start.toISOString();
       const endIso = end.toISOString();
-      const startDateStr = formatDateStr(start);
-      const endDateStr = formatDateStr(end);
 
       // 1. Fetch metadata in memory to avoid join errors
       const [catsRes, servsRes] = await Promise.all([
@@ -360,7 +358,6 @@ export default function Dashboard() {
         weeks.forEach(w => slotsMap.set(w, { Novos: new Set(), Recorrentes: new Set() }));
 
         concludedRecords.forEach(a => {
-          const dateStr = formatDateStr(new Date(a.data_hora));
           const wLabel = getWeekLabel(new Date(a.data_hora), start);
           const slot = slotsMap.get(wLabel) || slotsMap.get('Semana 4')!;
           
