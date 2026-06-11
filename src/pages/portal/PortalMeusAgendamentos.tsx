@@ -140,12 +140,21 @@ export default function PortalMeusAgendamentos() {
   }, [clienteId]);
 
   // Dividir os agendamentos em Próximos e Passados com base no horário atual do navegador
-  const agora = useMemo(() => new Date(), []);
+  // Recalcula "agora" sempre que os agendamentos são recarregados
+  const agora = useMemo(() => new Date(), [agendamentos]);
 
   const proximos = useMemo(() => {
     return agendamentos
       .filter(a => new Date(a.data_hora) >= agora)
-      .sort((a, b) => new Date(a.data_hora).getTime() - new Date(b.data_hora).getTime());
+      .sort((a, b) => {
+        // Agendamentos ativos (pendente/confirmado) sempre primeiro
+        const aAtivo = a.status === 'pendente' || a.status === 'confirmado';
+        const bAtivo = b.status === 'pendente' || b.status === 'confirmado';
+        if (aAtivo && !bAtivo) return -1;
+        if (!aAtivo && bAtivo) return 1;
+        // Dentro do mesmo grupo, ordenar por data/hora mais cedo primeiro
+        return new Date(a.data_hora).getTime() - new Date(b.data_hora).getTime();
+      });
   }, [agendamentos, agora]);
 
   const passados = useMemo(() => {
