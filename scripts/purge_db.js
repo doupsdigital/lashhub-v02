@@ -8,8 +8,8 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey);
 async function purge() {
   console.log('Iniciando o login...');
   const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-    email: 'rosae@clinic.com',
-    password: 'rosae2025',
+    email: 'admin@lashly.com',
+    password: 'admin123',
   });
 
   if (authError) {
@@ -18,14 +18,20 @@ async function purge() {
   }
   console.log('Login efetuado com sucesso!');
 
-  console.log('Limpando todas as informações transacionais...');
-  
+  const targetEst = 'e1000000-0000-0000-0000-000000000000';
+
+  // Buscar IDs dos agendamentos para poder limpar os agendamento_servicos
+  const { data: appts } = await supabase.from('agendamentos').select('id').eq('estabelecimento_id', targetEst);
+  const apptIds = appts?.map(a => a.id) || [];
+
   // Apaga vínculos de serviços, atendimentos, agendamentos, clientes e logs
-  const { error: err1 } = await supabase.from('agendamento_servicos').delete().neq('id', '00000000-0000-0000-0000-000000000000');
-  const { error: err2 } = await supabase.from('atendimentos').delete().neq('id', '00000000-0000-0000-0000-000000000000');
-  const { error: err3 } = await supabase.from('agendamentos').delete().neq('id', '00000000-0000-0000-0000-000000000000');
-  const { error: err4 } = await supabase.from('clientes').delete().neq('id', '00000000-0000-0000-0000-000000000000');
-  const { error: err5 } = await supabase.from('logs').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+  const { error: err1 } = apptIds.length > 0 
+    ? await supabase.from('agendamento_servicos').delete().in('agendamento_id', apptIds)
+    : { error: null };
+  const { error: err2 } = await supabase.from('atendimentos').delete().eq('estabelecimento_id', targetEst);
+  const { error: err3 } = await supabase.from('agendamentos').delete().eq('estabelecimento_id', targetEst);
+  const { error: err4 } = await supabase.from('clientes').delete().eq('estabelecimento_id', targetEst);
+  const { error: err5 } = await supabase.from('logs').delete().eq('estabelecimento_id', targetEst);
 
   if (err1 || err2 || err3 || err4 || err5) {
     console.error('Ocorreu um erro ao limpar o banco:', { err1, err2, err3, err4, err5 });
@@ -44,9 +50,10 @@ async function purge() {
     const { error: userInsertError } = await supabase.from('usuarios').insert({
       id: authData.user.id,
       nome: 'admin',
-      email: 'rosae@clinic.com',
+      email: 'admin@lashly.com',
       role: 'profissional',
-      cliente_id: null
+      cliente_id: null,
+      estabelecimento_id: targetEst
     });
     if (userInsertError) {
       console.error('Erro ao re-inserir usuário profissional:', userInsertError.message);

@@ -53,8 +53,8 @@ const servicos = [
 async function seed() {
   console.log('Iniciando o login...');
   const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-    email: 'rosae@clinic.com',
-    password: 'rosae2025',
+    email: 'admin@lashly.com',
+    password: 'admin123',
   });
 
   if (authError) {
@@ -84,9 +84,10 @@ async function seed() {
     const { error: userInsertError } = await supabase.from('usuarios').insert({
       id: authData.user.id,
       nome: 'admin',
-      email: 'rosae@clinic.com',
+      email: 'admin@lashly.com',
       role: 'profissional',
-      cliente_id: null
+      cliente_id: null,
+      estabelecimento_id: 'e1000000-0000-0000-0000-000000000000'
     });
     if (userInsertError) {
       console.error('Erro ao re-inserir usuário profissional:', userInsertError.message);
@@ -121,6 +122,7 @@ async function seed() {
 
     const client = {
       id: crypto.randomUUID(),
+      estabelecimento_id: 'e1000000-0000-0000-0000-000000000000',
       nome: item.nome,
       sobrenome: item.sobrenome,
       email: item.email,
@@ -178,6 +180,7 @@ async function seed() {
     const apptId = crypto.randomUUID();
     appointments.push({
       id: apptId,
+      estabelecimento_id: 'e1000000-0000-0000-0000-000000000000',
       cliente_id: client.id,
       data_hora: date.toISOString(),
       duracao_minutos: service.duracao,
@@ -198,6 +201,7 @@ async function seed() {
 
     attendances.push({
       id: crypto.randomUUID(),
+      estabelecimento_id: 'e1000000-0000-0000-0000-000000000000',
       cliente_id: client.id,
       servico_id: service.id,
       variacao_id: service.variacao_id,
@@ -221,6 +225,7 @@ async function seed() {
     const apptId = crypto.randomUUID();
     appointments.push({
       id: apptId,
+      estabelecimento_id: 'e1000000-0000-0000-0000-000000000000',
       cliente_id: client.id,
       data_hora: date.toISOString(),
       duracao_minutos: service.duracao,
@@ -253,6 +258,7 @@ async function seed() {
     const apptId = crypto.randomUUID();
     appointments.push({
       id: apptId,
+      estabelecimento_id: 'e1000000-0000-0000-0000-000000000000',
       cliente_id: client.id,
       data_hora: date.toISOString(),
       duracao_minutos: service.duracao,
@@ -285,6 +291,7 @@ async function seed() {
     const apptId = crypto.randomUUID();
     appointments.push({
       id: apptId,
+      estabelecimento_id: 'e1000000-0000-0000-0000-000000000000',
       cliente_id: client.id,
       data_hora: date.toISOString(),
       duracao_minutos: service.duracao,
