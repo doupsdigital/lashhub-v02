@@ -22,6 +22,7 @@ import type {
   Cliente,
   Servico,
   VariacaoServico,
+  BloqueioAgenda,
 } from '../types';
 import { registrarLog } from '../utils/log';
 import ConfirmModal from '../components/common/ConfirmModal';
@@ -69,6 +70,7 @@ export default function Agendamentos() {
   const [workHoursConfig, setWorkHoursConfig] = useState<{ dia_semana: number; hora_inicio: string; hora_fim: string }[]>([]);
   const [servicos, setServicos] = useState<(Servico & { variacoes_servico?: VariacaoServico[] })[]>([]);
   const [agendamentos, setAgendamentos] = useState<AgendamentoWithRelations[]>([]);
+  const [bloqueios, setBloqueios] = useState<BloqueioAgenda[]>([]);
   
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -171,14 +173,17 @@ export default function Agendamentos() {
   const fetchSetupData = async () => {
     if (!estabelecimentoId) return;
     try {
-      const [horariosRes, srvsRes] = await Promise.all([
+      const [horariosRes, srvsRes, bloqRes] = await Promise.all([
         supabase.from('horarios_atendimento').select('dia_semana, hora_inicio, hora_fim').eq('estabelecimento_id', estabelecimentoId),
-        supabase.from('servicos').select('*, variacoes_servico(*)').eq('ativo', true).eq('estabelecimento_id', estabelecimentoId).order('nome')
+        supabase.from('servicos').select('*, variacoes_servico(*)').eq('ativo', true).eq('estabelecimento_id', estabelecimentoId).order('nome'),
+        supabase.from('bloqueios_agenda').select('*').eq('estabelecimento_id', estabelecimentoId)
       ]);
       if (horariosRes.error) throw horariosRes.error;
       if (srvsRes.error) throw srvsRes.error;
+      if (bloqRes.error) throw bloqRes.error;
       setWorkHoursConfig(horariosRes.data || []);
       setServicos(srvsRes.data || []);
+      setBloqueios(bloqRes.data || []);
     } catch (err) {
       console.error('Erro de setup:', err);
       showTemporaryError('Falha ao carregar catálogo de serviços.');
@@ -492,6 +497,14 @@ export default function Agendamentos() {
       const startDateTime = new Date(`${formData}T${formHora}:00`);
       const endDateTime = new Date(startDateTime.getTime() + formDuracao * 60000);
 
+      // Check if the date falls in a blocked period
+      const isBlocked = bloqueios.some(b => formData >= b.data_inicio && formData <= b.data_fim);
+      if (isBlocked) {
+        showTemporaryError('Não é permitido agendar em datas bloqueadas ou folgas.');
+        setSaving(false);
+        return;
+      }
+
       const dayOfWeek = startDateTime.getDay();
       const startHourStr = startDateTime.toLocaleTimeString('pt-BR', { hour12: false });
       const endHourStr = endDateTime.toLocaleTimeString('pt-BR', { hour12: false });
@@ -769,8 +782,16 @@ export default function Agendamentos() {
   const endHour = 20;
   const hourSlots = Array.from({ length: endHour - startHour }, (_, i) => startHour + i);
 
-  // Availability validation using global horarios_atendimento
+  const formatDateStr = (date: Date) => {
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+  };
+
+  // Availability validation using global horarios_atendimento and bloqueios
   const isHourAvailable = (date: Date, hour: number) => {
+    const ds = formatDateStr(date);
+    const isBlocked = bloqueios.some(b => ds >= b.data_inicio && ds <= b.data_fim);
+    if (isBlocked) return false;
+
     if (workHoursConfig.length === 0) return true;
     const dayOfWeek = date.getDay();
     const sched = workHoursConfig.find(h => h.dia_semana === dayOfWeek);
@@ -1071,7 +1092,11 @@ export default function Agendamentos() {
             {getDaysOfMonthGrid(currentDate).map((day, idx) => {
               const isCurrentMonth = day.getMonth() === currentDate.getMonth();
               const isToday = new Date().toDateString() === day.toDateString();
-              const isDayClosed = workHoursConfig.length > 0 && !workHoursConfig.some(h => h.dia_semana === day.getDay());
+              const activeBlock = bloqueios.find(b => {
+                const ds = formatDateStr(day);
+                return ds >= b.data_inicio && ds <= b.data_fim;
+              });
+              const isDayClosed = (workHoursConfig.length > 0 && !workHoursConfig.some(h => h.dia_semana === day.getDay())) || !!activeBlock;
               
               const dayAppts = visibleAppointments.filter(appt => 
                 new Date(appt.data_hora).toDateString() === day.toDateString()
@@ -1092,7 +1117,7 @@ export default function Agendamentos() {
                       {day.getDate()}
                     </span>
                     {isDayClosed && (
-                      <span className="text-[10px] text-text-muted" title="Dia Fechado">🔒</span>
+                      <span className="text-[10px] text-text-muted" title={activeBlock ? `Bloqueado: ${activeBlock.motivo || 'Folga'}` : "Dia Fechado"}>🔒</span>
                     )}
                   </div>
 
