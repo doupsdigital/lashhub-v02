@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
+import { useAuth } from '../contexts/AuthContext';
 import { 
   Users, 
   CalendarDays, 
@@ -92,6 +93,7 @@ const getWeekLabel = (date: Date, start: Date) => {
 };
 
 export default function Dashboard() {
+  const { estabelecimentoId } = useAuth();
   const [period, setPeriod] = useState<PeriodType>('esteMes');
   
   // Custom date range states
@@ -121,6 +123,7 @@ export default function Dashboard() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const fetchDashboardData = async () => {
+    if (!estabelecimentoId) return;
     setLoading(true);
     setErrorMsg(null);
     try {
@@ -130,8 +133,8 @@ export default function Dashboard() {
 
       // 1. Fetch metadata in memory to avoid join errors
       const [catsRes, servsRes] = await Promise.all([
-        supabase.from('categorias_servico').select('id, nome'),
-        supabase.from('servicos').select('id, nome, categoria_id')
+        supabase.from('categorias_servico').select('id, nome').eq('estabelecimento_id', estabelecimentoId),
+        supabase.from('servicos').select('id, nome, categoria_id').eq('estabelecimento_id', estabelecimentoId)
       ]);
 
       if (catsRes.error) throw catsRes.error;
@@ -458,8 +461,10 @@ export default function Dashboard() {
   };
 
   useEffect(() => {
-    fetchDashboardData();
-  }, [period, customStartDate, customEndDate]);
+    if (estabelecimentoId) {
+      fetchDashboardData();
+    }
+  }, [period, customStartDate, customEndDate, estabelecimentoId]);
 
   const handlePeriodChange = (p: PeriodType) => {
     setPeriod(p);

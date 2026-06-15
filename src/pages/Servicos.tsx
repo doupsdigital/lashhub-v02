@@ -80,12 +80,14 @@ export default function Servicos() {
 
   // Fetch all categories with services and their variations
   const fetchData = async () => {
+    if (!estabelecimentoId) return;
     setLoading(true);
     try {
       // 1. Fetch categories
       const { data: catData, error: catError } = await supabase
         .from('categorias_servico')
         .select('*')
+        .eq('estabelecimento_id', estabelecimentoId)
         .order('nome', { ascending: true });
 
       if (catError) throw catError;
@@ -94,6 +96,7 @@ export default function Servicos() {
       const { data: servData, error: servError } = await supabase
         .from('servicos')
         .select('*, variacoes_servico(*)')
+        .eq('estabelecimento_id', estabelecimentoId)
         .order('nome', { ascending: true });
 
       if (servError) throw servError;
@@ -116,8 +119,10 @@ export default function Servicos() {
   };
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    if (estabelecimentoId) {
+      fetchData();
+    }
+  }, [estabelecimentoId]);
 
   const showTemporaryError = (msg: string) => {
     setErrorMessage(msg);
