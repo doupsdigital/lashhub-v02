@@ -11,6 +11,7 @@ interface PortalContextType {
   loading: boolean;
   slug: string | null;
   plano: string | null;
+  nomeProfissional: string | null;
 }
 
 const PortalContext = createContext<PortalContextType | undefined>(undefined);
@@ -23,6 +24,7 @@ export function PortalProvider({ children }: { children: React.ReactNode }) {
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [paletaCores, setPaletaCores] = useState<string | null>(null);
   const [plano, setPlano] = useState<string | null>(null);
+  const [nomeProfissional, setNomeProfissional] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -71,6 +73,21 @@ export function PortalProvider({ children }: { children: React.ReactNode }) {
           setPaletaCores('rosa_rose');
           applyPalette('rosa_rose', false);
         }
+
+        // 3. Buscar nome da profissional (dona do estúdio)
+        const { data: profData, error: profError } = await supabase
+          .from('usuarios')
+          .select('nome')
+          .eq('estabelecimento_id', est.id)
+          .eq('role', 'profissional')
+          .limit(1)
+          .maybeSingle();
+
+        if (!profError && profData) {
+          setNomeProfissional(profData.nome);
+        } else {
+          setNomeProfissional(null);
+        }
       } catch (err) {
         console.error('Erro ao carregar dados do portal:', err);
       } finally {
@@ -91,6 +108,7 @@ export function PortalProvider({ children }: { children: React.ReactNode }) {
         loading,
         slug: slug || null,
         plano,
+        nomeProfissional,
       }}
     >
       {children}

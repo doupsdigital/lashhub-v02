@@ -97,8 +97,8 @@ export default function Faturamento() {
       {/* Cabeçalho */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
-          <h1 className="font-title font-bold text-3xl text-text-primary">Faturamento e Assinatura</h1>
-          <p className="text-sm text-text-secondary mt-1">Gerencie os planos do seu estúdio e formas de pagamento no modelo SaaS.</p>
+          <h1 className="font-title font-bold text-3xl text-text-primary">Minha Assinatura</h1>
+          <p className="text-sm text-text-secondary mt-1">Gerencie os planos do seu estúdio e formas de pagamento.</p>
         </div>
       </div>
 

@@ -75,6 +75,10 @@ export default function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobile
     .substring(0, 2)
     .toUpperCase();
 
+  const displayName = businessName && businessName !== '...'
+    ? businessName
+    : (profile?.nome || 'Lash Hub');
+
   // Persistence of sidebar state
   useEffect(() => {
     localStorage.setItem('rosae-sidebar-collapsed', JSON.stringify(collapsed));
@@ -96,7 +100,7 @@ export default function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobile
   ];
 
   const systemItems: NavItem[] = [
-    { name: 'Faturamento', path: '/faturamento', icon: CreditCard },
+    { name: 'Minha Assinatura', path: '/faturamento', icon: CreditCard },
     { name: 'Configurações', path: '/configuracoes', icon: Settings },
   ];
 
@@ -174,17 +178,17 @@ export default function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobile
               {logoUrl ? (
                 <img
                   src={logoUrl}
-                  alt={businessName}
+                  alt={displayName}
                   className="w-8 h-8 rounded-lg object-cover flex-shrink-0"
                 />
               ) : (
                 <div className="w-8 h-8 rounded-lg bg-rose-600 text-white flex items-center justify-center font-title font-semibold text-lg flex-shrink-0">
-                  {businessName !== '...' ? businessName[0].toUpperCase() : 'S'}
+                  {initials}
                 </div>
               )}
               {!collapsed && (
-                <span className="font-title font-semibold text-xl text-text-primary tracking-wide whitespace-nowrap">
-                  {businessName}
+                <span className="font-title font-semibold text-xl text-text-primary tracking-wide whitespace-nowrap truncate max-w-[130px]" title={displayName}>
+                  {displayName}
                 </span>
               )}
             </div>

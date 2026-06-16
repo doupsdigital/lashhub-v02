@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState, useRef } from 'react';
 import type { ReactNode } from 'react';
 import { supabase } from '../lib/supabase';
 import type { User } from '@supabase/supabase-js';
@@ -26,7 +26,14 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [profile, setProfile] = useState<Usuario | null>(null);
+  const [profile, setProfileState] = useState<Usuario | null>(null);
+  const profileRef = useRef<Usuario | null>(null);
+
+  const setProfile = (val: Usuario | null) => {
+    profileRef.current = val;
+    setProfileState(val);
+  };
+
   const [estabelecimentoId, setEstabelecimentoId] = useState<string | null>(null);
   const [plano, setPlano] = useState<string | null>(null);
   const [statusAssinatura, setStatusAssinatura] = useState<string | null>(null);
@@ -48,7 +55,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       setUser(session.user);
-      setLoading(true);
+      
+      if (!profileRef.current) {
+        setLoading(true);
+      }
 
       let data = null;
       let error = null;

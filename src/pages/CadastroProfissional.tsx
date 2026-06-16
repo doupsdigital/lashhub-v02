@@ -88,7 +88,7 @@ export default function CadastroProfissional() {
       });
 
       setSuccess(true);
-      setTimeout(() => navigate('/dashboard', { replace: true }), 1500);
+      setTimeout(() => navigate('/configuracoes', { replace: true }), 1500);
     } catch (err: unknown) {
       setErrorMsg(err instanceof Error ? err.message : 'Ocorreu um erro ao criar seu cadastro. Tente novamente.');
       setSubmitting(false);
@@ -259,7 +259,7 @@ export default function CadastroProfissional() {
           <button
             type="submit"
             disabled={submitting || success}
-            className="w-full py-3 bg-rose-600 hover:bg-rose-800 disabled:bg-rose-300 text-white rounded-xl text-sm font-semibold transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center cursor-pointer mt-6"
+            className="w-full py-3 bg-rose-600 hover:bg-rose-800 disabled:bg-rose-400 text-white rounded-xl text-sm font-semibold transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center cursor-pointer mt-6"
           >
             {submitting ? (
               <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>

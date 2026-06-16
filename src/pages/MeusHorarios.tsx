@@ -348,7 +348,7 @@ export default function MeusHorarios() {
           <button
             onClick={handleSaveHorarios}
             disabled={savingHorarios || loadingHorarios}
-            className="px-4 py-2 bg-rose-600 hover:bg-rose-800 disabled:bg-rose-300 text-white rounded-lg text-xs font-semibold transition-colors cursor-pointer"
+            className="px-4 py-2 bg-rose-600 hover:bg-rose-800 disabled:bg-rose-400 text-white rounded-lg text-xs font-semibold transition-colors cursor-pointer"
           >
             {savingHorarios ? 'Salvando...' : 'Salvar Expediente'}
           </button>
@@ -420,7 +420,7 @@ export default function MeusHorarios() {
             <button
               type="submit"
               disabled={savingBloqueio}
-              className="flex items-center gap-2 px-4 py-2 bg-rose-600 hover:bg-rose-800 disabled:bg-rose-300 text-white rounded-lg text-xs font-semibold transition-colors cursor-pointer"
+              className="flex items-center gap-2 px-4 py-2 bg-rose-600 hover:bg-rose-800 disabled:bg-rose-400 text-white rounded-lg text-xs font-semibold transition-colors cursor-pointer"
             >
               <Plus className="w-4 h-4" />
               {savingBloqueio ? 'Adicionando...' : 'Adicionar Bloqueio'}

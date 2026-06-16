@@ -33,7 +33,6 @@ export default function Configuracoes() {
   const [nome, setNome] = useState(profile?.nome || '');
   const [loadingProfile, setLoadingProfile] = useState(false);
   const [profileError, setProfileError] = useState<string | null>(null);
-  const [profileSuccess, setProfileSuccess] = useState<string | null>(null);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
 
   // Estados da Senha
@@ -43,7 +42,6 @@ export default function Configuracoes() {
   const [showConfirmSenha, setShowConfirmSenha] = useState(false);
   const [loadingPassword, setLoadingPassword] = useState(false);
   const [passwordError, setPasswordError] = useState<string | null>(null);
-  const [passwordSuccess, setPasswordSuccess] = useState<string | null>(null);
 
   // Estados do Negócio
   const [configuracaoId, setConfiguracaoId] = useState<string | null>(null);
@@ -66,12 +64,20 @@ export default function Configuracoes() {
   const [dadosError, setDadosError] = useState<string | null>(null);
 
   const [savingVisual, setSavingVisual] = useState(false);
-  const [visualSuccessModalOpen, setVisualSuccessModalOpen] = useState(false);
   const [visualError, setVisualError] = useState<string | null>(null);
 
   const [savingAgendamento, setSavingAgendamento] = useState(false);
-  const [agendamentoSuccess, setAgendamentoSuccess] = useState<string | null>(null);
   const [agendamentoError, setAgendamentoError] = useState<string | null>(null);
+
+  const [successModal, setSuccessModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    description: string;
+  }>({
+    isOpen: false,
+    title: '',
+    description: '',
+  });
 
   const userName = profile?.nome || 'Usuário';
   const userEmail = profile?.email || user?.email || '';
@@ -115,7 +121,6 @@ export default function Configuracoes() {
   const handleUpdateProfile = async (e: FormEvent) => {
     e.preventDefault();
     setProfileError(null);
-    setProfileSuccess(null);
 
     if (!nome.trim()) {
       setProfileError('O nome completo não pode ficar em branco.');
@@ -131,7 +136,11 @@ export default function Configuracoes() {
 
       if (error) throw error;
 
-      setProfileSuccess('Perfil atualizado com sucesso!');
+      setSuccessModal({
+        isOpen: true,
+        title: 'Perfil atualizado!',
+        description: 'Os dados do seu perfil foram salvos com sucesso.',
+      });
       await refreshProfile();
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Falha ao atualizar o perfil.';
@@ -147,7 +156,6 @@ export default function Configuracoes() {
     if (!file || !user?.id) return;
 
     setProfileError(null);
-    setProfileSuccess(null);
     setUploadingAvatar(true);
 
     try {
@@ -172,7 +180,11 @@ export default function Configuracoes() {
 
       if (updateError) throw updateError;
 
-      setProfileSuccess('Foto de perfil atualizada!');
+      setSuccessModal({
+        isOpen: true,
+        title: 'Foto de perfil atualizada!',
+        description: 'Sua foto de perfil foi atualizada com sucesso.',
+      });
       await refreshProfile();
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Erro ao enviar foto de perfil.';
@@ -187,7 +199,6 @@ export default function Configuracoes() {
   const handleRemoveAvatar = async () => {
     if (!user?.id) return;
     setProfileError(null);
-    setProfileSuccess(null);
     setUploadingAvatar(true);
 
     try {
@@ -198,7 +209,11 @@ export default function Configuracoes() {
 
       if (error) throw error;
 
-      setProfileSuccess('Foto de perfil removida.');
+      setSuccessModal({
+        isOpen: true,
+        title: 'Foto de perfil removida!',
+        description: 'Sua foto de perfil foi removida com sucesso.',
+      });
       await refreshProfile();
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Erro ao remover foto de perfil.';
@@ -212,7 +227,6 @@ export default function Configuracoes() {
   const handleUpdatePassword = async (e: FormEvent) => {
     e.preventDefault();
     setPasswordError(null);
-    setPasswordSuccess(null);
 
     if (novaSenha.length < 6) {
       setPasswordError('A nova senha deve conter no mínimo 6 caracteres.');
@@ -229,7 +243,11 @@ export default function Configuracoes() {
       const { error } = await supabase.auth.updateUser({ password: novaSenha });
       if (error) throw error;
 
-      setPasswordSuccess('Senha alterada com sucesso!');
+      setSuccessModal({
+        isOpen: true,
+        title: 'Senha alterada!',
+        description: 'Sua senha de acesso foi alterada com sucesso.',
+      });
       setNovaSenha('');
       setConfirmarSenha('');
     } catch (err: unknown) {
@@ -300,7 +318,12 @@ export default function Configuracoes() {
         .eq('id', configuracaoId);
 
       if (error) throw error;
-      setDadosSuccess('Dados do negócio salvos com sucesso!');
+      setDadosSuccess(null);
+      setSuccessModal({
+        isOpen: true,
+        title: 'Dados salvos!',
+        description: 'Os dados do seu estúdio foram salvos com sucesso.',
+      });
       
       // Notificar layouts sobre a atualização do nome e logotipo em tempo real
       window.dispatchEvent(
@@ -335,7 +358,11 @@ export default function Configuracoes() {
         .eq('id', configuracaoId);
 
       if (error) throw error;
-      setVisualSuccessModalOpen(true);
+      setSuccessModal({
+        isOpen: true,
+        title: 'Cores salvas!',
+        description: 'A identidade visual do seu negócio foi atualizada com sucesso.',
+      });
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Erro ao salvar identidade visual.';
       setVisualError(msg);
@@ -349,7 +376,6 @@ export default function Configuracoes() {
     if (!configuracaoId) return;
     setSavingAgendamento(true);
     setAgendamentoError(null);
-    setAgendamentoSuccess(null);
 
     try {
       const { error } = await supabase
@@ -362,7 +388,11 @@ export default function Configuracoes() {
         .eq('id', configuracaoId);
 
       if (error) throw error;
-      setAgendamentoSuccess('Configurações de agendamento salvas com sucesso!');
+      setSuccessModal({
+        isOpen: true,
+        title: 'Configurações salvas!',
+        description: 'As configurações de agendamento foram salvas com sucesso.',
+      });
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Erro ao salvar configurações de agendamento.';
       setAgendamentoError(msg);
@@ -458,12 +488,7 @@ export default function Configuracoes() {
                   <p className="text-xs font-medium">{profileError}</p>
                 </div>
               )}
-              {profileSuccess && (
-                <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg flex items-center gap-2.5">
-                  <Sparkles className="w-5 h-5 text-green-600 flex-shrink-0" />
-                  <p className="text-xs font-medium">{profileSuccess}</p>
-                </div>
-              )}
+
 
               <div className="space-y-1.5">
                 <label className="text-xs font-semibold uppercase tracking-wider text-text-secondary block">
@@ -531,12 +556,7 @@ export default function Configuracoes() {
                   <p className="text-xs font-medium">{passwordError}</p>
                 </div>
               )}
-              {passwordSuccess && (
-                <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg flex items-center gap-2.5">
-                  <Sparkles className="w-5 h-5 text-green-600 flex-shrink-0" />
-                  <p className="text-xs font-medium">{passwordSuccess}</p>
-                </div>
-              )}
+
 
               <div className="space-y-1.5">
                 <label className="text-xs font-semibold uppercase tracking-wider text-text-secondary block">
@@ -989,12 +1009,7 @@ export default function Configuracoes() {
             <p className="text-xs font-medium">{agendamentoError}</p>
           </div>
         )}
-        {agendamentoSuccess && (
-          <div className="mt-6 bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg flex items-center gap-2.5">
-            <Sparkles className="w-5 h-5 text-green-600 flex-shrink-0" />
-            <p className="text-xs font-medium">{agendamentoSuccess}</p>
-          </div>
-        )}
+
 
         <div className="flex justify-end pt-6 border-t border-border mt-6">
           <button
@@ -1009,11 +1024,11 @@ export default function Configuracoes() {
       </div>
 
       <ConfirmModal
-        isOpen={visualSuccessModalOpen}
-        onClose={() => setVisualSuccessModalOpen(false)}
-        onConfirm={() => setVisualSuccessModalOpen(false)}
-        title="Cores salvas!"
-        description="A identidade visual do seu negócio foi atualizada com sucesso."
+        isOpen={successModal.isOpen}
+        onClose={() => setSuccessModal({ ...successModal, isOpen: false })}
+        onConfirm={() => setSuccessModal({ ...successModal, isOpen: false })}
+        title={successModal.title}
+        description={successModal.description}
         type="success"
         confirmText="OK"
         singleAction

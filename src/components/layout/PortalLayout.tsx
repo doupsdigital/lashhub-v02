@@ -6,7 +6,7 @@ import { usePortal } from '../../contexts/PortalContext';
 export default function PortalLayout() {
   const navigate = useNavigate();
   const { user, profile, signOut } = useAuth();
-  const { nomeNegocio, logoUrl, slug, loading } = usePortal();
+  const { nomeNegocio, logoUrl, slug, loading, nomeProfissional } = usePortal();
 
   const handleSignOut = async () => {
     await signOut();
@@ -15,6 +15,13 @@ export default function PortalLayout() {
 
   const clientName = profile?.nome?.split(' ')[0] || 'Cliente';
   const initials = (profile?.nome || 'Cliente')
+    .split(' ')
+    .map((n) => n[0] || '')
+    .join('')
+    .substring(0, 2)
+    .toUpperCase();
+
+  const profissionalInitials = (nomeProfissional || nomeNegocio || 'Studio')
     .split(' ')
     .map((n) => n[0] || '')
     .join('')
@@ -54,7 +61,7 @@ export default function PortalLayout() {
             <img src={logoUrl} alt={nomeNegocio || 'Studio'} className="h-8 w-auto object-contain flex-shrink-0" />
           ) : (
             <div className="w-8 h-8 rounded-lg bg-rose-600 text-white flex items-center justify-center font-title font-semibold text-lg flex-shrink-0">
-              {nomeNegocio ? nomeNegocio[0].toUpperCase() : 'S'}
+              {profissionalInitials}
             </div>
           )}
           <span className="font-title font-semibold text-xl text-text-primary tracking-wide truncate">

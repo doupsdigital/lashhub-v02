@@ -1696,7 +1696,7 @@ export default function Agendamentos() {
                 <button
                   type="submit"
                   disabled={saving}
-                  className="px-4 py-2 bg-rose-600 hover:bg-rose-800 disabled:bg-rose-300 text-white rounded-lg text-xs font-semibold transition-colors cursor-pointer"
+                  className="px-4 py-2 bg-rose-600 hover:bg-rose-800 disabled:bg-rose-400 text-white rounded-lg text-xs font-semibold transition-colors cursor-pointer"
                 >
                   {saving ? 'Salvando...' : (editingAppt ? 'Salvar Alterações' : 'Criar Agendamento')}
                 </button>

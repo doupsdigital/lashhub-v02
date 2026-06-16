@@ -719,7 +719,7 @@ export default function PerfilCliente() {
                   <button
                     type="submit"
                     disabled={saving}
-                    className="flex items-center justify-center gap-1.5 px-5 py-2.5 bg-rose-600 hover:bg-rose-800 disabled:bg-rose-300 text-white rounded-lg text-xs font-semibold transition-colors cursor-pointer"
+                    className="flex items-center justify-center gap-1.5 px-5 py-2.5 bg-rose-600 hover:bg-rose-800 disabled:bg-rose-400 text-white rounded-lg text-xs font-semibold transition-colors cursor-pointer"
                   >
                     <Save className="w-4 h-4" />
                     {saving ? 'Salvando...' : 'Salvar Dados Pessoais'}
@@ -977,7 +977,7 @@ export default function PerfilCliente() {
                   <button
                     type="submit"
                     disabled={saving}
-                    className="flex items-center justify-center gap-1.5 px-5 py-2.5 bg-rose-600 hover:bg-rose-800 disabled:bg-rose-300 text-white rounded-lg text-xs font-semibold transition-colors cursor-pointer"
+                    className="flex items-center justify-center gap-1.5 px-5 py-2.5 bg-rose-600 hover:bg-rose-800 disabled:bg-rose-400 text-white rounded-lg text-xs font-semibold transition-colors cursor-pointer"
                   >
                     <Save className="w-4 h-4" />
                     {saving ? 'Salvando...' : 'Salvar Ficha Clínica'}
@@ -1176,7 +1176,7 @@ export default function PerfilCliente() {
                 <button
                   type="submit"
                   disabled={saving}
-                  className="px-4 py-2 bg-rose-600 hover:bg-rose-800 disabled:bg-rose-300 text-white rounded-lg text-xs font-semibold transition-colors cursor-pointer"
+                  className="px-4 py-2 bg-rose-600 hover:bg-rose-800 disabled:bg-rose-400 text-white rounded-lg text-xs font-semibold transition-colors cursor-pointer"
                 >
                   {saving ? 'Registrando...' : 'Confirmar Registro'}
                 </button>
