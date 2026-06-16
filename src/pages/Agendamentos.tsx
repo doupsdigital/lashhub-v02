@@ -1116,7 +1116,7 @@ export default function Agendamentos() {
               const isToday = new Date().toDateString() === day.toDateString();
               const activeBlock = bloqueios.find(b => {
                 const ds = formatDateStr(day);
-                return ds >= b.data_inicio && ds <= b.data_fim;
+                return b.dia_inteiro !== false && ds >= b.data_inicio && ds <= b.data_fim;
               });
               const isDayClosed = (workHoursConfig.length > 0 && !workHoursConfig.some(h => h.dia_semana === day.getDay())) || !!activeBlock;
               
