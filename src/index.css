@@ -138,6 +138,9 @@ body {
 .dark .hover\:bg-rose-100:hover {
   background-color: var(--rose-200) !important;
 }
+.dark .hover\:bg-rose-800:hover {
+  background-color: var(--rose-400) !important;
+}
 
 /* 2. Pendentes (Amber) */
 .dark .bg-amber-50\/95,

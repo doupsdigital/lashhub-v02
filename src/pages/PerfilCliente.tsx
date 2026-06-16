@@ -16,7 +16,8 @@ import {
   Eye,
   Moon,
   HeartPulse,
-  ShieldAlert
+  ShieldAlert,
+  CheckCircle
 } from 'lucide-react';
 import type { Cliente, Servico, VariacaoServico } from '../types';
 import { registrarLog } from '../utils/log';
@@ -485,16 +486,34 @@ export default function PerfilCliente() {
         </div>
       )}
       {successMessage && (
-        <div className="fixed inset-0 flex items-center justify-center z-[100] p-4 bg-black/20 backdrop-blur-[1px] pointer-events-auto">
-          <div className="bg-green-50 border border-green-200 text-green-800 px-6 py-4 rounded-xl flex items-center gap-3 shadow-2xl animate-scale-in max-w-md">
-            <Sparkles className="w-6 h-6 flex-shrink-0 text-green-600" />
-            <div>
-              <p className="text-sm font-semibold">Sucesso</p>
-              <p className="text-xs mt-0.5 leading-relaxed">{successMessage}</p>
+        <div className="fixed inset-0 bg-black/45 backdrop-blur-sm z-[100] flex items-center justify-center p-4 overflow-y-auto animate-fade-in">
+          <div className="bg-white rounded-[14px] border border-border shadow-xl w-full max-w-sm p-6 text-center animate-slide-up space-y-4">
+            
+            {/* Animated Check Icon */}
+            <div className="mx-auto w-16 h-16 rounded-full bg-green-50 border border-green-200 flex items-center justify-center text-green-600 animate-pulse">
+              <CheckCircle className="w-9 h-9" />
             </div>
-            <button onClick={() => setSuccessMessage(null)} className="ml-auto text-green-600 hover:text-green-800 cursor-pointer">
-              <X className="w-4 h-4" />
-            </button>
+
+            <div className="space-y-1">
+              <h3 className="font-title font-bold text-xl text-text-primary">
+                Salvo com Sucesso!
+              </h3>
+              <p className="text-xs text-text-secondary leading-relaxed">
+                {successMessage}
+              </p>
+            </div>
+
+            {/* Actions */}
+            <div className="pt-2">
+              <button
+                type="button"
+                onClick={() => setSuccessMessage(null)}
+                className="w-full py-2.5 bg-rose-600 hover:bg-rose-800 text-white rounded-lg text-xs font-semibold transition-colors cursor-pointer"
+              >
+                Concluir
+              </button>
+            </div>
+
           </div>
         </div>
       )}

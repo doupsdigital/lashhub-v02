@@ -98,24 +98,25 @@ Aqui fica o seu banco de dados de clientes, que funciona como um CRM dedicado.
 
 ### Como Cadastrar uma Cliente Manualmente:
 1. Clique em **Nova Cliente**.
-2. Preencha as informações:
-   * **Nome Completo**.
+2. Preencha as informações obrigatórias:
+   * **Nome e Sobrenome**.
    * **WhatsApp**: Digite o número com DDD. O sistema formata automaticamente.
+3. Preencha as informações opcionais:
+   * **Email, Data de Nascimento e Endereço**
    * **CPF**: Opcional, útil se você emitir notas ou precisar de maior controle.
-   * **Observações Iniciais**: Alergias conhecidas, preferências de curvatura dos cílios, etc.
-3. Clique em **Salvar**.
+4. Clique em **Salvar**.
 
 > [!TIP]
 > Você não precisa cadastrar todas as clientes manualmente! Sempre que uma nova cliente acessar seu portal online e fizer um cadastro para agendar, ela será inserida nesta lista de forma automática com o status de cadastro ativo.
 
 ### Visualizando o Histórico Detalhado (Perfil da Cliente):
-Clique sobre o nome de qualquer cliente na tabela para abrir o perfil avançado dela:
-* **Indicadores Rápidos**: 
-  * Total de visitas realizadas.
-  * Valor total investido no seu estúdio.
-  * Quantidade de ausências sem aviso (no-shows).
-* **Notas de Atendimento (Ficha de Anamnese Dinâmica)**: Você pode escrever anotações pós-procedimento com data e hora (ex: *"Usamos fios curvatura D, tamanho 10 a 13. Cliente apresentou leve sensibilidade no olho esquerdo no início"*). Isso ajuda a lembrar o histórico no próximo atendimento.
-* **Histórico de Agendamentos**: Lista completa de todas as datas que a cliente marcou, os serviços escolhidos, os valores e se ela compareceu ou faltou.
+Clique sobre o nome de qualquer cliente na tabela para abrir o perfil avançado dela, que é organizado da seguinte forma:
+* **Resumo Rápido (Painel Lateral)**: Exibe rapidamente os principais dados cadastrais (WhatsApp, e-mail, idade/data de nascimento, canal de origem/como conheceu o estúdio e a data/hora exata do cadastro).
+* **Aba Dados Pessoais**: Permite visualizar e editar as informações cadastrais básicas da cliente (nome, sobrenome, contato, CPF e origem). Também há um botão rápido no topo da página para criar um **Novo Agendamento** direto para ela.
+* **Aba Ficha Clínica (Anamnese)**: Ficha com perguntas fundamentais para a segurança do procedimento, dividida entre:
+  * *Histórico & Cuidados Oculares*: Informações sobre procedimentos anteriores, uso de lentes de contato, sensibilidade nos olhos ou infecções recentes.
+  * *Hábitos & Retenção*: Detalhes como posição ao dormir (como costuma dormir), uso de maquiagem à prova d'água e contato com fontes de vapor/calor.
+* **Aba Histórico de Atendimentos**: Lista de todos os registros de procedimentos realizados e cobrados. Através do botão **+ Registrar Atendimento**, você pode lançar manualmente novos atendimentos, adicionando o relatório detalhado e os valores cobrados.
 
 ---
 

@@ -9,9 +9,10 @@ import {
   X, 
   UserPlus, 
   ChevronLeft, 
-  ChevronRight,
-  Filter,
-  Trash2
+  ChevronRight, 
+  Filter, 
+  Trash2,
+  CheckCircle
 } from 'lucide-react';
 import type { Cliente } from '../types';
 import { registrarLog } from '../utils/log';
@@ -74,6 +75,9 @@ export default function Clientes() {
   const [dataNascimento, setDataNascimento] = useState('');
   const [cpf, setCpf] = useState('');
   const [endereco, setEndereco] = useState('');
+  
+  // Success Modal State
+  const [successClient, setSuccessClient] = useState<{ nomeCompleto: string; whatsapp: string; email?: string | null } | null>(null);
 
   const fetchData = async () => {
     setLoading(true);
@@ -223,6 +227,11 @@ export default function Clientes() {
 
       await registrarLog('criou', 'cliente', newClient.id, `Cadastrou o cliente "${nome} ${sobrenome}"`);
       setIsModalOpen(false);
+      setSuccessClient({
+        nomeCompleto: `${nome} ${sobrenome}`,
+        whatsapp: whatsapp,
+        email: email.trim() || null
+      });
       fetchData();
     } catch (err) {
       console.error(err);
@@ -744,6 +753,58 @@ export default function Clientes() {
                 {isDeleting ? 'Excluindo...' : 'Confirmar Exclusão'}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* SUCCESS CONFIRMATION MODAL */}
+      {successClient && (
+        <div className="fixed inset-0 bg-black/45 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto animate-fade-in">
+          <div className="bg-white rounded-[14px] border border-border shadow-xl w-full max-w-sm p-6 text-center animate-slide-up space-y-4">
+            
+            {/* Animated Check Icon */}
+            <div className="mx-auto w-16 h-16 rounded-full bg-green-50 border border-green-200 flex items-center justify-center text-green-600 animate-pulse">
+              <CheckCircle className="w-9 h-9" />
+            </div>
+
+            <div className="space-y-1">
+              <h3 className="font-title font-bold text-xl text-text-primary">
+                Cliente Cadastrada!
+              </h3>
+              <p className="text-xs text-text-secondary">
+                O cadastro foi realizado com sucesso no sistema.
+              </p>
+            </div>
+
+            {/* Details Box */}
+            <div className="bg-bg/40 border border-border/80 rounded-xl p-4 text-left text-xs space-y-2.5">
+              <div className="flex justify-between border-b border-border/40 pb-1.5">
+                <span className="font-bold text-text-secondary uppercase text-[10px] tracking-wider">Cliente</span>
+                <span className="font-semibold text-text-primary">{successClient.nomeCompleto}</span>
+              </div>
+              <div className="flex justify-between border-b border-border/40 pb-1.5">
+                <span className="font-bold text-text-secondary uppercase text-[10px] tracking-wider">WhatsApp</span>
+                <span className="font-semibold text-text-primary">{successClient.whatsapp}</span>
+              </div>
+              {successClient.email && (
+                <div className="flex justify-between">
+                  <span className="font-bold text-text-secondary uppercase text-[10px] tracking-wider">Email</span>
+                  <span className="font-semibold text-text-primary truncate max-w-[180px]" title={successClient.email}>{successClient.email}</span>
+                </div>
+              )}
+            </div>
+
+            {/* Actions */}
+            <div className="pt-2">
+              <button
+                type="button"
+                onClick={() => setSuccessClient(null)}
+                className="w-full py-2.5 bg-rose-600 hover:bg-rose-800 text-white rounded-lg text-xs font-semibold transition-colors cursor-pointer"
+              >
+                Concluir e Fechar
+              </button>
+            </div>
+
           </div>
         </div>
       )}
