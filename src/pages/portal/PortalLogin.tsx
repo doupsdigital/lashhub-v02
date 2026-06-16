@@ -70,7 +70,7 @@ export default function PortalLogin() {
           {logoUrl ? (
             <img src={logoUrl} alt={nomeNegocio || 'Studio'} className="h-16 w-auto object-contain mb-4" />
           ) : (
-            <div className="w-16 h-16 rounded-2xl bg-rose-600 text-white flex items-center justify-center font-title font-semibold text-3xl shadow-lg mb-4 hover:scale-105 transition-transform duration-300">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-rose-600 to-rose-400 text-white flex items-center justify-center font-title font-semibold text-3xl shadow-lg mb-4 hover:scale-105 transition-transform duration-300">
               {initials}
             </div>
           )}

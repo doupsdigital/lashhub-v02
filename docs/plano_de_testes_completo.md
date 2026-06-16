@@ -106,18 +106,18 @@ Valida o cadastro de clientes, histórico de atendimentos e personalização das
 * **Resultado Esperado**:
   * Os dados da ficha devem persistir intactos após o recarregamento.
   * O registro de anamnese é salvo no formato estruturado (JSONB) no Supabase.
-* **Status**: `[ ] Aprovado` | `[ ] Reprovado`
+* **Status**: `[X] Aprovado` | `[ ] Reprovado`
 * **Observações**: __________________________________________________
 
 ### **[ ] T2.4: Histórico e Linha do Tempo**
-* **Cenário**: Registrar notas rápidas de atendimento.
+* **Cenário**: Registrar anotações de atendimentos.
 * **Passos para Executar**:
-  1. No perfil do cliente, localize o bloco de **Histórico de Atendimentos / Notas**.
-  2. Digite uma anotação na caixa de notas rápidas (Ex: "Cliente relatou desconforto leve no olho esquerdo no final").
-  3. Envie a nota.
+  1. Na aba Histórico de Atendimentos do prontuário da cliente, clique em Registrar Atendimento.
+  2. Escolha o serviço, informe a data, digite o valor e preencha a caixa de observações com a sua anotação (Ex: "Cliente relatou desconforto leve no olho esquerdo no final").
+  3. Clique em Confirmar Registro para salvar.
 * **Resultado Esperado**:
-  * A nota deve constar na linha do tempo exibindo a data, o horário atual e o nome da profissional autora do texto.
-* **Status**: `[ ] Aprovado` | `[ ] Reprovado`
+  * O atendimento deve constar na linha do tempo exibindo a data informada, o serviço realizado, o valor cobrado e a nota nas observações.
+* **Status**: `[X] Aprovado` | `[ ] Reprovado`
 * **Observações**: __________________________________________________
 
 ### **[ ] T2.5: Exclusão de Cliente**
@@ -129,7 +129,7 @@ Valida o cadastro de clientes, histórico de atendimentos e personalização das
 * **Resultado Esperado**:
   * O cliente deve sumir instantaneamente da lista geral.
   * O cadastro e os históricos vinculados devem ser removidos ou arquivados no banco de dados.
-* **Status**: `[ ] Aprovado` | `[ ] Reprovado`
+* **Status**: `[X] Aprovado` | `[ ] Reprovado`
 * **Observações**: __________________________________________________
 
 ---
@@ -146,7 +146,7 @@ Valida a montagem do portfólio de serviços oferecidos com preços e durações
   4. Clique em **Salvar**.
 * **Resultado Esperado**:
   * A categoria deve aparecer listada na tela como um bloco aguardando serviços.
-* **Status**: `[ ] Aprovado` | `[ ] Reprovado`
+* **Status**: `[X] Aprovado` | `[ ] Reprovado`
 * **Observações**: __________________________________________________
 
 ### **[ ] T3.2: Criação de Serviço Simples (Preço Único)**
@@ -157,7 +157,7 @@ Valida a montagem do portfólio de serviços oferecidos com preços e durações
   3. Clique em **Salvar**.
 * **Resultado Esperado**:
   * O serviço deve constar listado sob a categoria correta com preço e tempo bem legíveis.
-* **Status**: `[ ] Aprovado` | `[ ] Reprovado`
+* **Status**: `[X] Aprovado` | `[ ] Reprovado`
 * **Observações**: __________________________________________________
 
 ### **[ ] T3.3: Criação de Serviço com Variações de Preço/Tempo**
@@ -171,7 +171,7 @@ Valida a montagem do portfólio de serviços oferecidos com preços e durações
   4. Clique em **Salvar**.
 * **Resultado Esperado**:
   * O serviço deve ser exibido indicando que possui variações de preço, detalhando os prazos, valores e tempos de cada opção na lista.
-* **Status**: `[ ] Aprovado` | `[ ] Reprovado`
+* **Status**: `[X] Aprovado` | `[ ] Reprovado`
 * **Observações**: __________________________________________________
 
 ### **[ ] T3.4: Desativação Temporária de Serviço**
@@ -183,7 +183,7 @@ Valida a montagem do portfólio de serviços oferecidos com preços e durações
 * **Resultado Esperado**:
   * O serviço deve ficar com aspecto cinza ou indicativo de "Inativo" no painel.
   * O serviço não deve aparecer como opção no catálogo público para agendamento online.
-* **Status**: `[ ] Aprovado` | `[ ] Reprovado`
+* **Status**: `[X] Aprovado` | `[ ] Reprovado`
 * **Observações**: __________________________________________________
 
 ---
@@ -199,7 +199,7 @@ Valida a configuração de horários de funcionamento e regras da agenda.
   3. Clique em **Salvar**.
 * **Resultado Esperado**:
   * A grade horária na aba **Agenda** deve se ajustar e indicar a nova faixa de horários habilitados.
-* **Status**: `[ ] Aprovado` | `[ ] Reprovado`
+* **Status**: `[X] Aprovado` | `[ ] Reprovado`
 * **Observações**: __________________________________________________
 
 ### **[ ] T4.2: Dias Fechados (Desativar Dias)**
@@ -210,7 +210,7 @@ Valida a configuração de horários de funcionamento e regras da agenda.
 * **Resultado Esperado**:
   * O Domingo deve constar como inativo.
   * No portal online da cliente, a seleção de Domingo deve estar desabilitada (cinza) no calendário.
-* **Status**: `[ ] Aprovado` | `[ ] Reprovado`
+* **Status**: `[X] Aprovado` | `[ ] Reprovado`
 * **Observações**: __________________________________________________
 
 ### **[ ] T4.3: Criação de Bloqueios de Agenda**
@@ -222,7 +222,7 @@ Valida a configuração de horários de funcionamento e regras da agenda.
 * **Resultado Esperado**:
   * O bloqueio deve aparecer na lista de bloqueios ativos.
   * No portal de autoagendamento da cliente, a data bloqueada deve constar como indisponível para marcações.
-* **Status**: `[ ] Aprovado` | `[ ] Reprovado`
+* **Status**: `[X] Aprovado` | `[ ] Reprovado`
 * **Observações**: __________________________________________________
 
 ---
@@ -239,7 +239,7 @@ Valida as operações no calendário do painel administrativo.
 * **Resultado Esperado**:
   * O card do agendamento deve aparecer na grade de horários imediatamente no dia e horário escolhidos.
   * Por padrão, agendamentos manuais (feitos no admin) devem entrar com status **Confirmado** (cor de destaque do tema).
-* **Status**: `[ ] Aprovado` | `[ ] Reprovado`
+* **Status**: `[X] Aprovado` | `[ ] Reprovado`
 * **Observações**: __________________________________________________
 
 ### **[ ] T5.2: Alteração de Status (Concluir Atendimento)**
@@ -250,7 +250,7 @@ Valida as operações no calendário do painel administrativo.
   3. Clique em **Salvar**.
 * **Resultado Esperado**:
   * A cor do card de agendamento deve mudar na grade para a cor indicativa de conclusão (tom verde/esmeralda).
-* **Status**: `[ ] Aprovado` | `[ ] Reprovado`
+* **Status**: `[X] Aprovado` | `[ ] Reprovado`
 * **Observações**: __________________________________________________
 
 ### **[ ] T5.3: Cancelar e Liberar Horário**
@@ -261,7 +261,7 @@ Valida as operações no calendário do painel administrativo.
 * **Resultado Esperado**:
   * O card do agendamento deve mudar de cor (tom cinza/riscado) ou sumir da grade principal de acordo com as preferências de exibição de cancelados.
   * O horário deve ser liberado para novos agendamentos imediatamente.
-* **Status**: `[ ] Aprovado` | `[ ] Reprovado`
+* **Status**: `[X] Aprovado` | `[ ] Reprovado`
 * **Observações**: __________________________________________________
 
 ---
@@ -277,7 +277,7 @@ Valida a ponta final onde o cliente final faz o cadastro e autoagendamento onlin
   3. Clique em **Criar Conta**.
 * **Resultado Esperado**:
   * A conta é criada com sucesso, vinculada ao estabelecimento `Bruna Lash` e redireciona a cliente logada para o catálogo.
-* **Status**: `[ ] Aprovado` | `[ ] Reprovado`
+* **Status**: `[X] Aprovado` | `[ ] Reprovado`
 * **Observações**: __________________________________________________
 
 ### **[ ] T6.2: Catálogo de Serviços do Portal**
@@ -287,7 +287,7 @@ Valida a ponta final onde o cliente final faz o cadastro e autoagendamento onlin
 * **Resultado Esperado**:
   * Os serviços de teste devem aparecer ordenados pelas respectivas categorias.
   * Os valores, durações e descrições devem coincidir 100% com o configurado no painel da profissional.
-* **Status**: `[ ] Aprovado` | `[ ] Reprovado`
+* **Status**: `[X] Aprovado` | `[ ] Reprovado`
 * **Observações**: __________________________________________________
 
 ### **[ ] T6.3: Agendamento Online em 4 Passos**
@@ -301,7 +301,7 @@ Valida a ponta final onde o cliente final faz o cadastro e autoagendamento onlin
 * **Resultado Esperado**:
   * O portal deve exibir a tela de sucesso com a **Mensagem Pós-Agendamento** correta.
   * A reserva deve constar na aba **Meus Agendamentos** da cliente.
-* **Status**: `[ ] Aprovado` | `[ ] Reprovado`
+* **Status**: `[X] Aprovado` | `[ ] Reprovado`
 * **Observações**: __________________________________________________
 
 ### **[ ] T6.4: Meus Agendamentos (Cliente)**
@@ -310,7 +310,7 @@ Valida a ponta final onde o cliente final faz o cadastro e autoagendamento onlin
   1. No Portal do Cliente, acesse a aba **Meus Agendamentos**.
 * **Resultado Esperado**:
   * O agendamento feito no teste **T6.3** deve estar listado indicando o status correspondente (ex: `Pendente` ou `Confirmado`).
-* **Status**: `[ ] Aprovado` | `[ ] Reprovado`
+* **Status**: `[X] Aprovado` | `[ ] Reprovado`
 * **Observações**: __________________________________________________
 
 ---
@@ -327,7 +327,7 @@ Valida a flexibilidade visual e alteração de regras do agendamento online.
 * **Resultado Esperado**:
   * O painel administrativo deve atualizar sua coloração de forma instantânea.
   * Abra o Portal do Cliente e certifique-se de que ele também aplicou a nova paleta de cores automaticamente.
-* **Status**: `[ ] Aprovado` | `[ ] Reprovado`
+* **Status**: `[X] Aprovado` | `[ ] Reprovado`
 * **Observações**: __________________________________________________
 
 ### **[ ] T7.2: Regra de Aprovação Online (Manual vs. Automática)**
@@ -338,7 +338,7 @@ Valida a flexibilidade visual e alteração de regras do agendamento online.
   3. No painel admin da profissional, acesse a **Agenda** e depois a seção de **Agendamentos Pendentes**.
 * **Resultado Esperado**:
   * O agendamento online deve entrar com status de pendente, exigindo que a profissional clique em "Confirmar" para inseri-lo definitivamente na grade.
-* **Status**: `[ ] Aprovado` | `[ ] Reprovado`
+* **Status**: `[X] Aprovado` | `[ ] Reprovado`
 * **Observações**: __________________________________________________
 
 ---
@@ -356,7 +356,7 @@ Valida as principais regras financeiras desenvolvidas para a Etapa 5 (modelo de 
 * **Resultado Esperado**:
   * O sistema atualiza o banco e atualiza o status de faturamento da profissional para **Assinatura Ativa**.
   * A badge de testes some e o plano se torna oficialmente ativo.
-* **Status**: `[ ] Aprovado` | `[ ] Reprovado`
+* **Status**: `[X] Aprovado` | `[ ] Reprovado`
 * **Observações**: __________________________________________________
 
 ### **[ ] T8.2: Checkout Cartão de Crédito Simulado**
@@ -367,7 +367,7 @@ Valida as principais regras financeiras desenvolvidas para a Etapa 5 (modelo de 
   3. Clique em **Assinar com Cartão**.
 * **Resultado Esperado**:
   * O sistema processa o pagamento de forma simulada e exibe aviso de sucesso, alterando o status para **Assinatura Ativa**.
-* **Status**: `[ ] Aprovado` | `[ ] Reprovado`
+* **Status**: `[X] Aprovado` | `[ ] Reprovado`
 * **Observações**: __________________________________________________
 
 ### **[ ] T8.3: Trancamento de Rota / Bloqueio Total (Conta Suspensa)**
@@ -379,7 +379,7 @@ Valida as principais regras financeiras desenvolvidas para a Etapa 5 (modelo de 
 * **Resultado Esperado**:
   * A tela de bloqueio total do `BillingGuard` deve interceptar o acesso imediatamente.
   * O usuário profissional fica impedido de acessar qualquer aba do sistema, sendo apresentado à mensagem de inadimplência e à opção de ir para **Faturamento** regularizar ou fazer logout.
-* **Status**: `[ ] Aprovado` | `[ ] Reprovado`
+* **Status**: `[X] Aprovado` | `[ ] Reprovado`
 * **Observações**: __________________________________________________
 
 ### **[ ] T8.4: Restrições de Recursos por Plano (Downgrade Básico)**
@@ -391,7 +391,7 @@ Valida as principais regras financeiras desenvolvidas para a Etapa 5 (modelo de 
 * **Resultado Esperado**:
   * No painel da profissional, o acesso às abas de agenda e horários deve estar trancado (bloqueado pelo `PlanGuard`).
   * No Portal do Cliente, ao tentar acessar a rota de agendar, o sistema deve interceptar e redirecionar automaticamente a cliente de volta para o catálogo `/catalogo`, impossibilitando a marcação online.
-* **Status**: `[ ] Aprovado` | `[ ] Reprovado`
+* **Status**: `[X] Aprovado` | `[ ] Reprovado`
 * **Observações**: __________________________________________________
 
 ### **[ ] T8.5: Regularização e Desbloqueio Instantâneo**
@@ -403,5 +403,5 @@ Valida as principais regras financeiras desenvolvidas para a Etapa 5 (modelo de 
 * **Resultado Esperado**:
   * A tela de bloqueio total do `BillingGuard` deve sumir imediatamente.
   * Acesso pleno e irrestrito ao sistema restabelecido de forma automática pós-confirmação do webhook/banco.
-* **Status**: `[ ] Aprovado` | `[ ] Reprovado`
+* **Status**: `[X] Aprovado` | `[ ] Reprovado`
 * **Observações**: __________________________________________________

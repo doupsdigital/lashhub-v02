@@ -58,28 +58,15 @@ export default function Login() {
 
       <div className="w-full max-w-[420px] bg-white border border-border rounded-[20px] shadow-xl p-8 md:p-10 relative z-10 animate-fade-in">
         <div className="flex flex-col items-center text-center mb-8">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-rose-500 to-pink-600 text-white flex items-center justify-center shadow-lg mb-4 hover:scale-105 transition-transform duration-300">
-            <svg
-              viewBox="0 0 100 100"
-              className="w-10 h-10"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="5.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              {/* Pálpebra / Curva do olho fechado */}
-              <path d="M20,40 Q50,70 80,40" />
-              {/* Cílios individuais */}
-              <path d="M25,48 L15,58" />
-              <path d="M37,53 L32,66" />
-              <path d="M50,55 L50,70" />
-              <path d="M63,53 L68,66" />
-              <path d="M75,48 L85,58" />
-            </svg>
+          <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-rose-600 to-rose-400 text-white flex items-center justify-center shadow-lg mb-4 hover:scale-105 transition-transform duration-300 overflow-hidden">
+            <img
+              src="/logo-login.png"
+              alt="Lash Hub"
+              className="w-[110%] h-[110%] object-contain invert mix-blend-screen scale-130"
+            />
           </div>
-          <h1 className="font-title font-bold text-3xl tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-rose-600 to-pink-600">
-            LashLy
+          <h1 className="font-title font-bold text-3xl tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-rose-600 to-rose-400">
+            Lash Hub
           </h1>
           <p className="text-xs text-text-muted mt-2 uppercase tracking-wider font-medium">
             Acesse sua conta
