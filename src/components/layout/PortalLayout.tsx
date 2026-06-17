@@ -6,7 +6,8 @@ import { usePortal } from '../../contexts/PortalContext';
 export default function PortalLayout() {
   const navigate = useNavigate();
   const { user, profile, signOut } = useAuth();
-  const { nomeNegocio, logoUrl, slug, loading, nomeProfissional } = usePortal();
+  const { nomeNegocio, logoUrl, slug, loading, nomeProfissional, plano } = usePortal();
+  const isBasico = plano === 'basico';
 
   const handleSignOut = async () => {
     await signOut();
@@ -30,9 +31,11 @@ export default function PortalLayout() {
 
   const navItems = [
     { name: 'Catálogo', shortName: 'Catálogo', path: `/portal/${slug}/catalogo`, icon: BookOpen },
-    { name: 'Agendar', shortName: 'Agendar', path: `/portal/${slug}/agendar`, icon: Calendar },
-    { name: 'Meus Agendamentos', shortName: 'Agendamentos', path: `/portal/${slug}/meus-agendamentos`, icon: ClipboardList },
-    { name: 'Meu Perfil', shortName: 'Perfil', path: `/portal/${slug}/perfil`, icon: User },
+    ...(!isBasico ? [
+      { name: 'Agendar', shortName: 'Agendar', path: `/portal/${slug}/agendar`, icon: Calendar },
+      { name: 'Meus Agendamentos', shortName: 'Agendamentos', path: `/portal/${slug}/meus-agendamentos`, icon: ClipboardList },
+      { name: 'Meu Perfil', shortName: 'Perfil', path: `/portal/${slug}/perfil`, icon: User },
+    ] : []),
   ];
 
   if (loading) {
@@ -70,7 +73,7 @@ export default function PortalLayout() {
         </div>
 
         <div className="flex items-center gap-3">
-          {user ? (
+          {!isBasico && (user ? (
             <>
               {profile?.avatar_url ? (
                 <img
@@ -101,7 +104,7 @@ export default function PortalLayout() {
             >
               Entrar
             </Link>
-          )}
+          ))}
         </div>
       </header>
 

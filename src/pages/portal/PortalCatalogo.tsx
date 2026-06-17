@@ -291,23 +291,25 @@ export default function PortalCatalogo() {
 
       {/* WhatsApp banner if studio is on basic plan */}
       {isBasico && (
-        <div className="bg-gradient-to-r from-green-50 to-emerald-50/30 border border-green-200 rounded-2xl p-5 md:p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 animate-fade-in">
-          <div className="flex-1 space-y-1">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-800">
-              <MessageSquare className="w-3.5 h-3.5" /> Agendamento via WhatsApp
-            </span>
-            <h3 className="font-title font-semibold text-lg text-text-primary">
-              Agendamentos Diretos
-            </h3>
-            <p className="text-sm text-text-secondary leading-relaxed">
-              Neste estúdio, os agendamentos online são feitos diretamente via WhatsApp. Escolha o serviço abaixo para solicitar ou clique no botão para conversar conosco.
-            </p>
+        <div className="bg-green-50 border border-green-200 rounded-2xl p-5 md:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 animate-fade-in">
+          <div className="flex gap-3 items-start flex-1">
+            <div className="w-10 h-10 rounded-xl bg-green-600 flex items-center justify-center shrink-0 mt-0.5">
+              <MessageSquare className="w-5 h-5 text-white" />
+            </div>
+            <div className="space-y-1">
+              <h3 className="font-title font-semibold text-base text-green-900">
+                Agendamentos via WhatsApp
+              </h3>
+              <p className="text-sm text-green-800 leading-relaxed">
+                Neste estúdio, os horários são marcados diretamente via WhatsApp. Escolha o serviço abaixo para solicitar ou clique no botão para conversar conosco.
+              </p>
+            </div>
           </div>
           <a
             href={`https://wa.me/5511999999999?text=${encodeURIComponent(`Olá! Gostaria de agendar um serviço no *${nomeNegocio || 'Estúdio'}*.`)}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="px-5 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-xl text-sm font-semibold flex items-center justify-center gap-2 shadow-sm shadow-green-100 hover:shadow-md transition-all shrink-0 self-start md:self-auto"
+            className="px-5 py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-colors shrink-0 self-start md:self-auto"
           >
             <MessageSquare className="w-4 h-4" />
             Conversar no WhatsApp

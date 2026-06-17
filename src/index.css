@@ -259,8 +259,17 @@ body {
 .dark .bg-green-50 {
   background-color: #0C231E !important;
 }
+.dark .border-green-200 {
+  border-color: rgba(52, 211, 153, 0.25) !important;
+}
 .dark .border-green-200\/60 {
   border-color: rgba(52, 211, 153, 0.3) !important;
+}
+.dark .text-green-900 {
+  color: #6EE7B7 !important;
+}
+.dark .text-green-800 {
+  color: #34D399 !important;
 }
 
 /* 5. Falta (Red) */
