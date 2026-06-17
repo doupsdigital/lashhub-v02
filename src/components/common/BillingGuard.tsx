@@ -29,7 +29,7 @@ export default function BillingGuard() {
   }
 
   // Permite acesso direto à rota de faturamento para que a profissional possa assinar/regularizar
-  if (location.pathname === '/faturamento' || location.pathname === '/configuracoes') {
+  if (location.pathname === '/assinatura' || location.pathname === '/configuracoes') {
     return <Outlet />;
   }
 
@@ -116,7 +116,7 @@ export default function BillingGuard() {
         {/* Ações */}
         <div className="flex flex-col gap-3">
           <Link
-            to="/faturamento"
+            to="/assinatura"
             className="w-full py-3 px-4 bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-700 hover:to-pink-700 text-white rounded-xl text-sm font-semibold transition-all duration-200 shadow-md shadow-rose-100 hover:shadow-lg flex items-center justify-center gap-2 group cursor-pointer"
           >
             <CreditCard className="w-4 h-4" />

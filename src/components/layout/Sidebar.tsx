@@ -107,7 +107,7 @@ export default function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobile
   ];
 
   const systemItems: NavItem[] = [
-    { name: 'Minha Assinatura', path: '/faturamento', icon: CreditCard },
+    { name: 'Minha Assinatura', path: '/assinatura', icon: CreditCard },
     { name: 'Configurações', path: '/configuracoes', icon: Settings },
   ];
 
@@ -343,7 +343,7 @@ export default function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobile
                 <button
                   onClick={() => {
                     setIsUpgradeModalOpen(false);
-                    navigate('/faturamento');
+                    navigate('/assinatura');
                   }}
                   className="w-full py-3 bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-700 hover:to-pink-700 text-white rounded-xl text-sm font-semibold transition-all duration-200 shadow-md shadow-rose-100 hover:shadow-lg cursor-pointer flex items-center justify-center gap-1"
                 >

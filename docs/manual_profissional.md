@@ -212,34 +212,45 @@ Gráfico de pizza com a distribuição percentual do faturamento por tipo de ser
 
 ---
 
-## 8. Faturamento, Planos e Bloqueio Financeiro
-*Rota: `/faturamento` (Menu Lateral -> Faturamento)*
+## 8. Minha Assinatura
+*Rota: `/assinatura` (Menu Lateral -> Minha Assinatura)*
 
-Como administradora de um sistema SaaS, você gerencia sua assinatura do LashCenter diretamente pelo painel.
+Nesta tela você gerencia seu plano ativo e visualiza os planos disponíveis do Lashly.
 
-### Comparativo de Planos:
-* **Plano Básico (CRM)**:
-  * Acesso ao Dashboard financeiro.
-  * Cadastro ilimitado de clientes e fichas.
-  * Cadastro ilimitado de serviços.
-  * *Bloqueado*: Agenda de agendamentos e Portal de agendamento online para clientes.
-* **Plano Profissional/Premium (Agenda Inteligente)**:
-  * Todas as funções do plano básico.
-  * Agenda completa no sistema.
-  * Configuração de expediente e bloqueios de horários.
-  * Portal online de agendamentos exclusivo do seu estúdio (ex: `lashly.com/portal/seu-slug`).
+### Painel de Assinatura Atual
+À esquerda da tela fica o resumo do seu plano vigente, com o nome do plano e o status da assinatura. Os possíveis status são:
+* **Assinatura Ativa**: Tudo funcionando normalmente.
+* **Trial (período de testes)**: Você está no período gratuito de avaliação. A data de encerramento do trial é exibida abaixo do status.
+* **Suspenso**: A assinatura está suspensa por falta de pagamento.
+* **Cancelado**: A assinatura foi encerrada.
 
-### Contratação e Pagamento (Integração Asaas):
-1. Acesse a aba **Faturamento**.
-2. Clique no plano desejado.
-3. Selecione a forma de pagamento integrada:
-   * **Pix**: O sistema gerará um QR Code Pix dinâmico. O desbloqueio do plano é instantâneo assim que o pagamento for concluído.
-   * **Cartão de Crédito**: Insira os dados do cartão de forma segura. A cobrança é recorrente mensalmente.
+### Comparativo de Planos
 
-### Em caso de Inadimplência ou Atraso:
-Caso sua assinatura expire ou ocorra alguma falha na cobrança do cartão, o sistema entrará em status **Suspenso**.
-* **O que acontece**: O `BillingGuard` será ativado. Você não conseguirá visualizar a agenda, clientes ou serviços. Uma tela de bloqueio total será exibida.
-* **Como regularizar**: Na própria tela de bloqueio, haverá um botão **Regularizar Financeiro** que te levará para a tela de faturamento para efetuar o pagamento. O desbloqueio ocorre de forma imediata após a confirmação.
+**Plano Básico (CRM) — R$ 59,90/mês**
+Ideal para profissionais que querem organizar a carteira de clientes e prontuários:
+* Cadastro de Clientes ilimitado
+* Fichas de Anamnese Customizadas
+* Dashboard de Relatórios
+* Histórico de Atendimentos
+* Suporte por E-mail
+
+**Plano Premium (Agenda) — R$ 99,90/mês**
+Para quem quer automatizar a recepção de agendamentos 24h por dia:
+* Tudo do Plano Básico
+* Portal de Agendamento Online (link exclusivo do seu estúdio)
+* Horários Dinâmicos
+* Bloqueios Rápidos de Agenda
+* Aprovação Manual ou Automática de agendamentos
+* Suporte Prioritário
+
+### Como Assinar ou Trocar de Plano
+1. Na tela de **Minha Assinatura**, localize o card do plano desejado.
+2. Clique em **Assinar via Pix**.
+3. O sistema exibirá o código Pix (copia e cola). Realize o pagamento pelo aplicativo do seu banco.
+4. Clique em **Confirmar Pagamento Pix**. O plano é ativado imediatamente após a confirmação.
+
+### Em caso de Suspensão
+Caso sua assinatura fique suspensa por falta de pagamento, o sistema exibirá uma tela de bloqueio total — você não conseguirá acessar a agenda, clientes ou serviços. Para regularizar, acesse **Minha Assinatura** pela própria tela de bloqueio, realize o pagamento via Pix e confirme. O desbloqueio é imediato.
 
 ---
 

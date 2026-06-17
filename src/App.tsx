@@ -91,7 +91,7 @@ export default function App() {
             }
           >
             {/* Páginas acessíveis independente de faturamento */}
-            <Route path="faturamento" element={<Faturamento />} />
+            <Route path="assinatura" element={<Faturamento />} />
             <Route path="configuracoes" element={<Configuracoes />} />
 
             {/* Proteção de Faturamento Ativo / Trial Válido */}
