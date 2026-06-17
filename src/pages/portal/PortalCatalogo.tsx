@@ -96,10 +96,10 @@ function ServicoCard({ servico, onAgendar, isBasico, nomeNegocio }: ServicoCardP
           href={whatsappUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-auto w-full py-2.5 border border-green-600 hover:bg-green-50 text-green-700 rounded-xl text-sm font-semibold transition-colors duration-200 flex items-center justify-center gap-2 text-center"
+          className="mt-auto w-full py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-xl text-sm font-semibold transition-colors duration-200 flex items-center justify-center gap-2 text-center"
         >
-          <MessageSquare className="w-4 h-4 animate-pulse" />
-          Solicitar Orçamento
+          <MessageSquare className="w-4 h-4" />
+          Agendar via WhatsApp
         </a>
       </div>
     );
