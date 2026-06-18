@@ -157,12 +157,14 @@ export default function Dashboard() {
         supabase
           .from('clientes')
           .select('id, created_at')
+          .eq('estabelecimento_id', estabelecimentoId)
           .gte('created_at', startIso)
           .lte('created_at', endIso),
         // Appointments in the period
         supabase
           .from('agendamentos')
           .select('id, data_hora, status')
+          .eq('estabelecimento_id', estabelecimentoId)
           .gte('data_hora', startIso)
           .lte('data_hora', endIso),
         // Concluded appointments in the period (for revenue)
@@ -172,6 +174,7 @@ export default function Dashboard() {
             id, cliente_id, data_hora, valor_cobrado,
             agendamento_servicos ( servico_id, valor_cobrado )
           `)
+          .eq('estabelecimento_id', estabelecimentoId)
           .eq('status', 'concluido')
           .gte('data_hora', startIso)
           .lte('data_hora', endIso),
@@ -179,6 +182,7 @@ export default function Dashboard() {
         supabase
           .from('agendamentos')
           .select('id', { count: 'exact', head: true })
+          .eq('estabelecimento_id', estabelecimentoId)
           .eq('status', 'pendente'),
         // Today's appointments
         supabase
@@ -188,6 +192,7 @@ export default function Dashboard() {
             cliente:clientes(id, nome, sobrenome),
             agendamento_servicos(servico:servicos(nome))
           `)
+          .eq('estabelecimento_id', estabelecimentoId)
           .gte('data_hora', `${formatDateStr(new Date())}T00:00:00`)
           .lte('data_hora', `${formatDateStr(new Date())}T23:59:59`)
           .neq('status', 'cancelado')
@@ -300,6 +305,7 @@ export default function Dashboard() {
         const { data: pastConcluded, error: pastError } = await supabase
           .from('agendamentos')
           .select('cliente_id')
+          .eq('estabelecimento_id', estabelecimentoId)
           .eq('status', 'concluido')
           .in('cliente_id', uniqueClientIds)
           .lt('data_hora', startIso);
