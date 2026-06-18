@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
-import { useAuth } from '../contexts/AuthContext';
+import { supabase } from '../../lib/supabase';
+import { useAuth } from '../../contexts/AuthContext';
 import { 
   Plus, 
   Edit2, 
@@ -15,9 +15,9 @@ import {
   PlusCircle,
   HelpCircle
 } from 'lucide-react';
-import type { CategoriaServico, Servico, VariacaoServico } from '../types';
-import { registrarLog } from '../utils/log';
-import ConfirmModal from '../components/common/ConfirmModal';
+import type { CategoriaServico, Servico, VariacaoServico } from '../../types';
+import { registrarLog } from '../../utils/log';
+import ConfirmModal from '../../components/common/ConfirmModal';
 
 // Extend types to include relations
 interface VariacaoInput {

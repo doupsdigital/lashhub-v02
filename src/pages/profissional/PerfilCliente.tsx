@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { supabase } from '../lib/supabase';
-import { useAuth } from '../contexts/AuthContext';
+import { supabase } from '../../lib/supabase';
+import { useAuth } from '../../contexts/AuthContext';
 import {
   ArrowLeft,
   User,
@@ -21,8 +21,8 @@ import {
   CheckCircle,
   UserX
 } from 'lucide-react';
-import type { Cliente, Servico, VariacaoServico } from '../types';
-import { registrarLog } from '../utils/log';
+import type { Cliente, Servico, VariacaoServico } from '../../types';
+import { registrarLog } from '../../utils/log';
 
 interface AtendimentoWithRelations {
   id: string;

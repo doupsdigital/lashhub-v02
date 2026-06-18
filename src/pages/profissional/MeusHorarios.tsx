@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
-import { useAuth } from '../contexts/AuthContext';
+import { supabase } from '../../lib/supabase';
+import { useAuth } from '../../contexts/AuthContext';
 import { Clock, CalendarOff, Plus, Trash2, AlertCircle, CheckCircle } from 'lucide-react';
-import type { HorarioAtendimento, BloqueioAgenda } from '../types';
-import ConfirmModal from '../components/common/ConfirmModal';
+import type { HorarioAtendimento, BloqueioAgenda } from '../../types';
+import ConfirmModal from '../../components/common/ConfirmModal';
 
 const DIAS_SEMANA = [
   'Domingo',

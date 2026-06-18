@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { supabase } from '../lib/supabase';
+import { supabase } from '../../lib/supabase';
 import {
   Plus,
   ChevronLeft,
@@ -25,10 +25,10 @@ import type {
   Servico,
   VariacaoServico,
   BloqueioAgenda,
-} from '../types';
-import { registrarLog } from '../utils/log';
-import ConfirmModal from '../components/common/ConfirmModal';
-import { useAuth } from '../contexts/AuthContext';
+} from '../../types';
+import { registrarLog } from '../../utils/log';
+import ConfirmModal from '../../components/common/ConfirmModal';
+import { useAuth } from '../../contexts/AuthContext';
 
 interface AgendamentoServicoInput {
   servico_id: string;

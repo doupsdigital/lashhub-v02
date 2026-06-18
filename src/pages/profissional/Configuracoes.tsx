@@ -1,9 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
 import type { FormEvent } from 'react';
-import { supabase } from '../lib/supabase';
-import { useAuth } from '../contexts/AuthContext';
-import { PALETTES_LIST, applyPalette } from '../utils/theme';
-import ConfirmModal from '../components/common/ConfirmModal';
+import { supabase } from '../../lib/supabase';
+import { useAuth } from '../../contexts/AuthContext';
+import { PALETTES_LIST, applyPalette } from '../../utils/theme';
+import ConfirmModal from '../../components/common/ConfirmModal';
 import {
   Camera,
   Trash2,

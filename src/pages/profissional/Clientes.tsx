@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
-import { supabase } from '../lib/supabase';
+import { useAuth } from '../../contexts/AuthContext';
+import { supabase } from '../../lib/supabase';
 import { 
   Plus, 
   Search, 
@@ -14,8 +14,8 @@ import {
   Trash2,
   CheckCircle
 } from 'lucide-react';
-import type { Cliente } from '../types';
-import { registrarLog } from '../utils/log';
+import type { Cliente } from '../../types';
+import { registrarLog } from '../../utils/log';
 
 interface ClienteWithAttendances extends Cliente {
   atendimentos?: { data_atendimento: string }[];
