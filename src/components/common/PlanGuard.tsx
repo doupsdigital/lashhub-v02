@@ -13,7 +13,7 @@ export default function PlanGuard({ requiredFeature }: { requiredFeature: 'sched
   }
 
   if (!hasFeature(requiredFeature)) {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to="/meu-estudio" replace />;
   }
 
   return <Outlet />;

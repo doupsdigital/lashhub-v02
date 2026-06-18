@@ -19,7 +19,7 @@ export default function Login() {
   // Redireciona usuário já autenticado
   if (!authLoading && user) {
     if (isProfissional) {
-      return <Navigate to="/dashboard" replace />;
+      return <Navigate to="/meu-estudio" replace />;
     } else if (estabelecimentoSlug) {
       return <Navigate to={`/portal/${estabelecimentoSlug}/catalogo`} replace />;
     } else {

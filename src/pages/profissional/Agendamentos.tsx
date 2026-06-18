@@ -1982,7 +1982,7 @@ export default function Agendamentos() {
                   Atendimento Concluído!
                 </h3>
                 <p className="text-emerald-100 text-xs mt-1">
-                  O valor foi registrado no seu dashboard.
+                  O valor já aparece nos seus relatórios.
                 </p>
                 {successModal.valor !== undefined && (
                   <div className="mt-4 bg-white/15 rounded-xl px-4 py-3 inline-block">

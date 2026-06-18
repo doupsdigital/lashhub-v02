@@ -11,8 +11,8 @@ export default function Header({ setMobileOpen }: HeaderProps) {
   // Mapeamento de rotas para títulos da página
   const getPageInfo = (pathname: string): { title: string; subtitle?: string } => {
     switch (pathname) {
-      case '/dashboard':
-        return { title: 'Dashboard' };
+      case '/meu-estudio':
+        return { title: 'Meu Estúdio' };
       case '/clientes':
         return { title: 'Clientes' };
       case '/servicos':

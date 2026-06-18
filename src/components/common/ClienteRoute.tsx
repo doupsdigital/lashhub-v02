@@ -23,7 +23,7 @@ export default function ClienteRoute({ children }: { children: React.ReactNode }
   }
 
   if (!user) return <Navigate to={slug ? `/portal/${slug}/login` : '/login'} replace />;
-  if (!isCliente) return <Navigate to="/dashboard" replace />;
+  if (!isCliente) return <Navigate to="/meu-estudio" replace />;
 
   return <>{children}</>;
 }

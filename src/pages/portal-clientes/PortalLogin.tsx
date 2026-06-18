@@ -22,7 +22,7 @@ export default function PortalLogin() {
         navigate(`/portal/${slug}/catalogo`, { replace: true });
       } else {
         // Se profissional tentar acessar login do portal, manda pro dashboard
-        navigate('/dashboard', { replace: true });
+        navigate('/meu-estudio', { replace: true });
       }
     }
   }, [authLoading, user, isCliente, navigate, slug]);

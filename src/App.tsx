@@ -98,7 +98,7 @@ export default function App() {
 
             {/* Proteção de Faturamento Ativo / Trial Válido */}
             <Route element={<BillingGuard />}>
-              <Route path="dashboard" element={<Dashboard />} />
+              <Route path="meu-estudio" element={<Dashboard />} />
               <Route path="clientes" element={<Clientes />} />
               <Route path="clientes/:id" element={<PerfilCliente />} />
               <Route path="servicos" element={<Servicos />} />

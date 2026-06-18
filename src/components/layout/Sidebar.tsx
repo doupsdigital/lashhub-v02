@@ -99,7 +99,7 @@ export default function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobile
   }
 
   const menuItems: NavItem[] = [
-    { name: 'Dashboard', path: '/dashboard', icon: LayoutGrid },
+    { name: 'Meu Estúdio', path: '/meu-estudio', icon: LayoutGrid },
     { name: 'Clientes', path: '/clientes', icon: Users },
     { name: 'Serviços', path: '/servicos', icon: Tag },
     { name: 'Agendamentos', path: '/agendamentos', icon: Calendar, feature: 'scheduling' },

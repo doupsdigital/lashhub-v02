@@ -501,7 +501,7 @@ export default function Dashboard() {
       <div className="bg-white border border-border rounded-[14px] p-5 shadow-sm space-y-4">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div>
-            <h2 className="font-title font-semibold text-2xl text-text-primary">Dashboard</h2>
+            <h2 className="font-title font-semibold text-2xl text-text-primary">Meu Estúdio</h2>
             <p className="text-xs text-text-secondary mt-0.5">Visão geral do desempenho do seu negócio.</p>
           </div>
 
