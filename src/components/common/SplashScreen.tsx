@@ -34,38 +34,30 @@ export default function SplashScreen() {
         transition: 'opacity 0.6s ease-out',
       }}
     >
-      <div className="flex flex-col items-center gap-7">
-        {/* Mesmo logo usado pelo OS splash — transição imperceptível */}
-        <div
-          className="rounded-[22px] overflow-hidden"
-          style={{ width: 96, height: 96 }}
+      {/* Sem logo — evita o salto de tamanho/posição da OS splash */}
+      <div
+        className="flex flex-col items-center gap-2"
+        style={{
+          opacity: fading ? 0 : 1,
+          transform: fading ? 'translateY(4px)' : 'translateY(0)',
+          transition: 'opacity 0.5s ease-out, transform 0.5s ease-out',
+        }}
+      >
+        <h1
+          className="font-title font-semibold text-text-primary"
+          style={{ fontSize: '2.2rem', letterSpacing: '0.14em' }}
         >
-          <img
-            src="/logo-login.png"
-            alt="Lash Hub"
-            className="w-full h-full object-cover"
-          />
-        </div>
-
-        {/* Nome e subtítulo */}
-        <div className="flex flex-col items-center gap-1.5">
-          <h1
-            className="font-title font-semibold text-text-primary"
-            style={{ fontSize: '2rem', letterSpacing: '0.12em' }}
-          >
-            Lash Hub
-          </h1>
-          <p
-            className="uppercase text-text-muted font-sans"
-            style={{ fontSize: '0.58rem', letterSpacing: '0.28em' }}
-          >
-            Gestão & Agendamentos
-          </p>
-        </div>
+          Lash Hub
+        </h1>
+        <p
+          className="uppercase text-text-muted font-sans"
+          style={{ fontSize: '0.58rem', letterSpacing: '0.3em' }}
+        >
+          Gestão & Agendamentos
+        </p>
       </div>
 
-      {/* Detalhe decorativo */}
-      <div className="absolute bottom-14 flex items-center gap-2 opacity-30">
+      <div className="absolute bottom-14 flex items-center gap-2 opacity-25">
         <div className="w-8 h-px bg-text-secondary" />
         <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: '#A85560' }} />
         <div className="w-8 h-px bg-text-secondary" />
