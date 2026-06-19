@@ -23,7 +23,7 @@ export default function Layout() {
   // o padding-top que não é renderizado na primeira pintura visual.
   useEffect(() => {
     if (!isIOS) return;
-    const timer = setTimeout(iosRepaint, 300);
+    const timer = setTimeout(iosRepaint, 100);
     return () => clearTimeout(timer);
   }, []);
 

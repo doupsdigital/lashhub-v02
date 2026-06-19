@@ -21,7 +21,7 @@ if (/iphone|ipad|ipod/i.test(navigator.userAgent)) {
   };
 
   // Após rotação de tela (aguarda o browser concluir o resize)
-  window.addEventListener('orientationchange', () => setTimeout(repaint, 300));
+  window.addEventListener('orientationchange', () => setTimeout(repaint, 100));
 
   // Ao voltar ao app (após sair para outra janela)
   document.addEventListener('visibilitychange', () => {
