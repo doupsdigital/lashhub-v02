@@ -14,6 +14,7 @@ import {
   CheckCircle2,
   Loader2,
   X,
+  CreditCard,
 } from 'lucide-react';
 
 export default function Faturamento() {
@@ -28,6 +29,7 @@ export default function Faturamento() {
 
   const [pixQrCodeImage, setPixQrCodeImage] = useState<string | null>(null);
   const [pixKey, setPixKey] = useState<string | null>(null);
+  const [invoiceUrl, setInvoiceUrl] = useState<string | null>(null);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [cancelConfirm, setCancelConfirm] = useState(false);
@@ -102,6 +104,7 @@ export default function Faturamento() {
 
       setPixQrCodeImage(data.pixQrCodeImage);
       setPixKey(data.pixKey);
+      setInvoiceUrl(data.invoiceUrl ?? null);
       setCheckoutMode('pix');
       startPolling(profile.estabelecimento_id);
     } catch (err: unknown) {
@@ -438,6 +441,23 @@ export default function Faturamento() {
                       </button>
                     </div>
                     {copied && <p className="text-xs text-green-600 font-semibold">Copiado!</p>}
+                  </div>
+                )}
+
+                {/* Opção de cartão de crédito */}
+                {invoiceUrl && (
+                  <div className="w-full border-t border-border pt-4 space-y-2 text-center">
+                    <p className="text-xs text-text-muted">Prefere pagar com cartão?</p>
+                    <a
+                      href={invoiceUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full py-2.5 border border-rose-300 hover:bg-rose-50 text-rose-700 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                    >
+                      <CreditCard className="w-3.5 h-3.5" />
+                      Pagar com Cartão de Crédito
+                    </a>
+                    <p className="text-[10px] text-text-muted">Abre a página segura do Asaas em uma nova aba</p>
                   </div>
                 )}
 

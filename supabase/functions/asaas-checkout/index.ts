@@ -126,6 +126,7 @@ serve(async (req) => {
         pixQrCodeImage: qrCode.encodedImage,
         pixKey:         qrCode.payload,
         expirationDate: qrCode.expirationDate,
+        invoiceUrl:     payment.invoiceUrl,
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
