@@ -40,6 +40,14 @@ serve(async (req) => {
 
     if (searchData.data && searchData.data.length > 0) {
       customerId = searchData.data[0].id
+      // Atualiza o cliente com CPF/CNPJ se ainda não tiver
+      if (cpf_cnpj) {
+        await fetch(`${ASAAS_BASE_URL}/customers/${customerId}`, {
+          method: 'PUT',
+          headers: asaasHeaders,
+          body: JSON.stringify({ cpfCnpj: cpf_cnpj }),
+        })
+      }
     } else {
       const createRes = await fetch(`${ASAAS_BASE_URL}/customers`, {
         method: 'POST',
@@ -47,7 +55,7 @@ serve(async (req) => {
         body: JSON.stringify({
           name: nome,
           email: email,
-          cpfCnpj: cpf_cnpj ?? undefined,
+          cpfCnpj: cpf_cnpj,
         }),
       })
       const customer = await createRes.json()

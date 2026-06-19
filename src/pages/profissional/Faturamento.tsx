@@ -21,8 +21,10 @@ export default function Faturamento() {
   const { isSubscriptionActive, isPremium, status, trialEndsAt } = useSubscription();
 
   const [loading, setLoading] = useState(false);
-  const [checkoutMode, setCheckoutMode] = useState<'none' | 'pix' | 'success'>('none');
+  const [checkoutMode, setCheckoutMode] = useState<'none' | 'cpf' | 'pix' | 'success'>('none');
   const [selectedPlanToBuy, setSelectedPlanToBuy] = useState<'basico' | 'premium'>('premium');
+  const [cpfInput, setCpfInput] = useState('');
+  const [cpfError, setCpfError] = useState<string | null>(null);
 
   const [pixQrCodeImage, setPixQrCodeImage] = useState<string | null>(null);
   const [pixKey, setPixKey] = useState<string | null>(null);
@@ -59,10 +61,30 @@ export default function Faturamento() {
     }, 5000);
   };
 
-  // Chama a Edge Function asaas-checkout e exibe QR Code
-  const handleAsaasCheckout = async (plano: 'basico' | 'premium') => {
-    if (!profile?.estabelecimento_id) return;
+  const validateCpfCnpj = (value: string) => {
+    const digits = value.replace(/\D/g, '');
+    return digits.length === 11 || digits.length === 14;
+  };
+
+  const handleOpenCpfStep = (plano: 'basico' | 'premium') => {
     setSelectedPlanToBuy(plano);
+    setCpfInput('');
+    setCpfError(null);
+    setCheckoutError(null);
+    setCheckoutMode('cpf');
+  };
+
+  const handleCpfSubmit = () => {
+    if (!validateCpfCnpj(cpfInput)) {
+      setCpfError('Informe um CPF (11 dígitos) ou CNPJ (14 dígitos) válido.');
+      return;
+    }
+    handleAsaasCheckout(selectedPlanToBuy, cpfInput.replace(/\D/g, ''));
+  };
+
+  // Chama a Edge Function asaas-checkout e exibe QR Code
+  const handleAsaasCheckout = async (plano: 'basico' | 'premium', cpfCnpj: string) => {
+    if (!profile?.estabelecimento_id) return;
     setLoading(true);
     setCheckoutError(null);
     try {
@@ -72,6 +94,7 @@ export default function Faturamento() {
           plano,
           email: profile.email,
           nome:  profile.nome,
+          cpf_cnpj: cpfCnpj,
         },
       });
       if (error) throw new Error(error.message);
@@ -261,11 +284,11 @@ export default function Faturamento() {
                     <div className="py-2 text-center text-xs font-semibold text-green-700 bg-green-50 rounded-xl border border-green-200">Plano Ativo</div>
                   ) : (
                     <button
-                      onClick={() => handleAsaasCheckout('basico')}
+                      onClick={() => handleOpenCpfStep('basico')}
                       disabled={loading}
                       className="w-full py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-semibold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-sm disabled:opacity-60"
                     >
-                      {loading && selectedPlanToBuy === 'basico' ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <QrCode className="w-3.5 h-3.5" />}
+                      <QrCode className="w-3.5 h-3.5" />
                       Assinar via Pix
                     </button>
                   )}
@@ -306,11 +329,11 @@ export default function Faturamento() {
                     <div className="py-2 text-center text-xs font-semibold text-green-700 bg-green-50 rounded-xl border border-green-200">Plano Ativo</div>
                   ) : (
                     <button
-                      onClick={() => handleAsaasCheckout('premium')}
+                      onClick={() => handleOpenCpfStep('premium')}
                       disabled={loading}
                       className="w-full py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-semibold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-sm disabled:opacity-60"
                     >
-                      {loading && selectedPlanToBuy === 'premium' ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <QrCode className="w-3.5 h-3.5" />}
+                      <QrCode className="w-3.5 h-3.5" />
                       Assinar via Pix
                     </button>
                   )}
@@ -324,6 +347,50 @@ export default function Faturamento() {
                 </div>
               )}
 
+            </div>
+          )}
+
+          {/* Passo CPF/CNPJ */}
+          {checkoutMode === 'cpf' && (
+            <div className="bg-white border border-border rounded-2xl shadow-sm p-6 md:p-8 animate-fade-in">
+              <h2 className="font-title font-bold text-xl text-text-primary mb-1">
+                Informação para cobrança
+              </h2>
+              <p className="text-sm text-text-secondary mb-6">
+                O Asaas exige CPF ou CNPJ para processar cobranças via Pix. Seus dados são usados apenas para emissão da cobrança.
+              </p>
+              <div className="space-y-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold uppercase tracking-wider text-text-secondary block">
+                    CPF ou CNPJ
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Somente números — CPF (11 dígitos) ou CNPJ (14 dígitos)"
+                    value={cpfInput}
+                    onChange={(e) => { setCpfInput(e.target.value); setCpfError(null); }}
+                    className="w-full px-3 py-2.5 border border-border rounded-xl bg-bg text-text-primary text-sm focus:outline-none focus:ring-1 focus:ring-rose-400 placeholder:text-text-muted"
+                    onKeyDown={(e) => e.key === 'Enter' && handleCpfSubmit()}
+                  />
+                  {cpfError && <p className="text-xs text-red-600">{cpfError}</p>}
+                </div>
+                <div className="flex gap-3 pt-2">
+                  <button
+                    onClick={() => setCheckoutMode('none')}
+                    className="flex-1 py-2.5 border border-border rounded-xl text-xs font-semibold text-text-secondary cursor-pointer"
+                  >
+                    Voltar
+                  </button>
+                  <button
+                    onClick={handleCpfSubmit}
+                    disabled={loading}
+                    className="flex-1 py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-60"
+                  >
+                    {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <QrCode className="w-3.5 h-3.5" />}
+                    Gerar QR Code Pix
+                  </button>
+                </div>
+              </div>
             </div>
           )}
 
