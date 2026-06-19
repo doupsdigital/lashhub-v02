@@ -664,24 +664,31 @@ export default function Dashboard() {
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={revenueTimeData} margin={{ top: 10, right: 10, left: 10, bottom: 5 }}>
                       <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(180,150,130,0.12)" />
-                      <XAxis dataKey="name" tickLine={false} axisLine={false} stroke="var(--text-secondary)" />
-                      <YAxis 
-                        tickLine={false} 
-                        axisLine={false} 
-                        stroke="var(--text-secondary)" 
+                      <XAxis
+                        dataKey="name"
+                        tickLine={false}
+                        axisLine={false}
+                        stroke="var(--text-secondary)"
+                        interval={Math.max(0, Math.ceil(revenueTimeData.length / 6) - 1)}
+                        tick={{ fontSize: 10 }}
+                      />
+                      <YAxis
+                        tickLine={false}
+                        axisLine={false}
+                        stroke="var(--text-secondary)"
                         tickFormatter={(value) => `R$ ${value}`}
                       />
-                      <Tooltip 
+                      <Tooltip
                         formatter={(value: any) => [`R$ ${Number(value).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`, 'Receita']}
                         contentStyle={{ backgroundColor: 'white', borderRadius: '8px', border: '1px solid rgba(180,150,130,0.2)' }}
                       />
-                      <Line 
-                        type="monotone" 
-                        dataKey="Valor" 
-                        stroke="#A85560" 
-                        strokeWidth={2.5} 
-                        dot={{ r: 4, stroke: '#A85560', strokeWidth: 1, fill: 'white' }} 
-                        activeDot={{ r: 6 }} 
+                      <Line
+                        type="monotone"
+                        dataKey="Valor"
+                        stroke="#A85560"
+                        strokeWidth={2.5}
+                        dot={false}
+                        activeDot={{ r: 5, fill: '#A85560' }}
                       />
                     </LineChart>
                   </ResponsiveContainer>
