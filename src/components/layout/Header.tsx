@@ -32,7 +32,7 @@ export default function Header({ setMobileOpen }: HeaderProps) {
   const { title, subtitle } = getPageInfo(location.pathname);
 
   return (
-    <header className="h-[60px] bg-white border-b border-border flex items-center justify-between px-6 sticky top-0 z-30">
+    <header className="h-[60px] bg-white border-b border-border flex items-center justify-between px-6 flex-shrink-0 z-30">
       <div className="flex items-center gap-3">
         {/* Acionador do menu Mobile */}
         <button
