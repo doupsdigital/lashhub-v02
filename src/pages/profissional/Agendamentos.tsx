@@ -51,11 +51,11 @@ interface AgendamentoWithRelations extends Omit<Agendamento, 'cliente'> {
 
 const DIAS_SEMANA = [
   { valor: 0, nome: 'Domingo', sigla: 'Dom' },
-  { valor: 1, nome: 'Segunda-feira', sigla: 'Seg' },
-  { valor: 2, nome: 'Terça-feira', sigla: 'Ter' },
-  { valor: 3, nome: 'Quarta-feira', sigla: 'Qua' },
-  { valor: 4, nome: 'Quinta-feira', sigla: 'Qui' },
-  { valor: 5, nome: 'Sexta-feira', sigla: 'Sex' },
+  { valor: 1, nome: 'Segunda', sigla: 'Seg' },
+  { valor: 2, nome: 'Terça', sigla: 'Ter' },
+  { valor: 3, nome: 'Quarta', sigla: 'Qua' },
+  { valor: 4, nome: 'Quinta', sigla: 'Qui' },
+  { valor: 5, nome: 'Sexta', sigla: 'Sex' },
   { valor: 6, nome: 'Sábado', sigla: 'Sáb' }
 ];
 
@@ -1019,28 +1019,30 @@ export default function Agendamentos() {
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           
           {/* Title & Navigation */}
-          <div className="flex items-center gap-4">
-            <h2 className="font-title font-semibold text-2xl text-text-primary">Agendamentos</h2>
-            
-            <div className="flex items-center bg-bg rounded-lg p-0.5 border border-border/40">
-              <button 
-                onClick={() => handleNavigateDate('prev')}
-                className="p-1.5 hover:bg-white hover:text-rose-600 rounded-md transition-all text-text-secondary cursor-pointer"
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-              <button 
-                onClick={() => handleNavigateDate('today')}
-                className="px-3 py-1 text-xs font-semibold hover:bg-white hover:text-rose-600 rounded-md transition-all text-text-secondary cursor-pointer"
-              >
-                Hoje
-              </button>
-              <button 
-                onClick={() => handleNavigateDate('next')}
-                className="p-1.5 hover:bg-white hover:text-rose-600 rounded-md transition-all text-text-secondary cursor-pointer"
-              >
-                <ChevronRight className="w-4 h-4" />
-              </button>
+          <div className="flex flex-col gap-0.5">
+            <div className="flex items-center gap-4">
+              <h2 className="font-title font-semibold text-2xl text-text-primary">Agendamentos</h2>
+              
+              <div className="flex items-center bg-bg rounded-lg p-0.5 border border-border/40">
+                <button 
+                  onClick={() => handleNavigateDate('prev')}
+                  className="p-1.5 hover:bg-white hover:text-rose-600 rounded-md transition-all text-text-secondary cursor-pointer"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <button 
+                  onClick={() => handleNavigateDate('today')}
+                  className="px-3 py-1 text-xs font-semibold hover:bg-white hover:text-rose-600 rounded-md transition-all text-text-secondary cursor-pointer"
+                >
+                  Hoje
+                </button>
+                <button 
+                  onClick={() => handleNavigateDate('next')}
+                  className="p-1.5 hover:bg-white hover:text-rose-600 rounded-md transition-all text-text-secondary cursor-pointer"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
             </div>
 
             <span className="font-title font-medium text-lg text-text-primary">
@@ -1051,10 +1053,10 @@ export default function Agendamentos() {
           </div>
 
           {/* Filters & Actions */}
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex flex-col lg:flex-row lg:items-center gap-3">
 
             {/* View switcher */}
-            <div className="flex bg-bg rounded-lg p-0.5 border border-border/40">
+            <div className="flex w-full lg:w-auto bg-bg rounded-lg p-0.5 border border-border/40">
               {[
                 { id: 'diaria', label: 'Dia' },
                 { id: 'semanal', label: 'Semana' },
@@ -1063,7 +1065,7 @@ export default function Agendamentos() {
                 <button
                   key={mode.id}
                   onClick={() => setViewMode(mode.id as any)}
-                  className={`px-3 py-1 rounded-md text-xs font-semibold transition-all cursor-pointer ${viewMode === mode.id
+                  className={`flex-1 lg:flex-none px-3 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer text-center ${viewMode === mode.id
                     ? 'bg-white text-rose-600 shadow-sm border border-border/30'
                     : 'text-text-secondary hover:text-rose-600'}`}
                 >
@@ -1075,7 +1077,7 @@ export default function Agendamentos() {
             {/* Create button */}
             <button
               onClick={() => handleOpenForm(currentDate)}
-              className="flex items-center justify-center gap-1 px-3 py-2 bg-rose-600 hover:bg-rose-800 text-white rounded-lg text-xs font-semibold transition-colors cursor-pointer"
+              className="flex items-center justify-center gap-1 w-full lg:w-auto px-3 py-2.5 bg-rose-600 hover:bg-rose-800 text-white rounded-lg text-xs font-semibold transition-colors cursor-pointer"
             >
               <Plus className="w-4 h-4" />
               Novo Agendamento
@@ -1214,26 +1216,31 @@ export default function Agendamentos() {
                       const top = (startHourVal - startHour) * 60;
                       const height = (appt.duracao_minutos / 60) * 60;
                       const colors = getStatusColorStyles(appt.status);
+                      const weekAccentBorder =
+                        appt.status === 'cancelado' ? 'border-l-gray-400' :
+                        appt.status === 'concluido' ? 'border-l-emerald-500' :
+                        appt.status === 'pendente' ? 'border-l-amber-500' :
+                        appt.status === 'falta' ? 'border-l-red-500' :
+                        'border-l-rose-500';
                       return (
                         <div
                           key={appt.id}
                           style={{ top: `${top}px`, height: `${height}px` }}
                           onClick={(e) => { e.stopPropagation(); handleOpenDetail(appt); }}
-                          className={`absolute left-1.5 right-1.5 rounded-lg border px-2 py-1.5 text-[10px] flex flex-col justify-between overflow-hidden shadow-sm cursor-pointer z-10 transition-all ${colors.border} ${colors.bg}`}
-                          title={`${appt.cliente?.nome} ${appt.cliente?.sobrenome} - ${appt.agendamento_servicos?.map(s => s.servico?.nome).join(', ')}`}
+                          className={`absolute left-1 right-1 rounded-lg border border-l-[3px] overflow-hidden px-2 py-1 flex flex-col shadow-sm cursor-pointer z-10 transition-all ${colors.border} ${weekAccentBorder} ${colors.bg}`}
+                          title={`${appt.cliente?.nome} ${appt.cliente?.sobrenome} — ${appt.agendamento_servicos?.map(s => s.servico?.nome).join(', ')}`}
                         >
-                          <div className="truncate min-w-0">
-                            <p className="font-bold truncate leading-tight">{appt.cliente?.nome} {appt.cliente?.sobrenome}</p>
-                            <p className="text-[9px] truncate mt-0.5 opacity-80">
-                              {appt.agendamento_servicos?.map(s => s.servico?.nome).join(', ')}
-                            </p>
-                          </div>
-                          <div className="flex items-center justify-between border-t border-black/5 pt-0.5 mt-0.5 text-[8px] font-semibold opacity-75">
-                            <span>🕒 {apptDate.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</span>
-                            <span className={`px-1 py-0.5 rounded text-[7px] font-bold ${appt.origem === 'portal' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-500'}`}>
-                              {appt.origem === 'portal' ? 'Portal' : 'Manual'}
+                          <div className="flex items-start justify-between gap-1 min-h-0">
+                            <p className="font-bold text-[10px] leading-tight truncate flex-1">{appt.cliente?.nome} {appt.cliente?.sobrenome}</p>
+                            <span className="text-[9px] opacity-70 whitespace-nowrap flex-shrink-0">
+                              {apptDate.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
                             </span>
                           </div>
+                          {height >= 44 && (
+                            <p className="text-[9px] opacity-75 truncate leading-tight mt-0.5">
+                              {appt.agendamento_servicos?.map(s => s.servico?.nome).join(', ')}
+                            </p>
+                          )}
                         </div>
                       );
                     })}
@@ -1291,37 +1298,47 @@ export default function Agendamentos() {
                   const startHourVal = apptDate.getHours() + apptDate.getMinutes() / 60;
                   const top = (startHourVal - startHour) * 60;
                   const height = (appt.duracao_minutos / 60) * 60;
-
                   const colors = getStatusColorStyles(appt.status);
+
+                  // Accent left border por status (inspirado no layout de referência)
+                  const accentBorder =
+                    appt.status === 'cancelado' ? 'border-l-gray-400' :
+                    appt.status === 'concluido' ? 'border-l-emerald-500' :
+                    appt.status === 'pendente' ? 'border-l-amber-500' :
+                    appt.status === 'falta' ? 'border-l-red-500' :
+                    'border-l-rose-500';
 
                   return (
                     <div
                       key={appt.id}
                       style={{ top: `${top}px`, height: `${height}px` }}
                       onClick={() => handleOpenDetail(appt)}
-                      className={`absolute left-3 right-3 rounded-lg border px-3 py-2 flex flex-col justify-between shadow-sm cursor-pointer z-10 transition-all ${colors.border} ${colors.bg}`}
+                      className={`absolute left-2 right-2 rounded-lg border border-l-[4px] overflow-hidden px-3 py-1.5 flex flex-col shadow-sm cursor-pointer z-10 transition-all ${colors.border} ${accentBorder} ${colors.bg}`}
                     >
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <p className="font-bold text-sm text-text-primary leading-snug">
-                            {appt.cliente?.nome} {appt.cliente?.sobrenome}
-                            <span className="text-xs font-normal text-text-secondary ml-2">({appt.cliente?.whatsapp})</span>
-                          </p>
-                          <p className="text-xs text-text-secondary mt-0.5">
-                            {appt.agendamento_servicos?.map(s => s.servico?.nome).join(', ')}
-                            {appt.observacoes && <span className="text-text-muted italic block mt-0.5 text-[10px]">"{appt.observacoes}"</span>}
-                          </p>
-                        </div>
-                        <span className={`text-[10px] font-bold border px-2.5 py-0.5 rounded-full ${colors.badge}`}>
-                          🕒 {apptDate.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })} ({appt.duracao_minutos} min)
+                      {/* Linha 1: Nome + Horário */}
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="font-bold text-sm leading-tight truncate flex-1">
+                          {appt.cliente?.nome} {appt.cliente?.sobrenome}
+                        </p>
+                        <span className="text-xs font-semibold opacity-75 whitespace-nowrap flex-shrink-0">
+                          {apptDate.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
                         </span>
                       </div>
-                      <div className="border-t border-black/5 pt-1 mt-1 text-[10px] font-semibold text-text-secondary flex justify-between">
-                        <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold ${appt.origem === 'portal' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-500'}`}>
-                          {appt.origem === 'portal' ? 'Portal' : 'Manual'}
-                        </span>
-                        <span>Total: R$ {appt.agendamento_servicos?.reduce((sum, s) => sum + Number(s.valor_cobrado), 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-                      </div>
+                      {/* Linha 2: Serviço — só exibe se houver espaço (>= 48px ≈ 30 min) */}
+                      {height >= 48 && (
+                        <p className="text-xs opacity-75 truncate leading-tight mt-0.5">
+                          {appt.agendamento_servicos?.map(s => s.servico?.nome).join(', ')}
+                          {appt.observacoes && (
+                            <span className="opacity-60 italic ml-1">· {appt.observacoes}</span>
+                          )}
+                        </p>
+                      )}
+                      {/* Linha 3: Duração — só exibe se houver espaço suficiente (>= 70px ≈ ~45 min) */}
+                      {height >= 70 && (
+                        <p className="text-[10px] opacity-50 mt-auto">
+                          {appt.duracao_minutos} min
+                        </p>
+                      )}
                     </div>
                   );
                 })}
