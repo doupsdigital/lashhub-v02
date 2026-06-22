@@ -64,7 +64,7 @@ export default function Login() {
           <h1 className="font-title font-bold text-3xl tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-rose-600 to-rose-400">
             Lash Hub
           </h1>
-          <p className="text-sm text-text-secondary mt-2 font-medium leading-relaxed max-w-[300px]">
+          <p className="text-sm text-text-secondary mt-2 font-medium italic leading-relaxed max-w-[300px]">
             Sua agenda e suas clientes em um só lugar.
           </p>
         </div>

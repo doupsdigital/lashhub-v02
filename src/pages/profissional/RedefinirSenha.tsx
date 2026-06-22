@@ -71,7 +71,7 @@ export default function RedefinirSenha() {
           <h2 className="font-title font-semibold text-xl text-text-primary mt-5">
             Criar nova senha
           </h2>
-          <p className="text-sm text-text-secondary mt-2 font-medium leading-relaxed max-w-[300px]">
+          <p className="text-sm text-text-secondary mt-2 font-medium italic leading-relaxed max-w-[300px]">
             Digite sua nova senha abaixo para reestabelecer o acesso à sua conta.
           </p>
         </div>

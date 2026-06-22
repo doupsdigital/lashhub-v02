@@ -53,7 +53,7 @@ export default function RecuperarSenha() {
           <h2 className="font-title font-semibold text-xl text-text-primary mt-5">
             Esqueci minha senha
           </h2>
-          <p className="text-sm text-text-secondary mt-2 font-medium leading-relaxed max-w-[300px]">
+          <p className="text-sm text-text-secondary mt-2 font-medium italic leading-relaxed max-w-[300px]">
             Digite seu e-mail para receber instruções de redefinição.
           </p>
         </div>
