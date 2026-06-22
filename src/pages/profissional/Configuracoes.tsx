@@ -376,6 +376,11 @@ export default function Configuracoes() {
         .eq('id', configuracaoId);
 
       if (error) throw error;
+
+      // Sincronizar localStorage com o estado salvo — única fonte de verdade para o cache
+      localStorage.setItem('app_theme_palette', paletaCores);
+      localStorage.setItem('app_theme_dark_mode', modoEscuro ? 'true' : 'false');
+
       setSuccessModal({
         isOpen: true,
         title: 'Cores salvas!',

@@ -258,8 +258,4 @@ export const applyPalette = (paletteName: string, isDarkMode: boolean) => {
   } else {
     root.classList.remove('dark');
   }
-
-  // Salva no localStorage para carregamento rápido
-  localStorage.setItem('app_theme_palette', selectedName);
-  localStorage.setItem('app_theme_dark_mode', isDarkMode ? 'true' : 'false');
 };
