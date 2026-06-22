@@ -100,6 +100,7 @@ export default function Faturamento() {
 
   const [pixQrCodeImage, setPixQrCodeImage] = useState<string | null>(null);
   const [pixKey, setPixKey] = useState<string | null>(null);
+  const [currentPaymentId, setCurrentPaymentId] = useState<string | null>(null);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [cancelConfirm, setCancelConfirm] = useState(false);
@@ -108,31 +109,66 @@ export default function Faturamento() {
   const [showAsaasInfo, setShowAsaasInfo] = useState(false);
 
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const pollingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const daysRemaining = trialEndsAt
     ? Math.max(0, Math.ceil((new Date(trialEndsAt).getTime() - Date.now()) / 86400000))
     : 0;
 
-  // Para o polling ao desmontar ou sair do checkout
+  // Para o polling ao desmontar
   useEffect(() => {
-    return () => { if (pollingRef.current) clearInterval(pollingRef.current); };
+    return () => {
+      if (pollingRef.current) clearInterval(pollingRef.current);
+      if (pollingTimeoutRef.current) clearTimeout(pollingTimeoutRef.current);
+    };
   }, []);
 
-  // Inicia polling para detectar pagamento confirmado
-  const startPolling = (estabelecimentoId: string) => {
+  const stopPolling = () => {
     if (pollingRef.current) clearInterval(pollingRef.current);
-    pollingRef.current = setInterval(async () => {
-      const { data } = await supabase
+    if (pollingTimeoutRef.current) clearTimeout(pollingTimeoutRef.current);
+  };
+
+  // Polling dual: consulta Asaas diretamente (fallback) + verifica DB (captura webhook)
+  // Para automaticamente após 15 minutos
+  const startPolling = (estabelecimentoId: string, paymentId: string | null) => {
+    stopPolling();
+
+    const checkPayment = async () => {
+      // 1. Se tiver paymentId, consulta Asaas diretamente (não depende do webhook)
+      if (paymentId) {
+        try {
+          const { data } = await supabase.functions.invoke('asaas-check-payment', {
+            body: { payment_id: paymentId, estabelecimento_id: estabelecimentoId },
+          });
+          if (data?.ativo) {
+            stopPolling();
+            await refreshProfile();
+            setCheckoutMode('success');
+            return;
+          }
+        } catch {
+          // Falha na Edge Function → fallback para verificação no DB abaixo
+        }
+      }
+
+      // 2. Fallback: verifica se webhook já atualizou o banco
+      const { data: est } = await supabase
         .from('estabelecimentos')
         .select('status_assinatura')
         .eq('id', estabelecimentoId)
         .single();
-      if (data?.status_assinatura === 'ativo') {
-        clearInterval(pollingRef.current!);
+
+      if (est?.status_assinatura === 'ativo') {
+        stopPolling();
         await refreshProfile();
         setCheckoutMode('success');
       }
-    }, 5000);
+    };
+
+    pollingRef.current = setInterval(checkPayment, 10000);
+
+    // Para o polling após 15 minutos independente do resultado
+    pollingTimeoutRef.current = setTimeout(stopPolling, 15 * 60 * 1000);
   };
 
   const validateCpfCnpj = (value: string) => {
@@ -177,7 +213,8 @@ export default function Faturamento() {
       if (!data?.invoiceUrl) throw new Error('Link de pagamento não disponível.');
 
       window.open(data.invoiceUrl, '_blank');
-      startPolling(profile.estabelecimento_id);
+      // Cartão não retorna paymentId — polling usa só DB como fallback
+      startPolling(profile.estabelecimento_id, data.paymentId ?? null);
     } catch (err: unknown) {
       setCheckoutError(err instanceof Error ? err.message : 'Erro ao gerar link de pagamento.');
     } finally {
@@ -205,8 +242,9 @@ export default function Faturamento() {
 
       setPixQrCodeImage(data.pixQrCodeImage);
       setPixKey(data.pixKey);
+      setCurrentPaymentId(data.paymentId ?? null);
       setCheckoutMode('pix');
-      startPolling(profile.estabelecimento_id);
+      startPolling(profile.estabelecimento_id, data.paymentId ?? null);
     } catch (err: unknown) {
       setCheckoutError(err instanceof Error ? err.message : 'Erro ao gerar cobrança. Tente novamente.');
     } finally {
