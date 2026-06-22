@@ -79,13 +79,13 @@ export default function CadastroCliente() {
       }
 
       // Passo 2 — Verificar se a profissional já cadastrou essa cliente manualmente
-      // Se sim, reaproveita o registro existente para não criar duplicata
-      const { data: clienteExistente } = await supabase
-        .from('clientes')
-        .select('id')
-        .eq('email', form.email.trim().toLowerCase())
-        .eq('estabelecimento_id', establishmentId)
-        .maybeSingle();
+      // Usa RPC com SECURITY DEFINER para contornar RLS (anon não tem SELECT em clientes)
+      const { data: clienteExistenteId } = await supabase
+        .rpc('get_cliente_id_by_email', {
+          p_email: form.email.trim().toLowerCase(),
+          p_estabelecimento_id: establishmentId,
+        });
+      const clienteExistente = clienteExistenteId ? { id: clienteExistenteId as string } : null;
 
       const isNovoCliente = !clienteExistente;
       const clientId = clienteExistente?.id ?? crypto.randomUUID();

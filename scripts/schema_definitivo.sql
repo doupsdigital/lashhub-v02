@@ -436,6 +436,26 @@ CREATE POLICY "clientes_anon_insert"
   ON public.clientes FOR INSERT TO anon
   WITH CHECK (true);
 
+-- Função RPC usada no cadastro do portal para verificar se a profissional já
+-- cadastrou a cliente manualmente (bypass de RLS — retorna apenas o UUID).
+CREATE OR REPLACE FUNCTION public.get_cliente_id_by_email(
+  p_email           TEXT,
+  p_estabelecimento_id UUID
+)
+RETURNS UUID
+LANGUAGE SQL
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT id
+  FROM public.clientes
+  WHERE LOWER(email) = LOWER(p_email)
+    AND estabelecimento_id = p_estabelecimento_id
+  LIMIT 1;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.get_cliente_id_by_email TO anon;
+
 -- CATEGORIAS DE SERVIÇO
 CREATE POLICY "categorias_public_select"
   ON public.categorias_servico FOR SELECT TO anon, authenticated
