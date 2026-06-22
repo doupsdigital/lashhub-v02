@@ -67,7 +67,7 @@ export default function CadastroCliente() {
         throw new Error('Estabelecimento não carregado.');
       }
 
-      // Passo 1 — Verificar se e-mail já está cadastrado antes de criar qualquer registro
+      // Passo 1 — Verificar se e-mail já possui conta de acesso
       const { data: existingUser } = await supabase
         .from('usuarios')
         .select('id')
@@ -78,23 +78,33 @@ export default function CadastroCliente() {
         throw new Error('Este e-mail já está cadastrado.');
       }
 
-      // Passo 2 — Inserir clientes ANTES do auth.signUp porque a trigger
-      // handle_new_user_onboarding precisa do registro em clientes para criar usuarios.
-      const clientId = crypto.randomUUID();
-
-      const { error: clientError } = await supabase
+      // Passo 2 — Verificar se a profissional já cadastrou essa cliente manualmente
+      // Se sim, reaproveita o registro existente para não criar duplicata
+      const { data: clienteExistente } = await supabase
         .from('clientes')
-        .insert({
-          id: clientId,
-          nome: form.nome.trim(),
-          sobrenome: form.sobrenome.trim(),
-          email: form.email.trim().toLowerCase(),
-          whatsapp: form.whatsapp,
-          estabelecimento_id: establishmentId
-        });
+        .select('id')
+        .eq('email', form.email.trim().toLowerCase())
+        .eq('estabelecimento_id', establishmentId)
+        .maybeSingle();
 
-      if (clientError) {
-        throw new Error(`Erro ao registrar dados do cliente: ${clientError.message}`);
+      const isNovoCliente = !clienteExistente;
+      const clientId = clienteExistente?.id ?? crypto.randomUUID();
+
+      if (isNovoCliente) {
+        const { error: clientError } = await supabase
+          .from('clientes')
+          .insert({
+            id: clientId,
+            nome: form.nome.trim(),
+            sobrenome: form.sobrenome.trim(),
+            email: form.email.trim().toLowerCase(),
+            whatsapp: form.whatsapp,
+            estabelecimento_id: establishmentId
+          });
+
+        if (clientError) {
+          throw new Error(`Erro ao registrar dados do cliente: ${clientError.message}`);
+        }
       }
 
       // Passo 3 — Criar usuário no Auth
@@ -112,8 +122,10 @@ export default function CadastroCliente() {
       });
 
       if (authError) {
-        // Rollback: remove o registro de clientes criado no passo anterior
-        await supabase.from('clientes').delete().eq('id', clientId);
+        // Rollback: só remove o registro de clientes se foi criado agora
+        if (isNovoCliente) {
+          await supabase.from('clientes').delete().eq('id', clientId);
+        }
 
         const msg = authError.message.toLowerCase();
         if (msg.includes('already registered') || msg.includes('already been registered')) {
@@ -126,7 +138,9 @@ export default function CadastroCliente() {
       }
 
       if (!authData.user) {
-        await supabase.from('clientes').delete().eq('id', clientId);
+        if (isNovoCliente) {
+          await supabase.from('clientes').delete().eq('id', clientId);
+        }
         throw new Error('Ocorreu um erro ao criar sua conta. Tente novamente.');
       }
 
