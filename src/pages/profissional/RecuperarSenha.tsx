@@ -39,7 +39,7 @@ export default function RecuperarSenha() {
       <div className="absolute bottom-[-20%] right-[-10%] w-[500px] h-[500px] rounded-full bg-rose-100/40 blur-3xl pointer-events-none" />
 
       <div className="w-full max-w-[420px] bg-white border border-border rounded-[20px] shadow-xl p-8 md:p-10 relative z-10 animate-fade-in">
-        <div className="flex flex-col items-center text-center mb-8">
+        <div className="flex flex-col items-center text-center mb-4">
           <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-rose-600 to-rose-400 text-white flex items-center justify-center shadow-lg mb-4 hover:scale-105 transition-transform duration-300 overflow-hidden">
             <img
               src="/logo-login.png"
@@ -53,7 +53,7 @@ export default function RecuperarSenha() {
           <h2 className="font-title font-semibold text-xl text-text-primary mt-5">
             Esqueci minha senha
           </h2>
-          <p className="text-xs text-text-secondary mt-2 font-medium leading-relaxed max-w-[280px]">
+          <p className="text-sm text-text-secondary mt-2 font-medium leading-relaxed max-w-[300px]">
             Digite seu e-mail para receber instruções de redefinição.
           </p>
         </div>
