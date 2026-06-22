@@ -1,9 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Calendar, Clock, Tag, AlertCircle, Loader2, ClipboardList, Info } from 'lucide-react';
+import { Calendar, Clock, Tag, AlertCircle, Loader2, ClipboardList, Info, X, AlertTriangle } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
-import ConfirmModal from '../../components/common/ConfirmModal';
 import { usePortal } from '../../contexts/PortalContext';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -96,6 +95,7 @@ export default function PortalMeusAgendamentos() {
   
   const [antecedenciaMinima, setAntecedenciaMinima] = useState<number>(24);
   const [apptParaCancelar, setApptParaCancelar] = useState<AgendamentoWithServices | null>(null);
+  const [motivoCancelamento, setMotivoCancelamento] = useState('');
   const [cancelandoId, setCancelandoId] = useState<string | null>(null);
 
   const fetchAgendamentos = async () => {
@@ -171,18 +171,22 @@ export default function PortalMeusAgendamentos() {
   const handleConfirmarCancelamento = async () => {
     if (!apptParaCancelar) return;
     const apptId = apptParaCancelar.id;
+    const motivo = motivoCancelamento.trim() || null;
     setCancelandoId(apptId);
     setApptParaCancelar(null);
+    setMotivoCancelamento('');
 
     try {
       const { error: cancelErr } = await supabase
         .from('agendamentos')
-        .update({ status: 'cancelado' })
+        .update({
+          status: 'cancelado',
+          ...(motivo && { observacoes: motivo }),
+        })
         .eq('id', apptId);
 
       if (cancelErr) throw cancelErr;
 
-      // Atualizar o estado localmente sem precisar recarregar a página
       setAgendamentos(prev =>
         prev.map(a => (a.id === apptId ? { ...a, status: 'cancelado' } : a))
       );
@@ -445,17 +449,74 @@ export default function PortalMeusAgendamentos() {
         )}
       </section>
 
-      {/* CONFIRM MODAL FOR CANCELLATION */}
-      <ConfirmModal
-        isOpen={apptParaCancelar !== null}
-        onClose={() => setApptParaCancelar(null)}
-        onConfirm={handleConfirmarCancelamento}
-        title="Cancelar Agendamento"
-        description="Tem certeza que deseja cancelar este agendamento? Esta ação não poderá ser desfeita e liberará o horário para outras clientes."
-        confirmText="Sim, cancelar"
-        cancelText="Voltar"
-        type="warning"
-      />
+      {/* MODAL DE CONFIRMAÇÃO DE CANCELAMENTO */}
+      {apptParaCancelar && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4 animate-fade-in">
+          <div
+            className="bg-white rounded-2xl border border-border shadow-2xl w-full max-w-sm p-6 flex flex-col gap-4 animate-slide-up relative"
+            onClick={e => e.stopPropagation()}
+          >
+            <button
+              onClick={() => { setApptParaCancelar(null); setMotivoCancelamento(''); }}
+              className="absolute top-4 right-4 text-text-secondary hover:text-rose-600 p-1 rounded-full hover:bg-bg transition-colors cursor-pointer"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            <div className="flex flex-col items-center text-center gap-2">
+              <div className="w-12 h-12 rounded-full bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-600">
+                <AlertTriangle className="w-6 h-6" />
+              </div>
+              <h3 className="font-title font-semibold text-lg text-text-primary">
+                Cancelar Agendamento
+              </h3>
+              <p className="text-xs text-text-secondary leading-relaxed">
+                Tem certeza que deseja cancelar este agendamento?
+                Esta ação não poderá ser desfeita e o horário será liberado.
+              </p>
+            </div>
+
+            {/* Resumo do agendamento */}
+            <div className="bg-bg rounded-xl border border-border p-3 text-xs text-text-secondary space-y-1">
+              <p className="font-semibold text-text-primary text-sm">
+                {formatDataHoraExtenso(apptParaCancelar.data_hora)}
+              </p>
+              <p>
+                {apptParaCancelar.agendamento_servicos?.map(s => s.servico?.nome).join(', ')}
+              </p>
+            </div>
+
+            {/* Motivo (opcional) */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold uppercase tracking-wider text-text-secondary block">
+                Motivo do cancelamento <span className="text-text-muted font-normal normal-case tracking-normal">(opcional)</span>
+              </label>
+              <textarea
+                rows={3}
+                value={motivoCancelamento}
+                onChange={e => setMotivoCancelamento(e.target.value)}
+                placeholder="Ex: Não vou conseguir comparecer, surgiu um imprevisto..."
+                className="w-full px-3 py-2 border border-border rounded-xl bg-bg text-text-primary text-sm focus:outline-none focus:ring-1 focus:ring-amber-400 resize-none placeholder:text-text-muted"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                onClick={() => { setApptParaCancelar(null); setMotivoCancelamento(''); }}
+                className="px-4 py-2.5 border border-border hover:bg-bg text-text-secondary rounded-xl text-xs font-semibold cursor-pointer transition-colors"
+              >
+                Voltar
+              </button>
+              <button
+                onClick={handleConfirmarCancelamento}
+                className="px-4 py-2.5 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-semibold cursor-pointer transition-colors"
+              >
+                Sim, cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
