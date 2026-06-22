@@ -180,9 +180,11 @@ export default function Servicos() {
     e.preventDefault();
     if (!categoriaNome.trim()) return;
 
-    const nomeLower = categoriaNome.trim().toLowerCase();
+    const normalizar = (s: string) =>
+      s.trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+    const nomeNorm = normalizar(categoriaNome);
     const duplicata = categorias.find(
-      c => c.nome.trim().toLowerCase() === nomeLower && c.id !== editingCategoria?.id
+      c => normalizar(c.nome) === nomeNorm && c.id !== editingCategoria?.id
     );
     if (duplicata) {
       setCategoriaError(`Já existe uma categoria com o nome "${duplicata.nome}".`);
@@ -303,10 +305,12 @@ export default function Servicos() {
     e.preventDefault();
     if (!servicoNome.trim() || !servicoCategoriaId) return;
 
-    const nomeLower = servicoNome.trim().toLowerCase();
+    const normalizar = (s: string) =>
+      s.trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+    const nomeNorm = normalizar(servicoNome);
     const todosServicos = categorias.flatMap(c => c.servicos);
     const duplicata = todosServicos.find(
-      s => s.nome.trim().toLowerCase() === nomeLower && s.id !== editingServico?.id
+      s => normalizar(s.nome) === nomeNorm && s.id !== editingServico?.id
     );
     if (duplicata) {
       setServicoError(`Já existe um serviço com o nome "${duplicata.nome}".`);
