@@ -58,7 +58,7 @@ function PaymentButtons({
         <button
           onClick={onCard}
           disabled={pixLoading || cardLoading}
-          className="w-full py-3 px-4 border border-border hover:bg-bg active:scale-[0.99] text-text-primary rounded-xl text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer shadow-sm hover:shadow-md disabled:opacity-60 disabled:pointer-events-none"
+          className="w-full py-3 px-4 bg-surface border border-border hover:bg-bg active:scale-[0.99] text-text-primary rounded-xl text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer shadow-sm hover:shadow-md disabled:opacity-60 disabled:pointer-events-none"
         >
           {cardLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <CreditCard className="w-4 h-4" />}
           Pagar com Cartão de Crédito
