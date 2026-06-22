@@ -64,6 +64,10 @@ export default function Servicos() {
   // Tooltip / Notification state for delete locks
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  // Inline errors inside modals
+  const [categoriaError, setCategoriaError] = useState<string | null>(null);
+  const [servicoError, setServicoError] = useState<string | null>(null);
+
   // Confirm Modal States
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
   const [confirmModalConfig, setConfirmModalConfig] = useState<{
@@ -161,6 +165,7 @@ export default function Servicos() {
 
   // CATEGORIA ACTIONS
   const handleOpenCategoriaModal = (cat: CategoriaServico | null = null) => {
+    setCategoriaError(null);
     if (cat) {
       setEditingCategoria(cat);
       setCategoriaNome(cat.nome);
@@ -174,6 +179,16 @@ export default function Servicos() {
   const handleSaveCategoria = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!categoriaNome.trim()) return;
+
+    const nomeLower = categoriaNome.trim().toLowerCase();
+    const duplicata = categorias.find(
+      c => c.nome.trim().toLowerCase() === nomeLower && c.id !== editingCategoria?.id
+    );
+    if (duplicata) {
+      setCategoriaError(`Já existe uma categoria com o nome "${duplicata.nome}".`);
+      return;
+    }
+    setCategoriaError(null);
 
     try {
       if (editingCategoria) {
@@ -241,6 +256,7 @@ export default function Servicos() {
 
   // SERVICO ACTIONS
   const handleOpenServicoModal = (serv: ServicoWithRelations | null = null) => {
+    setServicoError(null);
     if (serv) {
       setEditingServico(serv);
       setServicoNome(serv.nome);
@@ -286,6 +302,17 @@ export default function Servicos() {
   const handleSaveServico = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!servicoNome.trim() || !servicoCategoriaId) return;
+
+    const nomeLower = servicoNome.trim().toLowerCase();
+    const todosServicos = categorias.flatMap(c => c.servicos);
+    const duplicata = todosServicos.find(
+      s => s.nome.trim().toLowerCase() === nomeLower && s.id !== editingServico?.id
+    );
+    if (duplicata) {
+      setServicoError(`Já existe um serviço com o nome "${duplicata.nome}".`);
+      return;
+    }
+    setServicoError(null);
 
     try {
       let servicoId = '';
@@ -687,15 +714,22 @@ export default function Servicos() {
                 <label className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
                   Nome da Categoria <span className="text-red-500">*</span>
                 </label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   required
                   placeholder="Ex: Extensão de Cílios, Lash Lifting, Sobrancelhas..."
                   value={categoriaNome}
-                  onChange={(e) => setCategoriaNome(e.target.value)}
+                  onChange={(e) => { setCategoriaNome(e.target.value); setCategoriaError(null); }}
                   className="w-full px-3 py-2 border border-border rounded-lg bg-bg text-text-primary text-sm focus:outline-none focus:ring-1 focus:ring-rose-400 placeholder:text-text-muted"
                 />
               </div>
+
+              {categoriaError && (
+                <div className="flex items-center gap-2 bg-red-50 border border-red-200 text-red-800 px-3 py-2 rounded-lg">
+                  <AlertCircle className="w-4 h-4 flex-shrink-0 text-red-600" />
+                  <p className="text-xs font-medium">{categoriaError}</p>
+                </div>
+              )}
 
               <div className="flex items-center justify-end gap-3 pt-3 border-t border-border">
                 <button
@@ -861,6 +895,13 @@ export default function Servicos() {
               </div>
 
               {/* Action buttons */}
+              {servicoError && (
+                <div className="flex items-center gap-2 bg-red-50 border border-red-200 text-red-800 px-3 py-2 rounded-lg">
+                  <AlertCircle className="w-4 h-4 flex-shrink-0 text-red-600" />
+                  <p className="text-xs font-medium">{servicoError}</p>
+                </div>
+              )}
+
               <div className="flex items-center justify-end gap-3 pt-4 border-t border-border">
                 <button
                   type="button"
