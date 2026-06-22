@@ -446,22 +446,27 @@ CREATE OR REPLACE FUNCTION public.get_cliente_id_by_email_or_whatsapp(
   p_estabelecimento_id UUID
 )
 RETURNS UUID
-LANGUAGE SQL
+LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = public
 AS $$
+DECLARE
+  v_id UUID;
+BEGIN
   -- 1ª tentativa: match por email
-  SELECT id
+  SELECT id INTO v_id
   FROM public.clientes
   WHERE LOWER(email) = LOWER(p_email)
     AND estabelecimento_id = p_estabelecimento_id
-  LIMIT 1
+  LIMIT 1;
 
-  UNION ALL
+  IF v_id IS NOT NULL THEN
+    RETURN v_id;
+  END IF;
 
   -- 2ª tentativa: fallback por WhatsApp (apenas dígitos) quando sem email
   -- e somente se o registro ainda não tem conta de acesso (sem usuarios)
-  SELECT c.id
+  SELECT c.id INTO v_id
   FROM public.clientes c
   WHERE REGEXP_REPLACE(c.whatsapp, '[^0-9]', '', 'g') = p_whatsapp_digits
     AND c.estabelecimento_id = p_estabelecimento_id
@@ -469,9 +474,10 @@ AS $$
     AND NOT EXISTS (
       SELECT 1 FROM public.usuarios u WHERE u.cliente_id = c.id
     )
-  LIMIT 1
-
   LIMIT 1;
+
+  RETURN v_id;
+END;
 $$;
 
 GRANT EXECUTE ON FUNCTION public.get_cliente_id_by_email_or_whatsapp TO anon;
