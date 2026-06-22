@@ -308,10 +308,17 @@ body {
   background-color: var(--bg) !important;
   opacity: 0.45 !important;
 }
-/* Botão outline de pagamento — elevação sutil em dark mode */
+/* Botão outline de pagamento — fundo tintado para diferenciar do card */
+.btn-outline-payment {
+  background-color: var(--rose-50) !important;
+  border-color: var(--rose-200) !important;
+}
+.btn-outline-payment:hover {
+  background-color: var(--rose-100) !important;
+}
 .dark .btn-outline-payment {
   background-color: rgba(255, 255, 255, 0.07) !important;
-  border-color: rgba(255, 255, 255, 0.18) !important;
+  border-color: rgba(255, 255, 255, 0.20) !important;
 }
 .dark .btn-outline-payment:hover {
   background-color: rgba(255, 255, 255, 0.12) !important;

@@ -31,7 +31,7 @@ export default {
         },
       },
       fontFamily: {
-        title: ['"Cormorant Garamond"', 'serif'],
+        title: ['"Crimson Pro"', 'serif'],
         sans: ['"DM Sans"', 'sans-serif'],
       },
       borderColor: {
