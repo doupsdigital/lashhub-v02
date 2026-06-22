@@ -29,13 +29,18 @@ serve(async (req) => {
       return new Response('Estabelecimento nao encontrado', { status: 200 })
     }
 
-    let novoStatus = null
+    let novoStatus: string | null = null
+    let novoPlano:  string | null = null
 
     switch (eventType) {
       case 'PAYMENT_RECEIVED':
-      case 'PAYMENT_CONFIRMED':
+      case 'PAYMENT_CONFIRMED': {
         novoStatus = 'ativo'
+        // Determina o plano pelo valor pago (fonte de verdade do Asaas)
+        const valor = parseFloat(String(payment.value ?? 0))
+        novoPlano = valor >= 90 ? 'premium' : 'basico'
         break
+      }
       case 'PAYMENT_OVERDUE':
         novoStatus = 'suspenso'
         break
@@ -46,9 +51,12 @@ serve(async (req) => {
     }
 
     if (novoStatus) {
+      const update: Record<string, string> = { status_assinatura: novoStatus }
+      if (novoPlano) update.plano = novoPlano
+
       await supabase
         .from('estabelecimentos')
-        .update({ status_assinatura: novoStatus })
+        .update(update)
         .eq('id', estab.id)
     }
 
