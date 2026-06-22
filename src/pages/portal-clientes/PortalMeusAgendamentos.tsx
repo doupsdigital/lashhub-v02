@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Calendar, Clock, Tag, AlertCircle, Loader2, ClipboardList, Info, X, AlertTriangle } from 'lucide-react';
+import { Calendar, Clock, Tag, AlertCircle, Loader2, ClipboardList, Info, X, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import { usePortal } from '../../contexts/PortalContext';
@@ -97,6 +97,7 @@ export default function PortalMeusAgendamentos() {
   const [apptParaCancelar, setApptParaCancelar] = useState<AgendamentoWithServices | null>(null);
   const [motivoCancelamento, setMotivoCancelamento] = useState('');
   const [cancelandoId, setCancelandoId] = useState<string | null>(null);
+  const [cancelamentoSucesso, setCancelamentoSucesso] = useState(false);
 
   const fetchAgendamentos = async () => {
     if (!clienteId || !establishmentId) return;
@@ -190,6 +191,7 @@ export default function PortalMeusAgendamentos() {
       setAgendamentos(prev =>
         prev.map(a => (a.id === apptId ? { ...a, status: 'cancelado' } : a))
       );
+      setCancelamentoSucesso(true);
     } catch (err) {
       console.error('Erro ao cancelar agendamento:', err);
       alert('Não foi possível cancelar o agendamento. Tente novamente.');
@@ -514,6 +516,31 @@ export default function PortalMeusAgendamentos() {
                 Sim, cancelar
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL DE SUCESSO DO CANCELAMENTO */}
+      {cancelamentoSucesso && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4 animate-fade-in">
+          <div className="bg-white rounded-2xl border border-border shadow-2xl w-full max-w-sm p-6 flex flex-col items-center text-center gap-4 animate-slide-up">
+            <div className="w-14 h-14 rounded-full bg-green-50 border border-green-200 flex items-center justify-center text-green-600">
+              <CheckCircle2 className="w-8 h-8" />
+            </div>
+            <div className="space-y-1">
+              <h3 className="font-title font-semibold text-lg text-text-primary">
+                Agendamento cancelado
+              </h3>
+              <p className="text-xs text-text-secondary leading-relaxed">
+                Seu agendamento foi cancelado com sucesso. O horário já está liberado.
+              </p>
+            </div>
+            <button
+              onClick={() => setCancelamentoSucesso(false)}
+              className="w-full py-2.5 bg-rose-600 hover:bg-rose-800 text-white rounded-xl text-sm font-semibold transition-colors cursor-pointer"
+            >
+              Fechar
+            </button>
           </div>
         </div>
       )}
