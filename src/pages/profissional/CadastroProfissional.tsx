@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AlertCircle, Eye, EyeOff, Mail, Lock, User, Briefcase, Sparkles, Calendar, Link2 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
@@ -53,7 +53,8 @@ export default function CadastroProfissional() {
         .trim()
         .normalize('NFD')
         .replace(/[\u0300-\u036f]/g, '') // Remove acentos
-        .replace(/[^a-z0-9]/g, '-');     // Substitui espaços por hifens
+        .replace(/[^a-z0-9]+/g, '-')     // Sequências de caracteres inválidos → único hífen
+        .replace(/^-+|-+$/g, '');        // Remove hífens nas bordas
 
       // Criar usuário profissional no Supabase Auth com metadados
       const { data, error: authError } = await supabase.auth.signUp({
@@ -333,3 +334,4 @@ export default function CadastroProfissional() {
     </div>
   );
 }
+
