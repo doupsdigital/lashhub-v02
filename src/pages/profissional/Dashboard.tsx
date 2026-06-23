@@ -149,7 +149,7 @@ export default function Dashboard() {
       )}
 
       {/* ── BANNER DE SAUDAÇÃO ── */}
-      <div className="bg-rose-600 rounded-2xl p-6 md:p-8 text-white relative overflow-hidden">
+      <div className="rounded-2xl p-6 md:p-8 text-white relative overflow-hidden" style={{ background: 'linear-gradient(to bottom right, var(--rose-600) 75%, var(--rose-400) 100%)' }}>
         <div className="absolute top-4 right-5 text-white/50 pointer-events-none select-none leading-none text-lg font-light">
           ✦<br /><span className="text-sm">✦</span>
         </div>
@@ -193,7 +193,7 @@ export default function Dashboard() {
           className={`bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-start justify-between shadow-sm ${pendingAppointments > 0 ? 'cursor-pointer hover:bg-amber-100/60 transition-colors' : ''}`}
         >
           <div className="min-w-0">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-amber-600 leading-tight">Aguardando Confirm.</p>
+            <p className="text-[10px] font-bold uppercase tracking-wider text-amber-600 leading-tight">Aguardando Confirmação</p>
             <p className="font-title font-semibold text-2xl text-amber-700 mt-1.5">
               {loading ? '—' : pendingAppointments}
             </p>
@@ -205,7 +205,7 @@ export default function Dashboard() {
 
         <div className="bg-white border border-border rounded-2xl p-4 flex items-start justify-between shadow-sm">
           <div className="min-w-0">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-text-muted leading-tight">Novos Clientes</p>
+            <p className="text-[10px] font-bold uppercase tracking-wider text-text-muted leading-tight">Novas Clientes</p>
             <p className="font-title font-semibold text-2xl text-text-primary mt-1.5">
               {heroLoading ? '—' : heroNewClients}
             </p>
@@ -231,7 +231,8 @@ export default function Dashboard() {
                 <button
                   key={label}
                   onClick={() => navigate(to, { state })}
-                  className="bg-rose-600 hover:bg-rose-700 active:bg-rose-800 text-white rounded-2xl p-5 flex flex-col items-start gap-4 transition-colors cursor-pointer shadow-sm text-left"
+                  className="hover:brightness-95 active:brightness-90 text-white rounded-2xl p-5 flex flex-col items-start gap-4 transition-all cursor-pointer shadow-sm text-left"
+                  style={{ background: 'linear-gradient(to bottom right, var(--rose-600) 75%, var(--rose-400) 100%)' }}
                 >
                   <Icon className="w-5 h-5 opacity-90" />
                   <span className="font-semibold text-sm leading-snug">{label}</span>
