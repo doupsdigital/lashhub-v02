@@ -113,7 +113,7 @@ export default function Dashboard() {
       });
       setLast7DaysRevData(
         Array.from(dailyMap.entries()).map(([dateStr, valor]) => ({
-          name: DAYS_SHORT[new Date(dateStr + 'T12:00:00').getDay()],
+          name: dateStr.slice(8) + '/' + dateStr.slice(5, 7),
           Valor: valor,
         }))
       );
