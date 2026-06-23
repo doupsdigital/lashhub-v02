@@ -21,8 +21,15 @@ export default function PortalLogin() {
     if (!user) return;
 
     if (!isCliente) {
-      // Profissional tentando acessar portal → manda pro dashboard
-      navigate('/meu-estudio', { replace: true });
+      if (submitting) {
+        // Profissional tentou logar pelo formulário do portal → rejeitar
+        signOut();
+        setErrorMsg('Este portal é exclusivo para clientes. Para acessar seu painel, use o link de login da profissional.');
+        setSubmitting(false);
+      } else {
+        // Profissional já logada navegou até aqui → redirecionar
+        navigate('/meu-estudio', { replace: true });
+      }
       return;
     }
 
