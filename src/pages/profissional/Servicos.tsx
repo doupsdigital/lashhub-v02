@@ -1007,7 +1007,7 @@ export default function Servicos() {
               </form>
 
               {/* ── PREVIEW ── */}
-              <div className="hidden lg:flex flex-col w-72 flex-shrink-0 bg-bg/40 p-5 gap-4 overflow-y-auto">
+              <div className="flex flex-col lg:w-72 flex-shrink-0 bg-bg/40 p-5 gap-4 overflow-y-auto border-t lg:border-t-0 lg:border-l border-border">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-wider text-text-secondary mb-0.5">Como vai aparecer no portal</p>
                   <p className="text-[10px] text-text-muted">Atualiza em tempo real</p>
