@@ -22,15 +22,10 @@ import {
   MessageSquare,
   Timer,
   Palette,
-  Link2,
-  Copy,
-  Check,
-  ExternalLink,
-  Share2,
 } from 'lucide-react';
 
 export default function Configuracoes() {
-  const { profile, user, refreshProfile, estabelecimentoId, estabelecimentoSlug } = useAuth();
+  const { profile, user, refreshProfile, estabelecimentoId } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const logoFileInputRef = useRef<HTMLInputElement>(null);
 
@@ -74,11 +69,6 @@ export default function Configuracoes() {
   const [savingAgendamento, setSavingAgendamento] = useState(false);
   const [agendamentoError, setAgendamentoError] = useState<string | null>(null);
 
-  // Estados do Link de Agendamento
-  const [slugEdit, setSlugEdit] = useState('');
-  const [savingSlug, setSavingSlug] = useState(false);
-  const [slugError, setSlugError] = useState<string | null>(null);
-  const [slugCopied, setSlugCopied] = useState(false);
 
   const [successModal, setSuccessModal] = useState<{
     isOpen: boolean;
@@ -128,12 +118,6 @@ export default function Configuracoes() {
     loadNegocio();
   }, [estabelecimentoId]);
 
-  // Inicializar slug editável quando o slug do contexto carregar
-  useEffect(() => {
-    if (estabelecimentoSlug) {
-      setSlugEdit(estabelecimentoSlug);
-    }
-  }, [estabelecimentoSlug]);
 
   // 1. Atualizar informações de perfil (Nome)
   const handleUpdateProfile = async (e: FormEvent) => {
@@ -421,85 +405,6 @@ export default function Configuracoes() {
       setAgendamentoError(msg);
     } finally {
       setSavingAgendamento(false);
-    }
-  };
-
-  // 9. Copiar link do portal
-  const handleCopyLink = async () => {
-    if (!estabelecimentoSlug) return;
-    const portalUrl = `${window.location.origin}/portal/${estabelecimentoSlug}`;
-    try {
-      await navigator.clipboard.writeText(portalUrl);
-      setSlugCopied(true);
-      setTimeout(() => setSlugCopied(false), 2500);
-    } catch {
-      // Fallback para browsers sem suporte
-      const el = document.createElement('textarea');
-      el.value = portalUrl;
-      document.body.appendChild(el);
-      el.select();
-      document.execCommand('copy');
-      document.body.removeChild(el);
-      setSlugCopied(true);
-      setTimeout(() => setSlugCopied(false), 2500);
-    }
-  };
-
-  // 10. Salvar novo slug
-  const handleSaveSlug = async () => {
-    if (!estabelecimentoId) return;
-    const cleanSlug = slugEdit.trim().toLowerCase();
-
-    if (!cleanSlug) {
-      setSlugError('O link não pode ficar em branco.');
-      return;
-    }
-    if (!/^[a-z0-9][a-z0-9-]*[a-z0-9]$/.test(cleanSlug) && cleanSlug.length > 1) {
-      setSlugError('Use apenas letras minúsculas, números e hífens. Não pode começar ou terminar com hífen.');
-      return;
-    }
-    if (cleanSlug.length < 3) {
-      setSlugError('O link deve ter pelo menos 3 caracteres.');
-      return;
-    }
-
-    setSavingSlug(true);
-    setSlugError(null);
-
-    try {
-      // Verificar unicidade (apenas se o slug mudou)
-      if (cleanSlug !== estabelecimentoSlug) {
-        const { data: existing } = await supabase
-          .from('estabelecimentos')
-          .select('id')
-          .eq('slug', cleanSlug)
-          .maybeSingle();
-
-        if (existing) {
-          setSlugError('Este link já está em uso. Tente outro nome.');
-          setSavingSlug(false);
-          return;
-        }
-      }
-
-      const { error } = await supabase
-        .from('estabelecimentos')
-        .update({ slug: cleanSlug })
-        .eq('id', estabelecimentoId);
-
-      if (error) throw error;
-
-      await refreshProfile();
-      setSuccessModal({
-        isOpen: true,
-        title: 'Link atualizado!',
-        description: `Seu link de agendamento agora é: ${window.location.origin}/portal/${cleanSlug}`,
-      });
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Erro ao salvar o link.';
-      setSlugError(msg);
-    } finally {
-      setSavingSlug(false);
     }
   };
 
@@ -902,112 +807,6 @@ export default function Configuracoes() {
             </div>
           </div>
         )}
-      </div>
-
-      {/* Section 3.5: Link de Agendamento */}
-      <div className="bg-white border border-border rounded-[14px] p-6 shadow-sm">
-        <h3 className="font-title font-bold text-lg text-text-primary flex items-center gap-2 border-b border-border pb-3">
-          <Link2 className="w-5 h-5 text-rose-600" />
-          Link de Agendamento
-        </h3>
-
-        <p className="text-xs text-text-secondary mt-3 mb-4">
-          Este é o link único do seu portal. Suas clientes acessam para ver seus serviços e agendar. Coloque na bio do Instagram ou compartilhe no WhatsApp.
-        </p>
-
-        {/* Exibição do link atual */}
-        <div className="flex items-center gap-0 p-3 bg-bg rounded-xl border border-border mb-5 overflow-hidden">
-          <span className="text-xs text-text-muted flex-shrink-0 hidden sm:block">
-            {window.location.origin}/portal/
-          </span>
-          <span className="text-xs font-bold text-primary truncate">
-            {estabelecimentoSlug || '...'}
-          </span>
-        </div>
-
-        {/* Botões de ação */}
-        <div className="flex flex-wrap gap-2 mb-6">
-          <button
-            type="button"
-            id="btn-copiar-link-agendamento"
-            onClick={handleCopyLink}
-            disabled={!estabelecimentoSlug}
-            className="flex items-center gap-2 px-4 py-2 bg-rose-600 hover:bg-rose-800 disabled:bg-rose-300 text-white rounded-lg text-xs font-semibold transition-all cursor-pointer"
-          >
-            {slugCopied ? (
-              <><Check className="w-4 h-4" /> Link copiado!</>
-            ) : (
-              <><Copy className="w-4 h-4" /> Copiar link</>
-            )}
-          </button>
-
-          <a
-            href={estabelecimentoSlug ? `/portal/${estabelecimentoSlug}` : '#'}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 px-4 py-2 bg-bg hover:bg-border text-text-primary border border-border rounded-lg text-xs font-semibold transition-colors"
-          >
-            <ExternalLink className="w-4 h-4" />
-            Ver portal
-          </a>
-
-          <a
-            href={`https://wa.me/?text=${encodeURIComponent(`Olá! Você pode agendar um horário comigo aqui: ${window.location.origin}/portal/${estabelecimentoSlug || ''}`)}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 px-4 py-2 bg-green-50 hover:bg-green-100 text-green-800 border border-green-200 rounded-lg text-xs font-semibold transition-colors"
-          >
-            <Share2 className="w-4 h-4" />
-            Compartilhar no WhatsApp
-          </a>
-        </div>
-
-        {/* Personalizar slug */}
-        <div className="border-t border-border pt-5">
-          <label className="text-xs font-semibold uppercase tracking-wider text-text-secondary block mb-1">
-            Personalizar link
-          </label>
-          <p className="text-[10px] text-text-secondary mb-3">
-            Use apenas letras minúsculas, números e hífens. Ex: <strong>studio-da-ju</strong>, <strong>lashes-by-ana</strong>
-          </p>
-
-          <div className="flex items-center rounded-lg border border-border bg-bg overflow-hidden focus-within:ring-1 focus-within:ring-rose-400">
-            <span className="text-xs text-text-muted px-3 py-2 bg-bg border-r border-border flex-shrink-0 hidden sm:block whitespace-nowrap">
-              /portal/
-            </span>
-            <input
-              type="text"
-              id="input-slug-agendamento"
-              value={slugEdit}
-              onChange={(e) => {
-                setSlugError(null);
-                setSlugEdit(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''));
-              }}
-              placeholder="meu-studio"
-              maxLength={60}
-              className="flex-1 px-3 py-2 bg-transparent text-text-primary text-sm focus:outline-none"
-            />
-          </div>
-
-          {slugError && (
-            <div className="mt-3 bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg flex items-center gap-2.5">
-              <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
-              <p className="text-xs font-medium">{slugError}</p>
-            </div>
-          )}
-
-          <div className="flex justify-end mt-4">
-            <button
-              type="button"
-              id="btn-salvar-link-agendamento"
-              onClick={handleSaveSlug}
-              disabled={savingSlug || !slugEdit.trim() || slugEdit.trim() === estabelecimentoSlug}
-              className="px-5 py-2 bg-rose-600 hover:bg-rose-800 disabled:bg-rose-400 text-white rounded-lg text-xs font-semibold transition-colors cursor-pointer"
-            >
-              {savingSlug ? 'Salvando...' : 'Salvar Link'}
-            </button>
-          </div>
-        </div>
       </div>
 
       {/* Section 4: Identidade Visual e Cores */}

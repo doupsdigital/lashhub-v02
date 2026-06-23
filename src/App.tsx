@@ -14,6 +14,7 @@ import PerfilCliente from './pages/profissional/PerfilCliente';
 import Servicos from './pages/profissional/Servicos';
 import Agendamentos from './pages/profissional/Agendamentos';
 import Configuracoes from './pages/profissional/Configuracoes';
+import LinkAgendamento from './pages/profissional/LinkAgendamento';
 import MeusHorarios from './pages/profissional/MeusHorarios';
 import CadastroProfissional from './pages/profissional/CadastroProfissional';
 import PortalCatalogo from './pages/portal-clientes/PortalCatalogo';
@@ -104,6 +105,7 @@ export default function App() {
             {/* Proteção de Faturamento Ativo / Trial Válido */}
             <Route element={<BillingGuard />}>
               <Route path="meu-estudio" element={<Dashboard />} />
+              <Route path="link-agendamento" element={<LinkAgendamento />} />
               <Route path="relatorios" element={<Relatorios />} />
               <Route path="clientes" element={<Clientes />} />
               <Route path="clientes/:id" element={<PerfilCliente />} />

@@ -13,6 +13,7 @@ import {
   Lock,
   CreditCard,
   BarChart2,
+  Link2,
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { supabase } from '../../lib/supabase';
@@ -103,6 +104,7 @@ export default function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobile
     { name: 'Serviços', path: '/servicos', icon: Tag },
     { name: 'Agendamentos', path: '/agendamentos', icon: Calendar, feature: 'scheduling' },
     { name: 'Meus Horários', path: '/meus-horarios', icon: Clock, feature: 'scheduling' },
+    { name: 'Link de Agendamento', path: '/link-agendamento', icon: Link2 },
     { name: 'Relatórios', path: '/relatorios', icon: BarChart2 },
   ];
 
