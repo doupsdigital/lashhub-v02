@@ -32,7 +32,6 @@ const formatDateStr = (date: Date) => {
 
 const WEEK_DAYS = ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado'];
 const MONTHS_PT = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
-const DAYS_SHORT = ['d', 's', 't', 'q', 'q', 's', 's'];
 
 const getGreeting = () => {
   const h = new Date().getHours();
