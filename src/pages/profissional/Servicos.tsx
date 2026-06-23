@@ -426,9 +426,7 @@ export default function Servicos() {
     } catch (err: unknown) {
       console.error(err);
       const msg = err instanceof Error ? err.message : '';
-      if (msg.toLowerCase().includes('policy') || msg.toLowerCase().includes('permission') || msg.toLowerCase().includes('security')) {
-        showTemporaryError('Sem permissão para fazer upload. Verifique as policies do bucket no Supabase.');
-      } else if (msg.toLowerCase().includes('upload') || msg.toLowerCase().includes('storage')) {
+      if (msg.toLowerCase().includes('storage') || msg.toLowerCase().includes('upload')) {
         showTemporaryError('Falha ao enviar imagem. Tente novamente.');
       } else {
         showTemporaryError('Falha ao salvar serviço.');
