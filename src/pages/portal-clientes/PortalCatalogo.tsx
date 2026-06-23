@@ -319,7 +319,7 @@ export default function PortalCatalogo() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-3">
-        <h1 className="font-title font-bold text-3xl text-text-primary">Nossos Serviços</h1>
+        <h1 className="font-title font-bold text-3xl text-text-primary">Meus Serviços</h1>
         <button
           onClick={() => document.getElementById('faq')?.scrollIntoView({ behavior: 'smooth' })}
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border text-text-secondary hover:text-rose-600 hover:border-rose-300 text-xs font-medium transition-colors cursor-pointer shrink-0"
