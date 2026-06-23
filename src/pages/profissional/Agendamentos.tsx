@@ -1355,31 +1355,50 @@ export default function Agendamentos() {
                       key={appt.id}
                       style={{ top: `${top}px`, height: `${height}px` }}
                       onClick={() => handleOpenDetail(appt)}
-                      className={`absolute left-2 right-2 rounded-lg border border-l-[4px] overflow-hidden flex flex-col shadow-sm cursor-pointer z-10 transition-all ${colors.border} ${accentBorder} ${colors.bg} ${height < 45 ? 'px-2 py-[2px]' : 'px-3 py-1.5'}`}
+                      className={`absolute left-2 right-2 rounded-lg border border-l-[4px] overflow-hidden flex flex-col shadow-sm cursor-pointer z-10 transition-all ${colors.border} ${accentBorder} ${colors.bg} ${height < 45 ? 'px-2 py-[2px]' : height < 70 ? 'px-2.5 py-1' : 'px-3 py-1.5'}`}
                     >
                       {/* Linha 1: Nome + Horário */}
                       <div className="flex items-center justify-between gap-2">
-                        <p className={`font-bold truncate flex-1 leading-none ${height < 45 ? 'text-[10px]' : 'text-sm leading-tight'}`}>
+                        <p className={`font-bold truncate flex-1 leading-none ${height < 45 ? 'text-[10px]' : height < 70 ? 'text-xs leading-tight' : 'text-sm leading-tight'}`}>
                           {appt.cliente?.nome} {appt.cliente?.sobrenome}
                         </p>
-                        <span className={`font-semibold opacity-75 whitespace-nowrap flex-shrink-0 leading-none ${height < 45 ? 'text-[9px]' : 'text-xs'}`}>
+                        <span className={`font-semibold opacity-75 whitespace-nowrap flex-shrink-0 leading-none ${height < 45 ? 'text-[9px]' : height < 70 ? 'text-[10px]' : 'text-xs'}`}>
                           {apptDate.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
                         </span>
                       </div>
-                      {/* Linha 2: Serviço — só exibe se houver espaço (>= 30px) */}
+                      {/* Linha 2: Serviço — só exibe se houver espaço (>= 28px) */}
                       {height >= 28 && (
-                        <p className={`opacity-75 truncate mt-1 leading-none ${height < 45 ? 'text-[9px]' : 'text-xs leading-tight'}`}>
+                        <p className={`opacity-75 truncate leading-none ${height < 45 ? 'text-[9px] mt-0.5' : height < 70 ? 'text-[10px] mt-0.5' : 'text-xs mt-1'}`}>
                           {appt.agendamento_servicos?.map(s => s.servico?.nome || servicos.find(ls => ls.id === s.servico_id)?.nome).filter(Boolean).join(', ')}
-                          {height >= 45 && appt.observacoes && (
+                          {height >= 70 && appt.observacoes && (
                             <span className="opacity-60 italic ml-1">· {appt.observacoes}</span>
                           )}
                         </p>
                       )}
-                      {/* Linha 3: Duração — só exibe se houver espaço suficiente (>= 70px ≈ ~45 min) */}
-                      {height >= 70 && (
-                        <p className="text-[10px] opacity-50 mt-auto">
-                          {appt.duracao_minutos} min
-                        </p>
+                      {/* Linha 3: Duração e Status */}
+                      {height >= 45 && (
+                        <div className="flex items-center justify-between mt-auto w-full text-[10px]">
+                          {height >= 70 ? (
+                            <p className="text-[10px] opacity-50 font-medium leading-none">
+                              {appt.duracao_minutos} min
+                            </p>
+                          ) : (
+                            <span />
+                          )}
+                          <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-semibold border leading-none ${
+                            appt.status === 'cancelado' ? 'bg-gray-100 text-gray-500 border-gray-200' :
+                            appt.status === 'concluido' ? 'bg-emerald-100 text-emerald-800 border-emerald-200' :
+                            appt.status === 'pendente' ? 'bg-amber-100 text-amber-800 border-amber-200' :
+                            appt.status === 'falta' ? 'bg-red-100 text-red-800 border-red-200' :
+                            'bg-rose-100 text-rose-800 border-rose-200'
+                          }`}>
+                            {appt.status === 'confirmado' ? 'Confirmado' :
+                             appt.status === 'pendente' ? 'Pendente' :
+                             appt.status === 'concluido' ? 'Concluído' :
+                             appt.status === 'cancelado' ? 'Cancelado' :
+                             appt.status === 'falta' ? 'Falta' : appt.status}
+                          </span>
+                        </div>
                       )}
                     </div>
                   );
