@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AlertCircle, Eye, EyeOff, Mail, Lock, User, Briefcase, Sparkles, Calendar, Link2 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
@@ -109,7 +109,7 @@ export default function CadastroProfissional() {
             <img
               src="/logo-login.png"
               alt="Lash Hub"
-              className="w-[110%] h-[110%] object-contain invert mix-blend-screen scale-130"
+              className="w-full h-full object-cover"
             />
           </div>
           <h1 className="font-title font-bold text-3xl tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-rose-600 to-rose-400">
@@ -281,7 +281,7 @@ export default function CadastroProfissional() {
               <img
                 src="/logo-login.png"
                 alt="Lash Hub"
-                className="w-[110%] h-[110%] object-contain invert mix-blend-screen scale-130"
+                className="w-full h-full object-cover"
               />
             </div>
 

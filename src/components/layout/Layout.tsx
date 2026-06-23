@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Header from './Header';
+import TabBar from './TabBar';
 import TrialBanner from '../common/TrialBanner';
 import { Sparkles } from 'lucide-react';
 
@@ -77,10 +78,13 @@ export default function Layout() {
           </div>
         )}
 
-        <main className="flex-1 p-6 md:p-8 max-w-[1600px] w-full mx-auto">
+        <main className="flex-1 p-4 md:p-8 pb-[76px] md:pb-8 max-w-[1600px] w-full mx-auto">
           <Outlet />
         </main>
       </div>
+
+      {/* TabBar — mobile only */}
+      <TabBar onMoreClick={() => setMobileOpen(true)} />
     </div>
   );
 }

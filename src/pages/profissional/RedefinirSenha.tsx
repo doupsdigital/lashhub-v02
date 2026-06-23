@@ -62,7 +62,7 @@ export default function RedefinirSenha() {
             <img
               src="/logo-login.png"
               alt="Lash Hub"
-              className="w-[110%] h-[110%] object-contain invert mix-blend-screen scale-130"
+              className="w-full h-full object-cover"
             />
           </div>
           <h1 className="font-title font-bold text-3xl tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-rose-600 to-rose-400">

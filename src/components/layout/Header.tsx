@@ -8,6 +8,7 @@ import {
   Clock,
   Settings,
   CreditCard,
+  BarChart2,
 } from 'lucide-react';
 
 interface HeaderProps {
@@ -42,6 +43,8 @@ export default function Header({ setMobileOpen }: HeaderProps) {
         return { title: 'Configurações', Icon: Settings };
       case '/assinatura':
         return { title: 'Minha Assinatura', Icon: CreditCard };
+      case '/relatorios':
+        return { title: 'Relatórios', Icon: BarChart2 };
       default:
         if (pathname.startsWith('/clientes/')) return { title: 'Perfil do Cliente', Icon: Users };
         return { title: 'Studio', Icon: LayoutGrid };

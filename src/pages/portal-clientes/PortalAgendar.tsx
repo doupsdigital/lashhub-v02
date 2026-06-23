@@ -444,17 +444,26 @@ export default function PortalAgendar() {
 
       if (agError) throw agError;
 
-      // 4. Insert agendamento_servicos
-      for (const item of itens) {
-        const { error: asError } = await supabase
-          .from('agendamento_servicos')
-          .insert({
-            agendamento_id: agendamentoId,
-            servico_id: item.servico.id,
-            variacao_id: item.variacao?.id ?? null,
-            valor_cobrado: getValorEfetivo(item),
-          });
-        if (asError) throw asError;
+      // 4. Insert agendamento_servicos com Rollback
+      try {
+        for (const item of itens) {
+          const { error: asError } = await supabase
+            .from('agendamento_servicos')
+            .insert({
+              agendamento_id: agendamentoId,
+              servico_id: item.servico.id,
+              variacao_id: item.variacao?.id ?? null,
+              valor_cobrado: getValorEfetivo(item),
+            });
+          if (asError) throw asError;
+        }
+      } catch (err) {
+        // Rollback: Deleta o agendamento recém-criado caso a inserção dos serviços falhe
+        await supabase
+          .from('agendamentos')
+          .delete()
+          .eq('id', agendamentoId);
+        throw err;
       }
 
       setMensagemPos(msg);

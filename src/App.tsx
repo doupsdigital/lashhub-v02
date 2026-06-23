@@ -29,6 +29,7 @@ import RedefinirSenha from './pages/profissional/RedefinirSenha';
 import PlanGuard from './components/common/PlanGuard';
 import BillingGuard from './components/common/BillingGuard';
 import Faturamento from './pages/profissional/Faturamento';
+import Relatorios from './pages/profissional/Relatorios';
 import InstallBanner from './components/common/InstallBanner';
 
 export default function App() {
@@ -103,6 +104,7 @@ export default function App() {
             {/* Proteção de Faturamento Ativo / Trial Válido */}
             <Route element={<BillingGuard />}>
               <Route path="meu-estudio" element={<Dashboard />} />
+              <Route path="relatorios" element={<Relatorios />} />
               <Route path="clientes" element={<Clientes />} />
               <Route path="clientes/:id" element={<PerfilCliente />} />
               <Route path="servicos" element={<Servicos />} />

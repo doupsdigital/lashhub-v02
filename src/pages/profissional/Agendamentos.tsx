@@ -143,6 +143,17 @@ export default function Agendamentos() {
 
   const [pendingOpen, setPendingOpen] = useState(() => !!(location.state as { openPending?: boolean })?.openPending);
 
+  // "Ver Agenda do Dia" from Dashboard: switch to daily view for today
+  useEffect(() => {
+    const state = location.state as { filterToday?: boolean } | null;
+    if (state?.filterToday) {
+      const today = new Date();
+      today.setHours(12, 0, 0, 0);
+      setCurrentDate(today);
+      setViewMode('diaria');
+    }
+  }, []);
+
   const [rejectModalAppt, setRejectModalAppt] = useState<AgendamentoWithRelations | null>(null);
   const [rejectMotivo, setRejectMotivo] = useState('');
   const [rejectSaving, setRejectSaving] = useState(false);
@@ -591,8 +602,17 @@ export default function Agendamentos() {
 
       let apptId = '';
       const clientName = `${selectedCliente.nome} ${selectedCliente.sobrenome}`;
+      let createdNew = false;
+      let existingRelationsIds: string[] = [];
 
       if (editingAppt) {
+        // Busca IDs das relações existentes para rollback posterior
+        const { data: existingRels } = await supabase
+          .from('agendamento_servicos')
+          .select('id')
+          .eq('agendamento_id', editingAppt.id);
+        existingRelationsIds = existingRels?.map(r => r.id) || [];
+
         const { error } = await supabase
           .from('agendamentos')
           .update({
@@ -606,9 +626,6 @@ export default function Agendamentos() {
 
         if (error) throw error;
         apptId = editingAppt.id;
-
-        await supabase.from('agendamento_servicos').delete().eq('agendamento_id', apptId);
-        await registrarLog('editou', 'agendamento', apptId, `Editou agendamento de "${clientName}"`);
       } else {
         const { data: apptResult, error: apptError } = await supabase
           .from('agendamentos')
@@ -627,8 +644,7 @@ export default function Agendamentos() {
         if (apptError) throw apptError;
         if (!apptResult) throw new Error('Falha ao criar agendamento.');
         apptId = apptResult.id;
-
-        await registrarLog('criou', 'agendamento', apptId, `Criou agendamento para "${clientName}"`);
+        createdNew = true;
       }
 
       // 5. Inserir Agendamento Serviços
@@ -643,7 +659,28 @@ export default function Agendamentos() {
         .from('agendamento_servicos')
         .insert(relPayloads);
 
-      if (relError) throw relError;
+      if (relError) {
+        // Rollback se for novo agendamento para evitar órfão
+        if (createdNew && apptId) {
+          await supabase.from('agendamentos').delete().eq('id', apptId);
+        }
+        throw relError;
+      }
+
+      // Se for edição, remove os antigos apenas APÓS os novos serem inseridos com sucesso
+      if (editingAppt && existingRelationsIds.length > 0) {
+        await supabase
+          .from('agendamento_servicos')
+          .delete()
+          .in('id', existingRelationsIds);
+      }
+
+      // Registra logs após sucesso total
+      if (editingAppt) {
+        await registrarLog('editou', 'agendamento', apptId, `Editou agendamento de "${clientName}"`);
+      } else {
+        await registrarLog('criou', 'agendamento', apptId, `Criou agendamento para "${clientName}"`);
+      }
 
       setIsModalOpen(false);
       if (editingAppt) {
@@ -1232,18 +1269,18 @@ export default function Agendamentos() {
                           key={appt.id}
                           style={{ top: `${top}px`, height: `${height}px` }}
                           onClick={(e) => { e.stopPropagation(); handleOpenDetail(appt); }}
-                          className={`absolute left-1 right-1 rounded-lg border border-l-[3px] overflow-hidden px-2 py-1 flex flex-col shadow-sm cursor-pointer z-10 transition-all ${colors.border} ${weekAccentBorder} ${colors.bg}`}
-                          title={`${appt.cliente?.nome} ${appt.cliente?.sobrenome} — ${appt.agendamento_servicos?.map(s => s.servico?.nome).join(', ')}`}
+                          className={`absolute left-1 right-1 rounded-lg border border-l-[3px] overflow-hidden flex flex-col shadow-sm cursor-pointer z-10 transition-all ${colors.border} ${weekAccentBorder} ${colors.bg} ${height < 45 ? 'px-1 py-[2px]' : 'px-2 py-1'}`}
+                          title={`${appt.cliente?.nome} ${appt.cliente?.sobrenome} — ${appt.agendamento_servicos?.map(s => s.servico?.nome || servicos.find(ls => ls.id === s.servico_id)?.nome).filter(Boolean).join(', ')}`}
                         >
                           <div className="flex items-start justify-between gap-1 min-h-0">
-                            <p className="font-bold text-[10px] leading-tight truncate flex-1">{appt.cliente?.nome} {appt.cliente?.sobrenome}</p>
-                            <span className="text-[9px] opacity-70 whitespace-nowrap flex-shrink-0">
+                            <p className={`font-bold truncate flex-1 leading-none ${height < 45 ? 'text-[9px]' : 'text-[10px] leading-tight'}`}>{appt.cliente?.nome} {appt.cliente?.sobrenome}</p>
+                            <span className={`opacity-70 whitespace-nowrap flex-shrink-0 leading-none ${height < 45 ? 'text-[8px]' : 'text-[9px]'}`}>
                               {apptDate.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
                             </span>
                           </div>
-                          {height >= 44 && (
-                            <p className="text-[9px] opacity-75 truncate leading-tight mt-0.5">
-                              {appt.agendamento_servicos?.map(s => s.servico?.nome).join(', ')}
+                          {height >= 28 && (
+                            <p className={`opacity-75 truncate mt-1 leading-none ${height < 45 ? 'text-[8px]' : 'text-[9px] leading-tight'}`}>
+                              {appt.agendamento_servicos?.map(s => s.servico?.nome || servicos.find(ls => ls.id === s.servico_id)?.nome).filter(Boolean).join(', ')}
                             </p>
                           )}
                         </div>
@@ -1318,22 +1355,22 @@ export default function Agendamentos() {
                       key={appt.id}
                       style={{ top: `${top}px`, height: `${height}px` }}
                       onClick={() => handleOpenDetail(appt)}
-                      className={`absolute left-2 right-2 rounded-lg border border-l-[4px] overflow-hidden px-3 py-1.5 flex flex-col shadow-sm cursor-pointer z-10 transition-all ${colors.border} ${accentBorder} ${colors.bg}`}
+                      className={`absolute left-2 right-2 rounded-lg border border-l-[4px] overflow-hidden flex flex-col shadow-sm cursor-pointer z-10 transition-all ${colors.border} ${accentBorder} ${colors.bg} ${height < 45 ? 'px-2 py-[2px]' : 'px-3 py-1.5'}`}
                     >
                       {/* Linha 1: Nome + Horário */}
                       <div className="flex items-center justify-between gap-2">
-                        <p className="font-bold text-sm leading-tight truncate flex-1">
+                        <p className={`font-bold truncate flex-1 leading-none ${height < 45 ? 'text-[10px]' : 'text-sm leading-tight'}`}>
                           {appt.cliente?.nome} {appt.cliente?.sobrenome}
                         </p>
-                        <span className="text-xs font-semibold opacity-75 whitespace-nowrap flex-shrink-0">
+                        <span className={`font-semibold opacity-75 whitespace-nowrap flex-shrink-0 leading-none ${height < 45 ? 'text-[9px]' : 'text-xs'}`}>
                           {apptDate.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
                         </span>
                       </div>
-                      {/* Linha 2: Serviço — só exibe se houver espaço (>= 48px ≈ 30 min) */}
-                      {height >= 48 && (
-                        <p className="text-xs opacity-75 truncate leading-tight mt-0.5">
-                          {appt.agendamento_servicos?.map(s => s.servico?.nome).join(', ')}
-                          {appt.observacoes && (
+                      {/* Linha 2: Serviço — só exibe se houver espaço (>= 30px) */}
+                      {height >= 28 && (
+                        <p className={`opacity-75 truncate mt-1 leading-none ${height < 45 ? 'text-[9px]' : 'text-xs leading-tight'}`}>
+                          {appt.agendamento_servicos?.map(s => s.servico?.nome || servicos.find(ls => ls.id === s.servico_id)?.nome).filter(Boolean).join(', ')}
+                          {height >= 45 && appt.observacoes && (
                             <span className="opacity-60 italic ml-1">· {appt.observacoes}</span>
                           )}
                         </p>

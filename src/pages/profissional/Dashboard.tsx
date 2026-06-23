@@ -2,31 +2,27 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
-import { 
-  Users, 
-  CalendarDays, 
-  Coins, 
-  Sparkles, 
+import {
+  CalendarDays,
+  CalendarCheck,
+  CalendarX,
+  Coins,
+  Sparkles,
   AlertCircle,
   TrendingUp,
-  Briefcase
+  TrendingDown,
+  Tag,
+  UserPlus,
+  Clock,
 } from 'lucide-react';
 import {
   ResponsiveContainer,
   LineChart,
   Line,
   XAxis,
-  YAxis,
-  CartesianGrid,
   Tooltip,
-  BarChart,
-  Bar,
-  Legend
 } from 'recharts';
 
-type PeriodType = 'hoje' | 'ontem' | '7dias' | 'esteMes' | 'mesPassado' | 'esteAno' | 'personalizado';
-
-// Helpers for Date management
 const formatDateStr = (date: Date) => {
   const y = date.getFullYear();
   const m = String(date.getMonth() + 1).padStart(2, '0');
@@ -34,799 +30,312 @@ const formatDateStr = (date: Date) => {
   return `${y}-${m}-${d}`;
 };
 
-const getPeriodDates = (period: PeriodType, customStart?: string, customEnd?: string) => {
-  const now = new Date();
-  let start = new Date(now);
-  let end = new Date(now);
+const WEEK_DAYS = ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado'];
+const MONTHS_PT = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+const DAYS_SHORT = ['d', 's', 't', 'q', 'q', 's', 's'];
 
-  switch (period) {
-    case 'hoje':
-      start.setHours(0, 0, 0, 0);
-      end.setHours(23, 59, 59, 999);
-      break;
-    case 'ontem':
-      start.setDate(now.getDate() - 1);
-      start.setHours(0, 0, 0, 0);
-      end.setDate(now.getDate() - 1);
-      end.setHours(23, 59, 59, 999);
-      break;
-    case '7dias':
-      start.setDate(now.getDate() - 6);
-      start.setHours(0, 0, 0, 0);
-      end.setHours(23, 59, 59, 999);
-      break;
-    case 'esteMes':
-      start = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
-      end = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
-      break;
-    case 'mesPassado':
-      start = new Date(now.getFullYear(), now.getMonth() - 1, 1, 0, 0, 0, 0);
-      end = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59, 999);
-      break;
-    case 'esteAno':
-      start = new Date(now.getFullYear(), 0, 1, 0, 0, 0, 0);
-      end = new Date(now.getFullYear(), 11, 31, 23, 59, 59, 999);
-      break;
-    case 'personalizado':
-      if (customStart && customEnd) {
-        const [sy, sm, sd] = customStart.split('-').map(Number);
-        const [ey, em, ed] = customEnd.split('-').map(Number);
-        start = new Date(sy, sm - 1, sd, 0, 0, 0, 0);
-        end = new Date(ey, em - 1, ed, 23, 59, 59, 999);
-      }
-      break;
-  }
-  return { start, end };
+const getGreeting = () => {
+  const h = new Date().getHours();
+  if (h >= 5 && h < 12) return 'Bom dia';
+  if (h >= 12 && h < 18) return 'Boa tarde';
+  return 'Boa noite';
 };
 
-const getWeekLabel = (date: Date, start: Date) => {
-  const diffTime = Math.abs(date.getTime() - start.getTime());
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  if (diffDays <= 7) return 'Semana 1';
-  if (diffDays <= 14) return 'Semana 2';
-  if (diffDays <= 21) return 'Semana 3';
-  return 'Semana 4';
+const getDateString = () => {
+  const now = new Date();
+  return `${WEEK_DAYS[now.getDay()]}, ${now.getDate()} de ${MONTHS_PT[now.getMonth()]}`;
 };
 
 export default function Dashboard() {
-  const { estabelecimentoId } = useAuth();
+  const { estabelecimentoId, profile } = useAuth();
   const navigate = useNavigate();
-  const [period, setPeriod] = useState<PeriodType>('esteMes');
-  
-  // Custom date range states
-  const [customStartDate, setCustomStartDate] = useState(() => {
-    const d = new Date();
-    return formatDateStr(new Date(d.getFullYear(), d.getMonth(), 1));
-  });
-  const [customEndDate, setCustomEndDate] = useState(() => formatDateStr(new Date()));
 
-  // KPI states
-  const [totalClients, setTotalClients] = useState(0);
-  const [totalAppointments, setTotalAppointments] = useState(0);
-  const [totalEarned, setTotalEarned] = useState(0);
   const [pendingAppointments, setPendingAppointments] = useState(0);
-
-  // Today's schedule
   const [todayAppointments, setTodayAppointments] = useState<any[]>([]);
-
-  // Chart states
-  const [revenueTimeData, setRevenueTimeData] = useState<any[]>([]);
-  const [appointmentsWeekdayData, setAppointmentsWeekdayData] = useState<any[]>([]);
-  const [clientsNewRecurrentData, setClientsNewRecurrentData] = useState<any[]>([]);
-  const [topServicesData, setTopServicesData] = useState<any[]>([]);
-  const [faltasCancelamentosData, setFaltasCancelamentosData] = useState<{ totalFaltas: number; totalCancelamentos: number }>({ totalFaltas: 0, totalCancelamentos: 0 });
-
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const fetchDashboardData = async () => {
+  const [heroRevenue, setHeroRevenue] = useState(0);
+  const [heroNewClients, setHeroNewClients] = useState(0);
+  const [last7DaysRevData, setLast7DaysRevData] = useState<{ name: string; Valor: number }[]>([]);
+  const [revenueGrowth, setRevenueGrowth] = useState<number | null>(null);
+  const [heroLoading, setHeroLoading] = useState(true);
+
+  const firstName = profile?.nome?.split(' ')[0] || '';
+
+  const fetchData = async () => {
     if (!estabelecimentoId) return;
+    setHeroLoading(true);
     setLoading(true);
     setErrorMsg(null);
     try {
-      const { start, end } = getPeriodDates(period, customStartDate, customEndDate);
-      const startIso = start.toISOString();
-      const endIso = end.toISOString();
+      const now = new Date();
+      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0).toISOString();
+      const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999).toISOString();
 
-      // 1. Fetch metadata in memory to avoid join errors
-      const [catsRes, servsRes] = await Promise.all([
-        supabase.from('categorias_servico').select('id, nome').eq('estabelecimento_id', estabelecimentoId),
-        supabase.from('servicos').select('id, nome, categoria_id').eq('estabelecimento_id', estabelecimentoId)
+      const last7End = new Date(); last7End.setHours(23, 59, 59, 999);
+      const last7Start = new Date(); last7Start.setDate(now.getDate() - 6); last7Start.setHours(0, 0, 0, 0);
+      const prev7End = new Date(); prev7End.setDate(now.getDate() - 7); prev7End.setHours(23, 59, 59, 999);
+      const prev7Start = new Date(); prev7Start.setDate(now.getDate() - 13); prev7Start.setHours(0, 0, 0, 0);
+
+      const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0).toISOString();
+      const todayEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999).toISOString();
+
+      const [monthRevRes, newClientsRes, last7Res, prev7Res, pendingRes, todayRes] = await Promise.all([
+        supabase.from('agendamentos').select('valor_cobrado').eq('estabelecimento_id', estabelecimentoId).eq('status', 'concluido').gte('data_hora', monthStart).lte('data_hora', monthEnd),
+        supabase.from('clientes').select('id', { count: 'exact', head: true }).eq('estabelecimento_id', estabelecimentoId).gte('created_at', monthStart).lte('created_at', monthEnd),
+        supabase.from('agendamentos').select('data_hora, valor_cobrado').eq('estabelecimento_id', estabelecimentoId).eq('status', 'concluido').gte('data_hora', last7Start.toISOString()).lte('data_hora', last7End.toISOString()),
+        supabase.from('agendamentos').select('valor_cobrado').eq('estabelecimento_id', estabelecimentoId).eq('status', 'concluido').gte('data_hora', prev7Start.toISOString()).lte('data_hora', prev7End.toISOString()),
+        supabase.from('agendamentos').select('id', { count: 'exact', head: true }).eq('estabelecimento_id', estabelecimentoId).eq('status', 'pendente'),
+        supabase.from('agendamentos').select(`id, data_hora, status, cliente:clientes(id, nome, sobrenome), agendamento_servicos(servico:servicos(nome))`).eq('estabelecimento_id', estabelecimentoId).gte('data_hora', todayStart).lte('data_hora', todayEnd).neq('status', 'cancelado').order('data_hora', { ascending: true }),
       ]);
 
-      if (catsRes.error) throw catsRes.error;
-      if (servsRes.error) throw servsRes.error;
-
-      const categoryMap = new Map<string, string>();
-      catsRes.data?.forEach(c => categoryMap.set(c.id, c.nome));
-
-      const serviceMap = new Map<string, { nome: string; categoriaNome: string }>();
-      servsRes.data?.forEach(s => {
-        const catName = categoryMap.get(s.categoria_id) || 'Sem Categoria';
-        serviceMap.set(s.id, { nome: s.nome, categoriaNome: catName });
-      });
-
-      // 2. Fetch main tables data for the active period
-      const [clientsRes, apptsRes, concludedRes, pendingRes, todayRes] = await Promise.all([
-        // Clients registered in the period
-        supabase
-          .from('clientes')
-          .select('id, created_at')
-          .eq('estabelecimento_id', estabelecimentoId)
-          .gte('created_at', startIso)
-          .lte('created_at', endIso),
-        // Appointments in the period
-        supabase
-          .from('agendamentos')
-          .select('id, data_hora, status')
-          .eq('estabelecimento_id', estabelecimentoId)
-          .gte('data_hora', startIso)
-          .lte('data_hora', endIso),
-        // Concluded appointments in the period (for revenue)
-        supabase
-          .from('agendamentos')
-          .select(`
-            id, cliente_id, data_hora, valor_cobrado,
-            agendamento_servicos ( servico_id, valor_cobrado )
-          `)
-          .eq('estabelecimento_id', estabelecimentoId)
-          .eq('status', 'concluido')
-          .gte('data_hora', startIso)
-          .lte('data_hora', endIso),
-        // Pending appointments (all time)
-        supabase
-          .from('agendamentos')
-          .select('id', { count: 'exact', head: true })
-          .eq('estabelecimento_id', estabelecimentoId)
-          .eq('status', 'pendente'),
-        // Today's appointments
-        supabase
-          .from('agendamentos')
-          .select(`
-            id, data_hora, status, duracao_minutos, origem,
-            cliente:clientes(id, nome, sobrenome),
-            agendamento_servicos(servico:servicos(nome))
-          `)
-          .eq('estabelecimento_id', estabelecimentoId)
-          .gte('data_hora', `${formatDateStr(new Date())}T00:00:00`)
-          .lte('data_hora', `${formatDateStr(new Date())}T23:59:59`)
-          .neq('status', 'cancelado')
-          .order('data_hora', { ascending: true })
-      ]);
-
-      if (clientsRes.error) throw clientsRes.error;
-      if (apptsRes.error) throw apptsRes.error;
-      if (concludedRes.error) throw concludedRes.error;
-
-      const clientRecords = clientsRes.data || [];
-      const apptRecords = apptsRes.data || [];
-      const concludedRecords = concludedRes.data || [];
-
+      setHeroRevenue((monthRevRes.data || []).reduce((sum, a) => sum + Number(a.valor_cobrado || 0), 0));
+      setHeroNewClients(newClientsRes.count ?? 0);
       setPendingAppointments(pendingRes.count ?? 0);
       setTodayAppointments(todayRes.data || []);
 
-      // Update KPI Cards
-      setTotalClients(clientRecords.length);
-      setTotalAppointments(apptRecords.length);
-      
-      const earnedSum = concludedRecords.reduce((sum, a) => sum + Number(a.valor_cobrado || 0), 0);
-      setTotalEarned(earnedSum);
+      const last7Rev = (last7Res.data || []).reduce((sum, a) => sum + Number(a.valor_cobrado || 0), 0);
+      const prev7Rev = (prev7Res.data || []).reduce((sum, a) => sum + Number(a.valor_cobrado || 0), 0);
+      if (prev7Rev > 0) setRevenueGrowth(((last7Rev - prev7Rev) / prev7Rev) * 100);
+      else if (last7Rev > 0) setRevenueGrowth(100);
+      else setRevenueGrowth(null);
 
-      // --- Chart 1: Revenue over time ---
-      const diffTime = Math.abs(end.getTime() - start.getTime());
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-      
-      if (diffDays <= 31) {
-        // Daily revenue
-        const dailyMap = new Map<string, number>();
-        let current = new Date(start);
-        while (current <= end) {
-          dailyMap.set(formatDateStr(current), 0);
-          current.setDate(current.getDate() + 1);
-        }
-
-        concludedRecords.forEach(a => {
-          const dateStr = formatDateStr(new Date(a.data_hora));
-          if (dailyMap.has(dateStr)) {
-            dailyMap.set(dateStr, dailyMap.get(dateStr)! + Number(a.valor_cobrado || 0));
-          }
-        });
-
-        const dailyChart = Array.from(dailyMap.entries()).map(([dateStr, valor]) => {
-          const [, m, d] = dateStr.split('-');
-          return {
-            name: `${d}/${m}`,
-            Valor: valor,
-            dateStr
-          };
-        }).sort((a, b) => a.dateStr.localeCompare(b.dateStr));
-
-        setRevenueTimeData(dailyChart);
-      } else {
-        // Monthly revenue
-        const monthlyMap = new Map<string, number>();
-        let current = new Date(start);
-        while (current <= end) {
-          const mKey = `${current.getFullYear()}-${String(current.getMonth() + 1).padStart(2, '0')}`;
-          monthlyMap.set(mKey, 0);
-          current.setMonth(current.getMonth() + 1);
-        }
-
-        concludedRecords.forEach(a => {
-          const mKey = formatDateStr(new Date(a.data_hora)).substring(0, 7);
-          if (monthlyMap.has(mKey)) {
-            monthlyMap.set(mKey, monthlyMap.get(mKey)! + Number(a.valor_cobrado || 0));
-          }
-        });
-
-        const MONTHS = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
-        const monthlyChart = Array.from(monthlyMap.entries()).map(([mKey, valor]) => {
-          const [y, m] = mKey.split('-');
-          const name = MONTHS[parseInt(m) - 1];
-          return {
-            name: `${name}/${y.substring(2)}`,
-            Valor: valor,
-            mKey
-          };
-        }).sort((a, b) => a.mKey.localeCompare(b.mKey));
-
-        setRevenueTimeData(monthlyChart);
+      const dailyMap = new Map<string, number>();
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(now.getDate() - i);
+        dailyMap.set(formatDateStr(d), 0);
       }
-
-      // --- Chart 2: Appointments by weekday ---
-      const weekdayCounts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 0: 0 };
-      apptRecords.forEach(a => {
-        const d = new Date(a.data_hora);
-        const wDay = d.getDay();
-        weekdayCounts[wDay as keyof typeof weekdayCounts] += 1;
+      (last7Res.data || []).forEach(a => {
+        const k = formatDateStr(new Date(a.data_hora));
+        if (dailyMap.has(k)) dailyMap.set(k, dailyMap.get(k)! + Number(a.valor_cobrado || 0));
       });
+      setLast7DaysRevData(
+        Array.from(dailyMap.entries()).map(([dateStr, valor]) => ({
+          name: DAYS_SHORT[new Date(dateStr + 'T12:00:00').getDay()],
+          Valor: valor,
+        }))
+      );
 
-      setAppointmentsWeekdayData([
-        { name: 'Seg', Quantidade: weekdayCounts[1] },
-        { name: 'Ter', Quantidade: weekdayCounts[2] },
-        { name: 'Qua', Quantidade: weekdayCounts[3] },
-        { name: 'Qui', Quantidade: weekdayCounts[4] },
-        { name: 'Sex', Quantidade: weekdayCounts[5] },
-        { name: 'Sáb', Quantidade: weekdayCounts[6] },
-        { name: 'Dom', Quantidade: weekdayCounts[0] }
-      ]);
-
-      // --- Chart 3: Clients new vs recurrent ---
-      const uniqueClientIds = [...new Set(concludedRecords.map(a => a.cliente_id))];
-      let recurrentSet = new Set<string>();
-
-      if (uniqueClientIds.length > 0) {
-        // Query if they have concluded appointments before the period start
-        const { data: pastConcluded, error: pastError } = await supabase
-          .from('agendamentos')
-          .select('cliente_id')
-          .eq('estabelecimento_id', estabelecimentoId)
-          .eq('status', 'concluido')
-          .in('cliente_id', uniqueClientIds)
-          .lt('data_hora', startIso);
-
-        if (pastError) throw pastError;
-        pastConcluded?.forEach(p => recurrentSet.add(p.cliente_id));
-      }
-
-      // Map client absolute first visit in the period or past
-      const clientFirstDate = new Map<string, string>();
-      concludedRecords.forEach(a => {
-        const dateStr = formatDateStr(new Date(a.data_hora));
-        if (recurrentSet.has(a.cliente_id)) {
-          clientFirstDate.set(a.cliente_id, 'past');
-        } else {
-          const cur = clientFirstDate.get(a.cliente_id);
-          if (!cur || dateStr < cur) {
-            clientFirstDate.set(a.cliente_id, dateStr);
-          }
-        }
-      });
-
-      // Group clients into slots
-      if (diffDays <= 7) {
-        // Group by Day
-        const slotsMap = new Map<string, { Novos: Set<string>; Recorrentes: Set<string> }>();
-        let current = new Date(start);
-        while (current <= end) {
-          slotsMap.set(formatDateStr(current), { Novos: new Set(), Recorrentes: new Set() });
-          current.setDate(current.getDate() + 1);
-        }
-
-        concludedRecords.forEach(a => {
-          const dateStr = formatDateStr(new Date(a.data_hora));
-          const slot = slotsMap.get(dateStr);
-          if (slot) {
-            const first = clientFirstDate.get(a.cliente_id);
-            if (first === dateStr) {
-              slot.Novos.add(a.cliente_id);
-            } else {
-              slot.Recorrentes.add(a.cliente_id);
-            }
-          }
-        });
-
-        const newRecChart = Array.from(slotsMap.entries()).map(([dateStr, sets]) => {
-          const [, m, d] = dateStr.split('-');
-          return {
-            name: `${d}/${m}`,
-            Novos: sets.Novos.size,
-            Recorrentes: sets.Recorrentes.size,
-            dateStr
-          };
-        }).sort((a, b) => a.dateStr.localeCompare(b.dateStr));
-
-        setClientsNewRecurrentData(newRecChart);
-      } else if (diffDays <= 31) {
-        // Group by Week
-        const weeks = ['Semana 1', 'Semana 2', 'Semana 3', 'Semana 4'];
-        const slotsMap = new Map<string, { Novos: Set<string>; Recorrentes: Set<string> }>();
-        weeks.forEach(w => slotsMap.set(w, { Novos: new Set(), Recorrentes: new Set() }));
-
-        concludedRecords.forEach(a => {
-          const wLabel = getWeekLabel(new Date(a.data_hora), start);
-          const slot = slotsMap.get(wLabel) || slotsMap.get('Semana 4')!;
-          
-          const first = clientFirstDate.get(a.cliente_id);
-          const isFirstVisitInThisWeek = first !== 'past' && getWeekLabel(new Date(first! + 'T12:00:00'), start) === wLabel;
-
-          if (isFirstVisitInThisWeek) {
-            slot.Novos.add(a.cliente_id);
-          } else {
-            slot.Recorrentes.add(a.cliente_id);
-          }
-        });
-
-        setClientsNewRecurrentData(weeks.map(w => ({
-          name: w,
-          Novos: slotsMap.get(w)!.Novos.size,
-          Recorrentes: slotsMap.get(w)!.Recorrentes.size
-        })));
-      } else {
-        // Group by Month
-        const slotsMap = new Map<string, { Novos: Set<string>; Recorrentes: Set<string> }>();
-        let current = new Date(start);
-        while (current <= end) {
-          const mKey = `${current.getFullYear()}-${String(current.getMonth() + 1).padStart(2, '0')}`;
-          slotsMap.set(mKey, { Novos: new Set(), Recorrentes: new Set() });
-          current.setMonth(current.getMonth() + 1);
-        }
-
-        concludedRecords.forEach(a => {
-          const mKey = formatDateStr(new Date(a.data_hora)).substring(0, 7);
-          const slot = slotsMap.get(mKey);
-          if (slot) {
-            const first = clientFirstDate.get(a.cliente_id);
-            const isFirstVisitInThisMonth = first !== 'past' && first!.substring(0, 7) === mKey;
-            
-            if (isFirstVisitInThisMonth) {
-              slot.Novos.add(a.cliente_id);
-            } else {
-              slot.Recorrentes.add(a.cliente_id);
-            }
-          }
-        });
-
-        const MONTHS = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
-        const newRecChart = Array.from(slotsMap.entries()).map(([mKey, sets]) => {
-          const [y, m] = mKey.split('-');
-          const name = MONTHS[parseInt(m) - 1];
-          return {
-            name: `${name}/${y.substring(2)}`,
-            Novos: sets.Novos.size,
-            Recorrentes: sets.Recorrentes.size,
-            mKey
-          };
-        }).sort((a, b) => a.mKey.localeCompare(b.mKey));
-
-        setClientsNewRecurrentData(newRecChart);
-      }
-
-      // --- Chart 4: Top 8 services performed ---
-      const srvMapCounts = new Map<string, number>();
-      concludedRecords.forEach(a => {
-        (a.agendamento_servicos || []).forEach((as: any) => {
-          const sName = serviceMap.get(as.servico_id)?.nome || 'Serviço Excluído/Desconhecido';
-          srvMapCounts.set(sName, (srvMapCounts.get(sName) || 0) + 1);
-        });
-      });
-
-      const topServices = Array.from(srvMapCounts.entries())
-        .map(([nome, quantidade]) => ({ name: nome, Quantidade: quantidade }))
-        .sort((a, b) => b.Quantidade - a.Quantidade)
-        .slice(0, 8);
-
-      // Recharts bar horizontal usually renders bottom-to-top, reverse it so highest is at the top
-      setTopServicesData(topServices.reverse());
-
-      // --- Chart 5: Faltas e Cancelamentos no período ---
-      const totalFaltas = apptRecords.filter(a => a.status === 'falta').length;
-      const totalCancelamentos = apptRecords.filter(a => a.status === 'cancelado').length;
-      setFaltasCancelamentosData({ totalFaltas, totalCancelamentos });
-
-    } catch (err: any) {
+    } catch (err) {
       console.error(err);
-      setErrorMsg('Falha ao processar e carregar dados do dashboard.');
+      setErrorMsg('Falha ao carregar dados da tela inicial.');
     } finally {
+      setHeroLoading(false);
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    if (estabelecimentoId) {
-      fetchDashboardData();
-    }
-  }, [period, customStartDate, customEndDate, estabelecimentoId]);
+    if (estabelecimentoId) fetchData();
+  }, [estabelecimentoId]);
 
-  const handlePeriodChange = (p: PeriodType) => {
-    setPeriod(p);
-  };
-
-  // Render empty state component
-  const renderEmptyState = (message: string = 'Nenhum dado encontrado para o período.') => (
-    <div className="flex flex-col items-center justify-center py-20 text-center text-text-muted bg-rose-50/5 border border-dashed border-border/60 rounded-xl h-[300px]">
-      <Sparkles className="w-8 h-8 text-rose-200 mb-2.5 animate-pulse" />
-      <p className="text-xs font-semibold">{message}</p>
-    </div>
-  );
+  const quickActions = [
+    { label: 'Novo Agendamento', Icon: CalendarCheck, to: '/agendamentos', state: {} },
+    { label: 'Bloquear Horário', Icon: CalendarX, to: '/meus-horarios', state: {} },
+    { label: 'Novo Serviço', Icon: Tag, to: '/servicos', state: {} },
+    { label: 'Ver Agenda do Dia', Icon: CalendarDays, to: '/agendamentos', state: { filterToday: true } },
+  ];
 
   return (
     <div className="space-y-6">
-      
-      {/* Top Banner Error */}
+
       {errorMsg && (
-        <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg flex items-center gap-3 animate-fade-in">
+        <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg flex items-center gap-3">
           <AlertCircle className="w-5 h-5 flex-shrink-0 text-red-600" />
           <p className="text-sm font-medium">{errorMsg}</p>
         </div>
       )}
 
-      {/* Control Header Filter Box */}
-      <div className="bg-white border border-border rounded-[14px] p-5 shadow-sm space-y-4">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-          <div>
-            <h2 className="font-title font-semibold text-2xl text-text-primary">Meu Estúdio</h2>
-            <p className="text-xs text-text-secondary mt-0.5">Visão geral do desempenho do seu negócio.</p>
-          </div>
-
-          {/* Period presets */}
-          <div className="flex flex-wrap items-center gap-2">
-            {[
-              { id: 'hoje', label: 'Hoje' },
-              { id: 'ontem', label: 'Ontem' },
-              { id: '7dias', label: 'Últimos 7 dias' },
-              { id: 'esteMes', label: 'Este mês' },
-              { id: 'mesPassado', label: 'Mês passado' },
-              { id: 'esteAno', label: 'Este ano' },
-              { id: 'personalizado', label: 'Personalizado' }
-            ].map(item => (
-              <button
-                key={item.id}
-                onClick={() => handlePeriodChange(item.id as PeriodType)}
-                className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer ${
-                  period === item.id
-                    ? 'bg-rose-600 text-white shadow-sm'
-                    : 'bg-bg text-text-secondary hover:text-rose-600 border border-border/30'
-                }`}
-              >
-                {item.label}
-              </button>
-            ))}
-          </div>
+      {/* ── BANNER DE SAUDAÇÃO ── */}
+      <div className="bg-rose-600 rounded-2xl p-6 md:p-8 text-white relative overflow-hidden">
+        <div className="absolute top-4 right-5 text-white/50 pointer-events-none select-none leading-none text-lg font-light">
+          ✦<br /><span className="text-sm">✦</span>
         </div>
-
-        {/* Custom Calendar Inputs */}
-        {period === 'personalizado' && (
-          <div className="flex items-center gap-3 bg-bg/30 p-3 rounded-lg border border-border/40 w-fit animate-fade-in">
-            <div className="flex items-center gap-2">
-              <label className="text-[10px] font-bold text-text-secondary uppercase">Início:</label>
-              <input 
-                type="date"
-                value={customStartDate}
-                onChange={(e) => setCustomStartDate(e.target.value)}
-                className="px-2.5 py-1 border border-border rounded bg-white text-text-primary text-xs focus:outline-none focus:ring-1 focus:ring-rose-400"
-              />
-            </div>
-            <span className="text-xs text-text-muted">—</span>
-            <div className="flex items-center gap-2">
-              <label className="text-[10px] font-bold text-text-secondary uppercase">Fim:</label>
-              <input 
-                type="date"
-                value={customEndDate}
-                onChange={(e) => setCustomEndDate(e.target.value)}
-                className="px-2.5 py-1 border border-border rounded bg-white text-text-primary text-xs focus:outline-none focus:ring-1 focus:ring-rose-400"
-              />
-            </div>
-          </div>
-        )}
+        <h1 className="font-title font-bold text-3xl md:text-4xl">
+          {getGreeting()}{firstName ? `, ${firstName}!` : '!'}
+        </h1>
+        <p className="text-sm text-white/70 mt-1.5">
+          Aqui está o resumo do seu dia — {getDateString()}.
+        </p>
       </div>
 
-      {loading ? (
-        <div className="flex flex-col items-center justify-center py-40 text-text-secondary bg-surface border rounded-[14px]">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-rose-600 mb-2"></div>
-          <p className="text-sm">Carregando métricas e estatísticas...</p>
+      {/* ── KPI CARDS ── */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+
+        <div className="bg-white border border-border rounded-2xl p-4 flex items-start justify-between shadow-sm">
+          <div className="min-w-0">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-text-muted leading-tight">Faturamento do Mês</p>
+            <p className="font-title font-semibold text-2xl text-rose-600 mt-1.5">
+              {heroLoading ? '—' : `R$ ${heroRevenue.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+            </p>
+          </div>
+          <div className="w-9 h-9 rounded-full bg-rose-50 flex items-center justify-center text-rose-400 flex-shrink-0 ml-2">
+            <Coins className="w-4 h-4" />
+          </div>
         </div>
-      ) : (
-        <>
-          {/* KPI CARDS GRID */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
 
-            {/* KPI 1: Valor Total Ganho */}
-            <div className="bg-white border border-border rounded-[14px] p-5 flex items-center justify-between shadow-sm">
-              <div className="space-y-1">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-text-secondary">Valor Total Ganho</span>
-                <p className="text-3xl font-title font-semibold text-rose-800">
-                  R$ {totalEarned.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                </p>
-                <p className="text-[10px] text-text-muted">Atendimentos finalizados</p>
-              </div>
-              <div className="w-12 h-12 rounded-full bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-600">
-                <Coins className="w-5 h-5" />
-              </div>
+        <div className="bg-white border border-border rounded-2xl p-4 flex items-start justify-between shadow-sm">
+          <div className="min-w-0">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-text-muted leading-tight">Agendamentos Hoje</p>
+            <p className="font-title font-semibold text-2xl text-text-primary mt-1.5">
+              {loading ? '—' : todayAppointments.length}
+            </p>
+          </div>
+          <div className="w-9 h-9 rounded-full bg-rose-50 flex items-center justify-center text-rose-400 flex-shrink-0 ml-2">
+            <CalendarDays className="w-4 h-4" />
+          </div>
+        </div>
+
+        <div
+          onClick={() => pendingAppointments > 0 && navigate('/agendamentos', { state: { openPending: true } })}
+          className={`bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-start justify-between shadow-sm ${pendingAppointments > 0 ? 'cursor-pointer hover:bg-amber-100/60 transition-colors' : ''}`}
+        >
+          <div className="min-w-0">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-amber-600 leading-tight">Aguardando Confirm.</p>
+            <p className="font-title font-semibold text-2xl text-amber-700 mt-1.5">
+              {loading ? '—' : pendingAppointments}
+            </p>
+          </div>
+          <div className="w-9 h-9 rounded-full bg-amber-100 flex items-center justify-center text-amber-500 flex-shrink-0 ml-2">
+            <Clock className="w-4 h-4" />
+          </div>
+        </div>
+
+        <div className="bg-white border border-border rounded-2xl p-4 flex items-start justify-between shadow-sm">
+          <div className="min-w-0">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-text-muted leading-tight">Novos Clientes</p>
+            <p className="font-title font-semibold text-2xl text-text-primary mt-1.5">
+              {heroLoading ? '—' : heroNewClients}
+            </p>
+          </div>
+          <div className="w-9 h-9 rounded-full bg-rose-50 flex items-center justify-center text-rose-400 flex-shrink-0 ml-2">
+            <UserPlus className="w-4 h-4" />
+          </div>
+        </div>
+
+      </div>
+
+      {/* ── AÇÕES RÁPIDAS + PRÓXIMOS ATENDIMENTOS ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-5">
+
+        {/* Left column */}
+        <div className="space-y-5">
+
+          {/* Quick Actions */}
+          <div>
+            <h2 className="font-sans font-semibold text-base text-text-primary mb-3">Ações Rápidas</h2>
+            <div className="grid grid-cols-2 gap-3">
+              {quickActions.map(({ label, Icon, to, state }) => (
+                <button
+                  key={label}
+                  onClick={() => navigate(to, { state })}
+                  className="bg-rose-600 hover:bg-rose-700 active:bg-rose-800 text-white rounded-2xl p-5 flex flex-col items-start gap-4 transition-colors cursor-pointer shadow-sm text-left"
+                >
+                  <Icon className="w-5 h-5 opacity-90" />
+                  <span className="font-semibold text-sm leading-snug">{label}</span>
+                </button>
+              ))}
             </div>
-
-            {/* KPI 2: Agendamentos */}
-            <div className="bg-white border border-border rounded-[14px] p-5 flex items-center justify-between shadow-sm">
-              <div className="space-y-1">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-text-secondary">Total de Agendamentos</span>
-                <p className="text-3xl font-title font-semibold text-text-primary">{totalAppointments}</p>
-                <p className="text-[10px] text-text-muted">Agendados no período</p>
-              </div>
-              <div className="w-12 h-12 rounded-full bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-600">
-                <CalendarDays className="w-5 h-5" />
-              </div>
-            </div>
-
-            {/* KPI 3: Agendamentos Pendentes */}
-            <div
-              onClick={() => pendingAppointments > 0 && navigate('/agendamentos', { state: { openPending: true } })}
-              className={`bg-white border border-amber-200 rounded-[14px] p-5 flex items-center justify-between shadow-sm transition-colors ${pendingAppointments > 0 ? 'cursor-pointer hover:bg-amber-50/60' : ''}`}
-            >
-              <div className="space-y-1">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-amber-600">Aguardando Confirmação</span>
-                <p className="text-3xl font-title font-semibold text-amber-700">{pendingAppointments}</p>
-                <p className="text-[10px] text-amber-500">Agendamentos pendentes</p>
-              </div>
-              <div className="w-12 h-12 rounded-full bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-600">
-                <Briefcase className="w-5 h-5" />
-              </div>
-            </div>
-
-            {/* KPI 4: Clientes */}
-            <div className="bg-white border border-border rounded-[14px] p-5 flex items-center justify-between shadow-sm">
-              <div className="space-y-1">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-text-secondary">Novos Clientes</span>
-                <p className="text-3xl font-title font-semibold text-text-primary">{totalClients}</p>
-                <p className="text-[10px] text-text-muted">Cadastrados no período</p>
-              </div>
-              <div className="w-12 h-12 rounded-full bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-600">
-                <Users className="w-5 h-5" />
-              </div>
-            </div>
-
           </div>
 
-          {/* PRÓXIMOS ATENDIMENTOS DO DIA */}
-          <div className="bg-white border border-border rounded-[14px] p-5 shadow-sm">
-            <h3 className="font-title font-semibold text-lg text-text-primary flex items-center gap-2 mb-4">
-              <CalendarDays className="w-5 h-5 text-rose-600" />
-              Próximos Atendimentos de Hoje
-            </h3>
-            {todayAppointments.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-10 text-center text-text-muted bg-rose-50/5 border border-dashed border-border/60 rounded-xl">
-                <Sparkles className="w-7 h-7 text-rose-200 mb-2" />
-                <p className="text-xs font-semibold">Nenhum atendimento agendado para hoje.</p>
+          {/* Mini Revenue Chart */}
+          <div className="bg-white border border-border rounded-2xl p-5 shadow-sm">
+            <div className="flex items-center justify-between mb-3">
+              <span className="font-sans font-semibold text-sm text-text-primary">Receita · últimos 7 dias</span>
+              {revenueGrowth !== null && (
+                <span className={`text-xs font-bold flex items-center gap-1 ${revenueGrowth >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                  {revenueGrowth >= 0
+                    ? <TrendingUp className="w-3.5 h-3.5" />
+                    : <TrendingDown className="w-3.5 h-3.5" />
+                  }
+                  {revenueGrowth >= 0 ? '+' : ''}{revenueGrowth.toFixed(0)}%
+                </span>
+              )}
+            </div>
+            {heroLoading ? (
+              <div className="h-[100px] flex items-center justify-center">
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-rose-600" />
               </div>
             ) : (
-              <div className="space-y-2">
-                {todayAppointments.map((appt: any) => {
-                  const hora = new Date(appt.data_hora).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-                  const cliente = appt.cliente;
-                  const servicos = (appt.agendamento_servicos || []).map((as: any) => as.servico?.nome).filter(Boolean).join(', ');
-                  return (
-                    <div key={appt.id} className="flex items-center gap-4 p-3 rounded-xl border border-border bg-bg/20 hover:bg-bg/50 transition-colors">
-                      <span className="text-sm font-title font-bold text-rose-700 w-12 flex-shrink-0">{hora}</span>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-text-primary truncate">
-                          {cliente?.nome} {cliente?.sobrenome}
-                        </p>
-                        <p className="text-[11px] text-text-secondary truncate">{servicos || 'Sem serviços'}</p>
-                      </div>
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider flex-shrink-0
-                        ${appt.status === 'confirmado' ? 'bg-rose-100 text-rose-700' : ''}
-                        ${appt.status === 'pendente' ? 'bg-amber-100 text-amber-700' : ''}
-                        ${appt.status === 'concluido' ? 'bg-green-100 text-green-700' : ''}`}
-                      >
-                        {appt.status}
-                      </span>
-                    </div>
-                  );
-                })}
+              <div className="h-[100px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={last7DaysRevData} margin={{ top: 4, right: 4, left: 4, bottom: 0 }}>
+                    <XAxis dataKey="name" tickLine={false} axisLine={false} tick={{ fontSize: 10, fill: 'var(--text-muted)' }} />
+                    <Tooltip
+                      formatter={(v: any) => [`R$ ${Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`, 'Receita']}
+                      contentStyle={{ backgroundColor: 'white', borderRadius: '8px', border: '1px solid rgba(180,150,130,0.2)', fontSize: 11 }}
+                    />
+                    <Line type="monotone" dataKey="Valor" stroke="var(--rose-600)" strokeWidth={2} dot={false} activeDot={{ r: 4, fill: 'var(--rose-600)' }} />
+                  </LineChart>
+                </ResponsiveContainer>
               </div>
             )}
           </div>
 
-          {/* CHARTS CONTAINER GRID */}
-          <div className="space-y-6">
-            
-            {/* Chart 1: Revenue over time (Full row) */}
-            <div className="bg-white border border-border rounded-[14px] p-5 shadow-sm">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-title font-semibold text-lg text-text-primary flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5 text-rose-600" />
-                  Receita ao longo do tempo
-                </h3>
-              </div>
-              {revenueTimeData.length === 0 || revenueTimeData.every(d => d.Valor === 0) ? (
-                renderEmptyState('Sem receita registrada no período selecionado.')
-              ) : (
-                <div className="h-[300px] w-full font-sans text-xs">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={revenueTimeData} margin={{ top: 10, right: 10, left: 10, bottom: 5 }}>
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(180,150,130,0.12)" />
-                      <XAxis
-                        dataKey="name"
-                        tickLine={false}
-                        axisLine={false}
-                        stroke="var(--text-secondary)"
-                        interval={Math.max(0, Math.ceil(revenueTimeData.length / 6) - 1)}
-                        tick={{ fontSize: 10 }}
-                      />
-                      <YAxis
-                        tickLine={false}
-                        axisLine={false}
-                        stroke="var(--text-secondary)"
-                        tickFormatter={(value) => `R$ ${value}`}
-                      />
-                      <Tooltip
-                        formatter={(value: any) => [`R$ ${Number(value).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`, 'Receita']}
-                        contentStyle={{ backgroundColor: 'white', borderRadius: '8px', border: '1px solid rgba(180,150,130,0.2)' }}
-                      />
-                      <Line
-                        type="monotone"
-                        dataKey="Valor"
-                        stroke="#A85560"
-                        strokeWidth={2.5}
-                        dot={false}
-                        activeDot={{ r: 5, fill: '#A85560' }}
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
-              )}
+        </div>
+
+        {/* Right column: Próximos atendimentos */}
+        <div className="bg-white border border-border rounded-2xl p-5 shadow-sm flex flex-col">
+          <h2 className="font-sans font-semibold text-base text-text-primary flex items-center gap-2 mb-4 flex-shrink-0">
+            <CalendarDays className="w-4 h-4 text-rose-600" />
+            Próximos atendimentos de hoje
+          </h2>
+          {loading ? (
+            <div className="flex-1 flex items-center justify-center py-8">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-rose-600" />
             </div>
-
-            {/* Row 2: Weekday appointments and new vs recurrent clients (2 columns) */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              
-              {/* Chart 2: Weekday appointments */}
-              <div className="bg-white border border-border rounded-[14px] p-5 shadow-sm">
-                <h3 className="font-title font-semibold text-lg text-text-primary flex items-center gap-2 mb-4">
-                  <CalendarDays className="w-5 h-5 text-rose-600" />
-                  Agendamentos por dia da semana
-                </h3>
-                {appointmentsWeekdayData.length === 0 || appointmentsWeekdayData.every(d => d.Quantidade === 0) ? (
-                  renderEmptyState('Sem agendamentos no período selecionado.')
-                ) : (
-                  <div className="h-[300px] w-full font-sans text-xs">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={appointmentsWeekdayData} margin={{ top: 10, right: 10, left: 0, bottom: 5 }}>
-                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(180,150,130,0.12)" />
-                        <XAxis dataKey="name" tickLine={false} axisLine={false} stroke="var(--text-secondary)" />
-                        <YAxis tickLine={false} axisLine={false} stroke="var(--text-secondary)" allowDecimals={false} />
-                        <Tooltip 
-                          formatter={(value) => [value, 'Agendamentos']}
-                          contentStyle={{ backgroundColor: 'white', borderRadius: '8px', border: '1px solid rgba(180,150,130,0.2)' }}
-                        />
-                        <Bar dataKey="Quantidade" fill="#C9A96E" radius={[4, 4, 0, 0]} />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </div>
-                )}
-              </div>
-
-              {/* Chart 3: New vs recurrent clients */}
-              <div className="bg-white border border-border rounded-[14px] p-5 shadow-sm">
-                <h3 className="font-title font-semibold text-lg text-text-primary flex items-center gap-2 mb-4">
-                  <Users className="w-5 h-5 text-rose-600" />
-                  Clientes Novas vs Fiéis
-                </h3>
-                {clientsNewRecurrentData.length === 0 || clientsNewRecurrentData.every(d => d.Novos === 0 && d.Recorrentes === 0) ? (
-                  renderEmptyState('Sem atendimentos de clientes no período selecionado.')
-                ) : (
-                  <div className="h-[300px] w-full font-sans text-xs flex flex-col justify-between">
-                    <div className="flex-1">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={clientsNewRecurrentData} margin={{ top: 10, right: 10, left: 0, bottom: 5 }}>
-                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(180,150,130,0.12)" />
-                          <XAxis dataKey="name" tickLine={false} axisLine={false} stroke="var(--text-secondary)" />
-                          <YAxis tickLine={false} axisLine={false} stroke="var(--text-secondary)" allowDecimals={false} />
-                          <Tooltip 
-                            contentStyle={{ backgroundColor: 'white', borderRadius: '8px', border: '1px solid rgba(180,150,130,0.2)' }}
-                          />
-                          <Legend verticalAlign="top" height={36} iconType="circle" />
-                          <Bar dataKey="Novos" stackId="a" fill="#A85560" radius={[0, 0, 0, 0]} />
-                          <Bar dataKey="Recorrentes" stackId="a" fill="#B0A097" radius={[4, 4, 0, 0]} />
-                        </BarChart>
-                      </ResponsiveContainer>
+          ) : todayAppointments.length === 0 ? (
+            <div className="flex-1 flex flex-col items-center justify-center py-10 text-center text-text-muted border border-dashed border-border/60 rounded-xl">
+              <Sparkles className="w-6 h-6 text-rose-200 mb-2" />
+              <p className="text-xs font-semibold">Nenhum atendimento hoje.</p>
+            </div>
+          ) : (
+            <div className="space-y-2 overflow-y-auto">
+              {todayAppointments.map((appt: any) => {
+                const hora = new Date(appt.data_hora).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+                const cliente = appt.cliente;
+                const servicos = (appt.agendamento_servicos || []).map((as: any) => as.servico?.nome).filter(Boolean).join(', ');
+                const isPending = appt.status === 'pendente';
+                const isFalta = appt.status === 'falta';
+                return (
+                  <div
+                    key={appt.id}
+                    className={`flex items-center gap-3 p-3 rounded-xl border transition-colors 
+                      ${isPending ? 'border-amber-200 bg-amber-50/40' : 
+                        isFalta ? 'border-red-200 bg-red-50/30 hover:bg-red-50/50' : 
+                        'border-border bg-bg/30 hover:bg-bg/60'}`}
+                  >
+                    <span className={`text-sm font-title font-bold w-11 flex-shrink-0 
+                      ${isPending ? 'text-amber-700' : isFalta ? 'text-red-700' : 'text-rose-600'}`}
+                    >
+                      {hora}
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-text-primary truncate">
+                        {cliente?.nome} {cliente?.sobrenome}
+                      </p>
+                      <p className="text-[11px] text-text-secondary truncate">{servicos || 'Sem serviços'}</p>
                     </div>
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0 whitespace-nowrap
+                      ${appt.status === 'confirmado' ? 'bg-green-100 text-green-700' : ''}
+                      ${appt.status === 'pendente' ? 'bg-amber-100 text-amber-700' : ''}
+                      ${appt.status === 'concluido' ? 'bg-blue-100 text-blue-700' : ''}
+                      ${appt.status === 'falta' ? 'bg-red-100 text-red-700' : ''}
+                    `}>
+                      {appt.status === 'confirmado' ? 'Confirmado' : 
+                       appt.status === 'pendente' ? 'Aguardando' : 
+                       appt.status === 'falta' ? 'Falta' : 'Concluído'}
+                    </span>
                   </div>
-                )}
-              </div>
-
+                );
+              })}
             </div>
+          )}
+        </div>
 
-            {/* Row 3: Top services and professional appointments (2 columns) */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              
-              {/* Chart 4: Top services */}
-              <div className="bg-white border border-border rounded-[14px] p-5 shadow-sm">
-                <h3 className="font-title font-semibold text-lg text-text-primary flex items-center gap-2 mb-4">
-                  <Briefcase className="w-5 h-5 text-rose-600" />
-                  Serviços mais realizados
-                </h3>
-                {topServicesData.length === 0 || topServicesData.every(d => d.Quantidade === 0) ? (
-                  renderEmptyState('Sem atendimentos registrados no período.')
-                ) : (
-                  <div className="h-[300px] w-full font-sans text-xs">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart 
-                        layout="vertical" 
-                        data={topServicesData} 
-                        margin={{ top: 10, right: 15, left: 25, bottom: 5 }}
-                      >
-                        <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="rgba(180,150,130,0.12)" />
-                        <XAxis type="number" tickLine={false} axisLine={false} stroke="var(--text-secondary)" allowDecimals={false} />
-                        <YAxis 
-                          type="category" 
-                          dataKey="name" 
-                          tickLine={false} 
-                          axisLine={false} 
-                          stroke="var(--text-secondary)" 
-                          width={100}
-                          tick={{ fontSize: 10 }}
-                        />
-                        <Tooltip 
-                          formatter={(value) => [value, 'Realizado']}
-                          contentStyle={{ backgroundColor: 'white', borderRadius: '8px', border: '1px solid rgba(180,150,130,0.2)' }}
-                        />
-                        <Bar dataKey="Quantidade" fill="#7A2E38" radius={[0, 4, 4, 0]} />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </div>
-                )}
-              </div>
-
-            </div>
-
-            {/* Row 4: Faltas e Cancelamentos */}
-            <div className="bg-white border border-border rounded-[14px] p-5 shadow-sm">
-              <h3 className="font-title font-semibold text-lg text-text-primary flex items-center gap-2 mb-2">
-                <AlertCircle className="w-5 h-5 text-rose-600" />
-                Faltas e Cancelamentos
-              </h3>
-              <p className="text-xs text-text-secondary mb-6">Agendamentos perdidos no período selecionado.</p>
-              {faltasCancelamentosData.totalFaltas === 0 && faltasCancelamentosData.totalCancelamentos === 0 ? (
-                renderEmptyState('Nenhuma falta ou cancelamento no período.')
-              ) : (
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="flex flex-col items-center justify-center bg-red-50 border border-red-100 rounded-xl p-6 gap-1">
-                    <p className="text-[10px] font-bold uppercase tracking-wider text-red-500">Faltas (No-show)</p>
-                    <p className="font-title font-bold text-4xl text-red-600">{faltasCancelamentosData.totalFaltas}</p>
-                    <p className="text-[10px] text-text-muted">cliente não apareceu</p>
-                  </div>
-                  <div className="flex flex-col items-center justify-center bg-gray-50 border border-gray-100 rounded-xl p-6 gap-1">
-                    <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500">Cancelamentos</p>
-                    <p className="font-title font-bold text-4xl text-gray-600">{faltasCancelamentosData.totalCancelamentos}</p>
-                    <p className="text-[10px] text-text-muted">agendamentos cancelados</p>
-                  </div>
-                </div>
-              )}
-            </div>
-
-          </div>
-        </>
-      )}
+      </div>
 
     </div>
   );
