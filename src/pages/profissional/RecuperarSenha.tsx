@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { Mail, AlertCircle, ArrowLeft, CheckCircle2 } from 'lucide-react';
@@ -42,9 +42,9 @@ export default function RecuperarSenha() {
         <div className="flex flex-col items-center text-center mb-4">
           <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-rose-600 to-rose-400 text-white flex items-center justify-center shadow-lg mb-4 hover:scale-105 transition-transform duration-300 overflow-hidden">
             <img
-              src="/logotrans2.png"
+              src="/logo-login.png"
               alt="Lash Hub"
-              className="w-[85%] h-[85%] object-contain"
+              className="w-full h-full object-contain"
             />
           </div>
           <h1 className="font-title font-bold text-3xl tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-rose-600 to-rose-400">

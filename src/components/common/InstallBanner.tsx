@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 
 const STORAGE_KEY = 'lashhub-install-banner-dismissed';
@@ -48,9 +48,9 @@ export default function InstallBanner() {
       <div className="bg-white border border-border rounded-2xl shadow-xl p-4 flex items-start gap-3 max-w-md mx-auto">
         <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-rose-600 to-rose-400 flex items-center justify-center flex-shrink-0 border border-border overflow-hidden">
           <img
-            src="/logotrans2.png"
+            src="/logo-login.png"
             alt="Lash Hub"
-            className="w-[85%] h-[85%] object-contain"
+            className="w-full h-full object-contain"
           />
         </div>
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AlertCircle, Eye, EyeOff, Mail, Lock, User, Briefcase, Sparkles, Calendar, Link2 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
@@ -107,9 +107,9 @@ export default function CadastroProfissional() {
         <div className="flex flex-col items-center text-center mb-8">
           <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-rose-600 to-rose-400 text-white flex items-center justify-center shadow-lg mb-4 hover:scale-105 transition-transform duration-300 overflow-hidden">
             <img
-              src="/logotrans2.png"
+              src="/logo-login.png"
               alt="Lash Hub"
-              className="w-[85%] h-[85%] object-contain"
+              className="w-full h-full object-contain"
             />
           </div>
           <h1 className="font-title font-bold text-3xl tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-rose-600 to-rose-400">
@@ -279,9 +279,9 @@ export default function CadastroProfissional() {
 
             <div className="w-20 h-20 rounded-2xl bg-gradient-to-tr from-rose-600 to-rose-400 flex items-center justify-center shadow-lg mb-5 overflow-hidden">
               <img
-                src="/logotrans2.png"
+                src="/logo-login.png"
                 alt="Lash Hub"
-                className="w-[85%] h-[85%] object-contain"
+                className="w-full h-full object-contain"
               />
             </div>
 
