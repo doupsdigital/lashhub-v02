@@ -107,7 +107,7 @@ export default function CadastroProfissional() {
         <div className="flex flex-col items-center text-center mb-8">
           <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-rose-600 to-rose-400 text-white flex items-center justify-center shadow-lg mb-4 hover:scale-105 transition-transform duration-300 overflow-hidden">
             <img
-              src="/logotransparente.png"
+              src="/logotrans2.png"
               alt="Lash Hub"
               className="w-[70%] h-[70%] object-contain"
             />
@@ -279,7 +279,7 @@ export default function CadastroProfissional() {
 
             <div className="w-20 h-20 rounded-2xl bg-gradient-to-tr from-rose-600 to-rose-400 flex items-center justify-center shadow-lg mb-5 overflow-hidden">
               <img
-                src="/logotransparente.png"
+                src="/logotrans2.png"
                 alt="Lash Hub"
                 className="w-[70%] h-[70%] object-contain"
               />

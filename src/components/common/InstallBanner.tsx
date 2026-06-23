@@ -48,7 +48,7 @@ export default function InstallBanner() {
       <div className="bg-white border border-border rounded-2xl shadow-xl p-4 flex items-start gap-3 max-w-md mx-auto">
         <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-rose-600 to-rose-400 flex items-center justify-center flex-shrink-0 border border-border overflow-hidden">
           <img
-            src="/logotransparente.png"
+            src="/logotrans2.png"
             alt="Lash Hub"
             className="w-[75%] h-[75%] object-contain"
           />
