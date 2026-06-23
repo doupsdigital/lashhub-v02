@@ -1,23 +1,26 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
-import { 
-  Plus, 
-  Edit2, 
-  Trash2, 
-  Power, 
-  Search, 
-  AlertCircle, 
-  Sparkles, 
-  Clock, 
+import {
+  Plus,
+  Edit2,
+  Trash2,
+  Power,
+  Search,
+  AlertCircle,
+  Sparkles,
+  Clock,
   Coins,
   X,
   PlusCircle,
-  HelpCircle
+  HelpCircle,
+  ImagePlus,
+  Tag,
 } from 'lucide-react';
 import type { CategoriaServico, Servico, VariacaoServico } from '../../types';
 import { registrarLog } from '../../utils/log';
 import ConfirmModal from '../../components/common/ConfirmModal';
+import { compressImage } from '../../utils/imageCompression';
 
 // Extend types to include relations
 interface VariacaoInput {
@@ -46,7 +49,7 @@ export default function Servicos() {
   // Modals state
   const [isCategoriaModalOpen, setIsCategoriaModalOpen] = useState(false);
   const [isServicoModalOpen, setIsServicoModalOpen] = useState(false);
-  
+
   // Selected items for editing
   const [editingCategoria, setEditingCategoria] = useState<CategoriaServico | null>(null);
   const [editingServico, setEditingServico] = useState<ServicoWithRelations | null>(null);
@@ -60,6 +63,13 @@ export default function Servicos() {
   const [servicoDuracao, setServicoDuracao] = useState<number | ''>(30);
   const [servicoValor, setServicoValor] = useState<number | ''>(100.0);
   const [servicoVariacoes, setServicoVariacoes] = useState<VariacaoInput[]>([]);
+
+  // Imagem do serviço
+  const [servicoImagemFile, setServicoImagemFile] = useState<File | null>(null);
+  const [servicoImagemPreviewUrl, setServicoImagemPreviewUrl] = useState<string | null>(null);
+  const [removerImagem, setRemoverImagem] = useState(false);
+  const [uploadingImagem, setUploadingImagem] = useState(false);
+  const imagemFileInputRef = useRef<HTMLInputElement>(null);
 
   // Tooltip / Notification state for delete locks
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -248,6 +258,8 @@ export default function Servicos() {
   // SERVICO ACTIONS
   const handleOpenServicoModal = (serv: ServicoWithRelations | null = null) => {
     setServicoError(null);
+    setServicoImagemFile(null);
+    setRemoverImagem(false);
     if (serv) {
       setEditingServico(serv);
       setServicoNome(serv.nome);
@@ -261,6 +273,7 @@ export default function Servicos() {
           valor: Number(v.valor)
         }))
       );
+      setServicoImagemPreviewUrl(serv.imagem_url ?? null);
     } else {
       setEditingServico(null);
       setServicoNome('');
@@ -268,8 +281,29 @@ export default function Servicos() {
       setServicoDuracao(30);
       setServicoValor(100.0);
       setServicoVariacoes([]);
+      setServicoImagemPreviewUrl(null);
     }
     setIsServicoModalOpen(true);
+  };
+
+  const handleImagemSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const compressed = await compressImage(file);
+      setServicoImagemFile(compressed);
+      setServicoImagemPreviewUrl(URL.createObjectURL(compressed));
+      setRemoverImagem(false);
+    } catch {
+      showTemporaryError('Não foi possível processar a imagem.');
+    }
+  };
+
+  const handleRemoverImagem = () => {
+    setServicoImagemFile(null);
+    setServicoImagemPreviewUrl(null);
+    setRemoverImagem(true);
+    if (imagemFileInputRef.current) imagemFileInputRef.current.value = '';
   };
 
   const handleAddVariacaoField = () => {
@@ -312,23 +346,41 @@ export default function Servicos() {
       const duracaoFinal = servicoDuracao === '' ? 0 : servicoDuracao;
       const valorFinal = servicoValor === '' ? 0 : servicoValor;
 
+      // Upload imagem se houver arquivo novo
+      let imagemUrlFinal: string | null | undefined = undefined;
+      if (servicoImagemFile && estabelecimentoId) {
+        setUploadingImagem(true);
+        const timestamp = Date.now();
+        const filePath = `${estabelecimentoId}/servico-${timestamp}.jpg`;
+        const { error: uploadError } = await supabase.storage
+          .from('servicos-imagens')
+          .upload(filePath, servicoImagemFile, { cacheControl: '3600', upsert: true });
+        if (uploadError) throw uploadError;
+        const { data: urlData } = supabase.storage.from('servicos-imagens').getPublicUrl(filePath);
+        imagemUrlFinal = urlData.publicUrl;
+        setUploadingImagem(false);
+      } else if (removerImagem) {
+        imagemUrlFinal = null;
+      }
+
       if (editingServico) {
-        // Update Service
+        const updatePayload: Record<string, unknown> = {
+          nome: servicoNome,
+          categoria_id: servicoCategoriaId,
+          duracao_minutos: duracaoFinal,
+          valor: valorFinal,
+        };
+        if (imagemUrlFinal !== undefined) updatePayload.imagem_url = imagemUrlFinal;
+
         const { error } = await supabase
           .from('servicos')
-          .update({
-            nome: servicoNome,
-            categoria_id: servicoCategoriaId,
-            duracao_minutos: duracaoFinal,
-            valor: valorFinal
-          })
+          .update(updatePayload)
           .eq('id', editingServico.id);
 
         if (error) throw error;
         servicoId = editingServico.id;
         await registrarLog('editou', 'servico', servicoId, `Editou serviço "${servicoNome}"`);
       } else {
-        // Create Service
         const { data, error } = await supabase
           .from('servicos')
           .insert({
@@ -336,7 +388,8 @@ export default function Servicos() {
             categoria_id: servicoCategoriaId,
             duracao_minutos: duracaoFinal,
             valor: valorFinal,
-            estabelecimento_id: estabelecimentoId
+            estabelecimento_id: estabelecimentoId,
+            ...(imagemUrlFinal !== undefined ? { imagem_url: imagemUrlFinal } : {}),
           })
           .select()
           .single();
@@ -347,17 +400,10 @@ export default function Servicos() {
         await registrarLog('criou', 'servico', servicoId, `Criou serviço "${servicoNome}"`);
       }
 
-      // Handle Variations
-      // Para simplificar e garantir a consistência das variações:
-      // Exclui todas as variações anteriores do serviço e insere as novas (se existirem)
       if (editingServico) {
-        await supabase
-          .from('variacoes_servico')
-          .delete()
-          .eq('servico_id', servicoId);
+        await supabase.from('variacoes_servico').delete().eq('servico_id', servicoId);
       }
 
-      // Insere as variações atuais se houverem
       const validVariacoes = servicoVariacoes.filter(v => v.nome.trim() !== '');
       if (validVariacoes.length > 0) {
         const insertData = validVariacoes.map(v => ({
@@ -365,10 +411,7 @@ export default function Servicos() {
           nome: v.nome,
           valor: v.valor === '' ? 0 : v.valor
         }));
-        const { error: varError } = await supabase
-          .from('variacoes_servico')
-          .insert(insertData);
-
+        const { error: varError } = await supabase.from('variacoes_servico').insert(insertData);
         if (varError) throw varError;
       }
 
@@ -747,170 +790,289 @@ export default function Servicos() {
       {/* SERVICO MODAL */}
       {isServicoModalOpen && (
         <div className="fixed inset-0 bg-black/45 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto animate-fade-in">
-          <div className="bg-white rounded-[14px] border border-border shadow-xl w-full max-w-lg flex flex-col max-h-[calc(100vh-2rem)] overflow-hidden my-8 animate-slide-up">
+          <div className="bg-white rounded-[14px] border border-border shadow-xl w-full max-w-4xl flex flex-col max-h-[calc(100vh-2rem)] overflow-hidden my-8 animate-slide-up">
             <div className="px-6 py-4 border-b border-border flex items-center justify-between bg-rose-50/10 flex-shrink-0">
               <h4 className="font-title font-semibold text-lg text-text-primary">
                 {editingServico ? 'Editar Serviço' : 'Novo Serviço'}
               </h4>
-              <button 
+              <button
                 onClick={() => setIsServicoModalOpen(false)}
                 className="text-text-secondary hover:text-rose-600 cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
-            
-            <form onSubmit={handleSaveServico} className="p-6 space-y-5 overflow-y-auto flex-1">
-              {/* Nome */}
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
-                  Nome do Serviço <span className="text-red-500">*</span>
-                </label>
-                <input 
-                  type="text" 
-                  required
-                  placeholder="Volume Brasileiro - Aplicação"
-                  value={servicoNome}
-                  onChange={(e) => setServicoNome(e.target.value)}
-                  className="w-full px-3 py-2 border border-border rounded-lg bg-bg text-text-primary text-sm focus:outline-none focus:ring-1 focus:ring-rose-400 placeholder:text-text-muted"
-                />
-              </div>
 
-              {/* Categoria Selection */}
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
-                  Categoria <span className="text-red-500">*</span>
-                </label>
-                <select
-                  required
-                  value={servicoCategoriaId}
-                  onChange={(e) => setServicoCategoriaId(e.target.value)}
-                  className="w-full px-3 py-2 border border-border rounded-lg bg-bg text-text-primary text-sm focus:outline-none focus:ring-1 focus:ring-rose-400 cursor-pointer"
-                >
-                  <option value="" disabled>Selecione uma categoria ativa</option>
-                  {categorias.map(cat => (
-                    <option key={cat.id} value={cat.id}>{cat.nome}</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Duração & Valor */}
-              <div className="grid grid-cols-2 gap-4">
+            <div className="flex flex-col lg:flex-row flex-1 overflow-hidden">
+              {/* ── FORMULÁRIO ── */}
+              <form onSubmit={handleSaveServico} className="p-6 space-y-5 overflow-y-auto flex-1 lg:border-r lg:border-border">
+                {/* Nome */}
                 <div className="space-y-1.5">
                   <label className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
-                    Duração (minutos) <span className="text-red-500">*</span>
+                    Nome do Serviço <span className="text-red-500">*</span>
                   </label>
-                  <input 
-                    type="number" 
+                  <input
+                    type="text"
                     required
-                    min="1"
-                    value={servicoDuracao}
-                    onChange={(e) => setServicoDuracao(e.target.value === '' ? '' : parseInt(e.target.value) || 0)}
-                    className="w-full px-3 py-2 border border-border rounded-lg bg-bg text-text-primary text-sm focus:outline-none focus:ring-1 focus:ring-rose-400"
+                    placeholder="Volume Brasileiro - Aplicação"
+                    value={servicoNome}
+                    onChange={(e) => setServicoNome(e.target.value)}
+                    className="w-full px-3 py-2 border border-border rounded-lg bg-bg text-text-primary text-sm focus:outline-none focus:ring-1 focus:ring-rose-400 placeholder:text-text-muted"
                   />
                 </div>
 
+                {/* Categoria */}
                 <div className="space-y-1.5">
                   <label className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
-                    Valor Padrão (R$) <span className="text-red-500">*</span>
+                    Categoria <span className="text-red-500">*</span>
                   </label>
-                  <input 
-                    type="number" 
+                  <select
                     required
-                    step="0.01"
-                    min="0"
-                    value={servicoValor}
-                    onChange={(e) => setServicoValor(e.target.value === '' ? '' : parseFloat(e.target.value) || 0)}
-                    className="w-full px-3 py-2 border border-border rounded-lg bg-bg text-text-primary text-sm focus:outline-none focus:ring-1 focus:ring-rose-400"
-                  />
-                </div>
-              </div>
-
-              {/* Variações de Serviço */}
-              <div className="space-y-3 pt-2">
-                <div className="flex items-center justify-between border-b border-border pb-1.5">
-                  <label className="text-xs font-semibold uppercase tracking-wider text-text-secondary flex items-center gap-1.5">
-                    Variações de Serviço
-                    <span title="Use variações para cadastrar valores diferentes dependendo da região corporal ou técnica (Ex: Depilação Pernas / Axilas).">
-                      <HelpCircle className="w-3.5 h-3.5 text-text-muted cursor-help" />
-                    </span>
-                  </label>
-                  <button
-                    type="button"
-                    onClick={handleAddVariacaoField}
-                    className="text-xs text-rose-600 hover:text-rose-800 font-semibold flex items-center gap-1 cursor-pointer"
+                    value={servicoCategoriaId}
+                    onChange={(e) => setServicoCategoriaId(e.target.value)}
+                    className="w-full px-3 py-2 border border-border rounded-lg bg-bg text-text-primary text-sm focus:outline-none focus:ring-1 focus:ring-rose-400 cursor-pointer"
                   >
-                    <PlusCircle className="w-4 h-4" />
-                    Adicionar variação
-                  </button>
+                    <option value="" disabled>Selecione uma categoria ativa</option>
+                    {categorias.map(cat => (
+                      <option key={cat.id} value={cat.id}>{cat.nome}</option>
+                    ))}
+                  </select>
                 </div>
 
-                {servicoVariacoes.length === 0 ? (
-                  <p className="text-xs text-text-muted italic">Nenhuma variação cadastrada para este serviço. Ele usará apenas o valor padrão.</p>
-                ) : (
-                  <div className="space-y-2.5 max-h-[180px] overflow-y-auto pr-1">
-                    {servicoVariacoes.map((variacao, index) => (
-                      <div key={index} className="flex items-center gap-3 bg-bg/40 p-2 rounded-lg border border-border/50 animate-fade-in">
-                        <div className="flex-1">
-                          <input 
-                            type="text" 
-                            required
-                            placeholder="Ex: Manutenção Fio a Fio, Volume Russo..."
-                            value={variacao.nome}
-                            onChange={(e) => handleVariacaoChange(index, 'nome', e.target.value)}
-                            className="w-full px-2.5 py-1.5 border border-border rounded-md bg-white text-text-primary text-xs focus:outline-none focus:ring-1 focus:ring-rose-400"
-                          />
-                        </div>
-                        <div className="w-28">
-                          <input 
-                            type="number" 
-                            required
-                            step="0.01"
-                            min="0"
-                            placeholder="Valor"
-                            value={variacao.valor || ''}
-                            onChange={(e) => handleVariacaoChange(index, 'valor', e.target.value)}
-                            className="w-full px-2.5 py-1.5 border border-border rounded-md bg-white text-text-primary text-xs focus:outline-none focus:ring-1 focus:ring-rose-400"
-                          />
-                        </div>
+                {/* Duração & Valor */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
+                      Duração (min) <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="number"
+                      required
+                      min="1"
+                      value={servicoDuracao}
+                      onChange={(e) => setServicoDuracao(e.target.value === '' ? '' : parseInt(e.target.value) || 0)}
+                      className="w-full px-3 py-2 border border-border rounded-lg bg-bg text-text-primary text-sm focus:outline-none focus:ring-1 focus:ring-rose-400"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
+                      Valor (R$) <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="number"
+                      required
+                      step="0.01"
+                      min="0"
+                      value={servicoValor}
+                      onChange={(e) => setServicoValor(e.target.value === '' ? '' : parseFloat(e.target.value) || 0)}
+                      className="w-full px-3 py-2 border border-border rounded-lg bg-bg text-text-primary text-sm focus:outline-none focus:ring-1 focus:ring-rose-400"
+                    />
+                  </div>
+                </div>
+
+                {/* Foto do serviço */}
+                <div className="space-y-2">
+                  <label className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
+                    Foto do Serviço <span className="text-text-muted font-normal normal-case">(opcional)</span>
+                  </label>
+                  <input
+                    ref={imagemFileInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleImagemSelect}
+                  />
+                  {servicoImagemPreviewUrl ? (
+                    <div className="relative w-full aspect-video rounded-xl overflow-hidden border border-border group">
+                      <img src={servicoImagemPreviewUrl} alt="Preview" className="w-full h-full object-cover" />
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
                         <button
                           type="button"
-                          onClick={() => handleRemoveVariacaoField(index)}
-                          className="p-1.5 text-red-500 hover:bg-red-50 rounded transition-colors cursor-pointer"
-                          title="Remover Variação"
+                          onClick={() => imagemFileInputRef.current?.click()}
+                          className="px-3 py-1.5 bg-white text-text-primary rounded-lg text-xs font-semibold cursor-pointer"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          Trocar foto
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleRemoverImagem}
+                          className="px-3 py-1.5 bg-red-500 text-white rounded-lg text-xs font-semibold cursor-pointer"
+                        >
+                          Remover
                         </button>
                       </div>
-                    ))}
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => imagemFileInputRef.current?.click()}
+                      className="w-full aspect-video rounded-xl border-2 border-dashed border-border hover:border-rose-300 hover:bg-rose-50/30 transition-colors flex flex-col items-center justify-center gap-2 text-text-muted cursor-pointer"
+                    >
+                      <ImagePlus className="w-7 h-7" />
+                      <span className="text-xs font-medium">Clique para adicionar uma foto</span>
+                      <span className="text-[10px]">A imagem será comprimida automaticamente</span>
+                    </button>
+                  )}
+                </div>
+
+                {/* Variações */}
+                <div className="space-y-3 pt-2">
+                  <div className="flex items-center justify-between border-b border-border pb-1.5">
+                    <label className="text-xs font-semibold uppercase tracking-wider text-text-secondary flex items-center gap-1.5">
+                      Variações de Serviço
+                      <span title="Use variações para cadastrar valores diferentes dependendo da região corporal ou técnica.">
+                        <HelpCircle className="w-3.5 h-3.5 text-text-muted cursor-help" />
+                      </span>
+                    </label>
+                    <button
+                      type="button"
+                      onClick={handleAddVariacaoField}
+                      className="text-xs text-rose-600 hover:text-rose-800 font-semibold flex items-center gap-1 cursor-pointer"
+                    >
+                      <PlusCircle className="w-4 h-4" />
+                      Adicionar variação
+                    </button>
+                  </div>
+
+                  {servicoVariacoes.length === 0 ? (
+                    <p className="text-xs text-text-muted italic">Nenhuma variação. O serviço usará apenas o valor padrão.</p>
+                  ) : (
+                    <div className="space-y-2.5 max-h-[160px] overflow-y-auto pr-1">
+                      {servicoVariacoes.map((variacao, index) => (
+                        <div key={index} className="flex items-center gap-3 bg-bg/40 p-2 rounded-lg border border-border/50 animate-fade-in">
+                          <div className="flex-1">
+                            <input
+                              type="text"
+                              required
+                              placeholder="Ex: Manutenção Fio a Fio..."
+                              value={variacao.nome}
+                              onChange={(e) => handleVariacaoChange(index, 'nome', e.target.value)}
+                              className="w-full px-2.5 py-1.5 border border-border rounded-md bg-white text-text-primary text-xs focus:outline-none focus:ring-1 focus:ring-rose-400"
+                            />
+                          </div>
+                          <div className="w-28">
+                            <input
+                              type="number"
+                              required
+                              step="0.01"
+                              min="0"
+                              placeholder="Valor"
+                              value={variacao.valor || ''}
+                              onChange={(e) => handleVariacaoChange(index, 'valor', e.target.value)}
+                              className="w-full px-2.5 py-1.5 border border-border rounded-md bg-white text-text-primary text-xs focus:outline-none focus:ring-1 focus:ring-rose-400"
+                            />
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveVariacaoField(index)}
+                            className="p-1.5 text-red-500 hover:bg-red-50 rounded transition-colors cursor-pointer"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {servicoError && (
+                  <div className="flex items-center gap-2 bg-red-50 border border-red-200 text-red-800 px-3 py-2 rounded-lg">
+                    <AlertCircle className="w-4 h-4 flex-shrink-0 text-red-600" />
+                    <p className="text-xs font-medium">{servicoError}</p>
                   </div>
                 )}
-              </div>
 
-              {/* Action buttons */}
-              {servicoError && (
-                <div className="flex items-center gap-2 bg-red-50 border border-red-200 text-red-800 px-3 py-2 rounded-lg">
-                  <AlertCircle className="w-4 h-4 flex-shrink-0 text-red-600" />
-                  <p className="text-xs font-medium">{servicoError}</p>
+                <div className="flex items-center justify-end gap-3 pt-4 border-t border-border">
+                  <button
+                    type="button"
+                    onClick={() => setIsServicoModalOpen(false)}
+                    className="px-4 py-2 border border-border rounded-lg text-xs font-medium text-text-secondary hover:bg-bg transition-colors cursor-pointer"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={uploadingImagem}
+                    className="px-4 py-2 bg-rose-600 hover:bg-rose-800 disabled:bg-rose-400 text-white rounded-lg text-xs font-medium transition-colors cursor-pointer"
+                  >
+                    {uploadingImagem ? 'Enviando imagem...' : 'Salvar'}
+                  </button>
                 </div>
-              )}
+              </form>
 
-              <div className="flex items-center justify-end gap-3 pt-4 border-t border-border">
-                <button
-                  type="button"
-                  onClick={() => setIsServicoModalOpen(false)}
-                  className="px-4 py-2 border border-border rounded-lg text-xs font-medium text-text-secondary hover:bg-bg transition-colors cursor-pointer"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-rose-600 hover:bg-rose-800 text-white rounded-lg text-xs font-medium transition-colors cursor-pointer"
-                >
-                  Salvar
-                </button>
+              {/* ── PREVIEW ── */}
+              <div className="hidden lg:flex flex-col w-72 flex-shrink-0 bg-bg/40 p-5 gap-4 overflow-y-auto">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wider text-text-secondary mb-0.5">Como vai aparecer no portal</p>
+                  <p className="text-[10px] text-text-muted">Atualiza em tempo real</p>
+                </div>
+
+                {/* Card preview — com imagem */}
+                <div>
+                  <p className="text-[10px] font-medium text-text-muted mb-2 flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-green-500 inline-block" />
+                    Com foto
+                  </p>
+                  <div className="bg-white border border-border rounded-2xl overflow-hidden shadow-sm">
+                    {servicoImagemPreviewUrl ? (
+                      <img src={servicoImagemPreviewUrl} alt="Preview" className="w-full aspect-video object-cover" />
+                    ) : (
+                      <div className="w-full aspect-video bg-rose-50 flex items-center justify-center">
+                        <ImagePlus className="w-8 h-8 text-rose-200" />
+                      </div>
+                    )}
+                    <div className="p-3 space-y-2">
+                      <p className="font-title font-semibold text-sm text-text-primary leading-snug">
+                        {servicoNome || 'Nome do Serviço'}
+                      </p>
+                      <div className="flex items-center gap-3 text-xs text-text-secondary">
+                        <span className="flex items-center gap-1">
+                          <Clock className="w-3 h-3 text-rose-400" />
+                          {servicoDuracao || 0} min
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Tag className="w-3 h-3 text-amber-500" />
+                          R$ {Number(servicoValor || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                        </span>
+                      </div>
+                      <div className="w-full py-1.5 bg-rose-600 text-white rounded-lg text-xs font-semibold text-center">
+                        Agendar
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Card preview — sem imagem */}
+                <div>
+                  <p className="text-[10px] font-medium text-text-muted mb-2 flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-gray-400 inline-block" />
+                    Sem foto
+                  </p>
+                  <div className="bg-white border border-border rounded-2xl overflow-hidden shadow-sm p-3 space-y-2">
+                    <p className="font-title font-semibold text-sm text-text-primary leading-snug">
+                      {servicoNome || 'Nome do Serviço'}
+                    </p>
+                    <div className="flex items-center gap-3 text-xs text-text-secondary">
+                      <span className="flex items-center gap-1">
+                        <Clock className="w-3 h-3 text-rose-400" />
+                        {servicoDuracao || 0} min
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Tag className="w-3 h-3 text-amber-500" />
+                        R$ {Number(servicoValor || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                      </span>
+                    </div>
+                    <div className="w-full py-1.5 bg-rose-600 text-white rounded-lg text-xs font-semibold text-center">
+                      Agendar
+                    </div>
+                  </div>
+                </div>
+
+                <p className="text-[10px] text-text-muted leading-relaxed mt-auto pt-2 border-t border-border">
+                  A foto é opcional. Serviços sem foto exibem o card no formato simples, como mostrado acima.
+                </p>
               </div>
-            </form>
+            </div>
           </div>
         </div>
       )}

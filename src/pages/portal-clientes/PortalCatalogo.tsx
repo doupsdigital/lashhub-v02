@@ -76,7 +76,11 @@ function ServicoCard({ servico, onAgendar, isBasico, nomeNegocio }: ServicoCardP
     const whatsappUrl = `https://wa.me/5511999999999?text=${encodeURIComponent(whatsappText)}`;
     
     return (
-      <div className="bg-white border border-border rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow duration-200 flex flex-col gap-3">
+      <div className="bg-white border border-border rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200 flex flex-col overflow-hidden">
+        {servico.imagem_url && (
+          <img src={servico.imagem_url} alt={servico.nome} className="w-full aspect-video object-cover" />
+        )}
+        <div className="p-5 flex flex-col gap-3 flex-1">
         <h3 className="font-title font-semibold text-xl text-text-primary leading-snug">
           {servico.nome}
         </h3>
@@ -124,12 +128,17 @@ function ServicoCard({ servico, onAgendar, isBasico, nomeNegocio }: ServicoCardP
           <MessageSquare className="w-4 h-4" />
           Agendar via WhatsApp
         </a>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-white border border-border rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow duration-200 flex flex-col gap-3">
+    <div className="bg-white border border-border rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200 flex flex-col overflow-hidden">
+      {servico.imagem_url && (
+        <img src={servico.imagem_url} alt={servico.nome} className="w-full aspect-video object-cover" />
+      )}
+      <div className="p-5 flex flex-col gap-3 flex-1">
       <h3 className="font-title font-semibold text-xl text-text-primary leading-snug">
         {servico.nome}
       </h3>
@@ -175,6 +184,7 @@ function ServicoCard({ servico, onAgendar, isBasico, nomeNegocio }: ServicoCardP
         <Calendar className="w-4 h-4" />
         Agendar
       </button>
+      </div>
     </div>
   );
 }

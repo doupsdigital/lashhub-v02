@@ -26,6 +26,7 @@ export interface Servico {
   duracao_minutos: number;
   valor: number;
   ativo: boolean;
+  imagem_url?: string | null;
   created_at?: string;
   categoria?: CategoriaServico;
 }
