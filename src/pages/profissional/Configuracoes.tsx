@@ -22,6 +22,7 @@ import {
   MessageSquare,
   Timer,
   Palette,
+  Phone,
 } from 'lucide-react';
 
 export default function Configuracoes() {
@@ -31,9 +32,18 @@ export default function Configuracoes() {
 
   // Estados do Perfil
   const [nome, setNome] = useState(profile?.nome || '');
+  const [telefone, setTelefone] = useState(profile?.telefone || '');
   const [loadingProfile, setLoadingProfile] = useState(false);
   const [profileError, setProfileError] = useState<string | null>(null);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
+
+  const formatPhone = (value: string) => {
+    const numbers = value.replace(/\D/g, '');
+    if (numbers.length <= 2) return numbers;
+    if (numbers.length <= 6) return `(${numbers.slice(0, 2)}) ${numbers.slice(2)}`;
+    if (numbers.length <= 10) return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 6)}-${numbers.slice(6)}`;
+    return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(7, 11)}`;
+  };
 
   // Estados da Senha
   const [novaSenha, setNovaSenha] = useState('');
@@ -118,8 +128,15 @@ export default function Configuracoes() {
     loadNegocio();
   }, [estabelecimentoId]);
 
+  useEffect(() => {
+    if (profile) {
+      setNome(profile.nome || '');
+      setTelefone(profile.telefone ? formatPhone(profile.telefone) : '');
+    }
+  }, [profile]);
 
-  // 1. Atualizar informações de perfil (Nome)
+
+  // 1. Atualizar informações de perfil (Nome e Telefone)
   const handleUpdateProfile = async (e: FormEvent) => {
     e.preventDefault();
     setProfileError(null);
@@ -129,11 +146,20 @@ export default function Configuracoes() {
       return;
     }
 
+    const phoneDigits = telefone.replace(/\D/g, '');
+    if (phoneDigits && (phoneDigits.length < 10 || phoneDigits.length > 11)) {
+      setProfileError('Informe um número de telefone/WhatsApp válido com DDD.');
+      return;
+    }
+
     setLoadingProfile(true);
     try {
       const { error } = await supabase
         .from('usuarios')
-        .update({ nome: nome.trim() })
+        .update({ 
+          nome: nome.trim(),
+          telefone: phoneDigits || null
+        })
         .eq('id', user?.id);
 
       if (error) throw error;
@@ -308,6 +334,7 @@ export default function Configuracoes() {
     setDadosSuccess(null);
 
     try {
+      // 1. Atualizar a tabela configuracao_negocio
       const { error } = await supabase
         .from('configuracao_negocio')
         .update({
@@ -320,6 +347,63 @@ export default function Configuracoes() {
         .eq('id', configuracaoId);
 
       if (error) throw error;
+
+      // 2. Atualizar a tabela estabelecimentos (nome_negocio e slug se disponível/não conflitante)
+      if (estabelecimentoId) {
+        const cleanSlug = nomeNegocio
+          .toLowerCase()
+          .trim()
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '') // Remove acentos
+          .replace(/[^a-z0-9]+/g, '-')     // Sequências de caracteres inválidos → único hífen
+          .replace(/^-+|-+$/g, '');        // Remove hífens nas bordas
+
+        if (cleanSlug.length >= 3) {
+          // Verificar se o novo slug já está sendo usado por outro estabelecimento
+          const { data: existing } = await supabase
+            .from('estabelecimentos')
+            .select('id')
+            .eq('slug', cleanSlug)
+            .neq('id', estabelecimentoId)
+            .maybeSingle();
+
+          if (!existing) {
+            const { error: estError } = await supabase
+              .from('estabelecimentos')
+              .update({
+                nome_negocio: nomeNegocio.trim(),
+                slug: cleanSlug,
+              })
+              .eq('id', estabelecimentoId);
+
+            if (estError) throw estError;
+          } else {
+            // Se o slug já existe, atualiza apenas o nome_negocio do estabelecimento
+            const { error: estError } = await supabase
+              .from('estabelecimentos')
+              .update({
+                nome_negocio: nomeNegocio.trim(),
+              })
+              .eq('id', estabelecimentoId);
+
+            if (estError) throw estError;
+          }
+        } else {
+          // Slug inválido/muito curto, atualiza apenas o nome_negocio do estabelecimento
+          const { error: estError } = await supabase
+            .from('estabelecimentos')
+            .update({
+              nome_negocio: nomeNegocio.trim(),
+            })
+            .eq('id', estabelecimentoId);
+
+          if (estError) throw estError;
+        }
+
+        // Atualizar o contexto global de autenticação
+        await refreshProfile();
+      }
+
       setDadosSuccess(null);
       setSuccessModal({
         isOpen: true,
@@ -534,6 +618,30 @@ export default function Configuracoes() {
                     placeholder="Seu nome completo"
                     className="w-full pl-10 pr-4 py-2 border border-border rounded-lg bg-bg text-text-primary text-sm focus:outline-none focus:ring-1 focus:ring-rose-400 transition-all"
                   />
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold uppercase tracking-wider text-text-secondary block">
+                  Telefone / WhatsApp
+                </label>
+                <div className="flex gap-2">
+                  <div className="flex items-center justify-center px-3 border border-border rounded-lg bg-bg text-text-secondary text-sm font-medium select-none">
+                    +55
+                  </div>
+                  <div className="relative flex-1">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-text-muted">
+                      <Phone className="w-4 h-4" />
+                    </div>
+                    <input
+                      type="text"
+                      value={telefone}
+                      onChange={(e) => setTelefone(formatPhone(e.target.value))}
+                      disabled={loadingProfile}
+                      placeholder="Seu número de WhatsApp"
+                      className="w-full pl-10 pr-4 py-2 border border-border rounded-lg bg-bg text-text-primary text-sm focus:outline-none focus:ring-1 focus:ring-rose-400 transition-all"
+                    />
+                  </div>
                 </div>
               </div>
 

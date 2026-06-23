@@ -1,6 +1,6 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { AlertCircle, Eye, EyeOff, Mail, Lock, User, Briefcase, Sparkles, Calendar, Link2 } from 'lucide-react';
+import { AlertCircle, Eye, EyeOff, Mail, Lock, User, Sparkles, Calendar, Link2, Phone } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 
 export default function CadastroProfissional() {
@@ -8,7 +8,7 @@ export default function CadastroProfissional() {
   const [form, setForm] = useState({
     nome: '',
     email: '',
-    nomeNegocio: '',
+    telefone: '',
     senha: '',
     confirmarSenha: '',
   });
@@ -18,14 +18,30 @@ export default function CadastroProfissional() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
+  const formatPhone = (value: string) => {
+    const numbers = value.replace(/\D/g, '');
+    if (numbers.length <= 2) return numbers;
+    if (numbers.length <= 6) return `(${numbers.slice(0, 2)}) ${numbers.slice(2)}`;
+    if (numbers.length <= 10) return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 6)}-${numbers.slice(6)}`;
+    return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(7, 11)}`;
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+    if (name === 'telefone') {
+      setForm((prev) => ({ ...prev, [name]: formatPhone(value) }));
+    } else {
+      setForm((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   const validate = (): string | null => {
-    if (!form.nome || !form.email || !form.nomeNegocio || !form.senha || !form.confirmarSenha) {
+    if (!form.nome || !form.email || !form.telefone || !form.senha || !form.confirmarSenha) {
       return 'Preencha todos os campos obrigatórios.';
+    }
+    const phoneDigits = form.telefone.replace(/\D/g, '');
+    if (phoneDigits.length < 10 || phoneDigits.length > 11) {
+      return 'Informe um número de telefone/WhatsApp válido com DDD.';
     }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(form.email)) return 'Informe um e-mail válido.';
@@ -47,8 +63,8 @@ export default function CadastroProfissional() {
     setSubmitting(true);
 
     try {
-      // Gerar o slug do negócio amigável para URL
-      const slug = form.nomeNegocio
+      // Gerar o slug do negócio amigável para URL (a partir do nome pessoal da profissional)
+      const slug = form.nome
         .toLowerCase()
         .trim()
         .normalize('NFD')
@@ -56,15 +72,18 @@ export default function CadastroProfissional() {
         .replace(/[^a-z0-9]+/g, '-')     // Sequências de caracteres inválidos → único hífen
         .replace(/^-+|-+$/g, '');        // Remove hífens nas bordas
 
+      const phoneDigits = form.telefone.replace(/\D/g, '');
+
       // Criar usuário profissional no Supabase Auth com metadados
       const { data, error: authError } = await supabase.auth.signUp({
         email: form.email.trim().toLowerCase(),
         password: form.senha,
         options: {
           data: {
-            nome_negocio: form.nomeNegocio.trim(),
+            nome_negocio: form.nome.trim(),
             slug: slug,
-            role: 'profissional'
+            role: 'profissional',
+            telefone: phoneDigits
           }
         }
       });
@@ -88,6 +107,14 @@ export default function CadastroProfissional() {
         password: form.senha,
       });
 
+      // Atualiza o telefone na tabela public.usuarios após login automático
+      const { error: updateError } = await supabase
+        .from('usuarios')
+        .update({ telefone: phoneDigits })
+        .eq('id', data.user.id);
+
+      if (updateError) throw updateError;
+
       setSuccess(true);
     } catch (err: unknown) {
       setErrorMsg(err instanceof Error ? err.message : 'Ocorreu um erro ao criar seu cadastro. Tente novamente.');
@@ -104,7 +131,7 @@ export default function CadastroProfissional() {
       <div className="absolute bottom-[-20%] right-[-10%] w-[500px] h-[500px] rounded-full bg-rose-100/40 blur-3xl pointer-events-none" />
 
       <div className="w-full max-w-[440px] bg-white border border-border rounded-[20px] shadow-xl p-8 md:p-10 relative z-10 animate-fade-in">
-        <div className="flex flex-col items-center text-center mb-8">
+        <div className="flex flex-col items-center text-center mb-6">
           <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-rose-600 to-rose-400 text-white flex items-center justify-center shadow-lg mb-4 hover:scale-105 transition-transform duration-300 overflow-hidden">
             <img
               src="/logo-login.png"
@@ -115,8 +142,12 @@ export default function CadastroProfissional() {
           <h1 className="font-title font-bold text-3xl tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-rose-600 to-rose-400">
             Lash Hub
           </h1>
-          <p className="text-xs text-text-muted mt-2 uppercase tracking-wider font-medium">
-            Crie sua conta profissional
+          
+          <h2 className="font-title font-bold text-2xl text-text-primary mt-2.5">
+            Comece grátis agora
+          </h2>
+          <p className="text-rose-600 font-semibold text-sm mt-0.5">
+            14 dias sem compromisso
           </p>
         </div>
 
@@ -151,24 +182,31 @@ export default function CadastroProfissional() {
             </div>
           </div>
 
-          {/* Nome do Negócio */}
+
+
+          {/* Telefone / WhatsApp */}
           <div className="space-y-1.5">
             <label className="text-xs font-semibold uppercase tracking-wider text-text-secondary block">
-              Nome do seu Estúdio
+              Telefone / WhatsApp <span className="text-red-500">*</span>
             </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-text-muted">
-                <Briefcase className="w-4 h-4" />
+            <div className="flex gap-2">
+              <div className="flex items-center justify-center px-3.5 border border-border rounded-xl bg-bg text-text-secondary text-sm font-medium select-none">
+                +55
               </div>
-              <input
-                name="nomeNegocio"
-                type="text"
-                required
-                placeholder="Ex: Studio Bella Lash"
-                value={form.nomeNegocio}
-                onChange={handleChange}
-                className={inputClass}
-              />
+              <div className="relative flex-1">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-text-muted">
+                  <Phone className="w-4 h-4" />
+                </div>
+                <input
+                  name="telefone"
+                  type="text"
+                  required
+                  placeholder="Seu número de WhatsApp"
+                  value={form.telefone}
+                  onChange={handleChange}
+                  className={inputClass}
+                />
+              </div>
             </div>
           </div>
 
@@ -259,9 +297,14 @@ export default function CadastroProfissional() {
             {submitting ? (
               <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
             ) : (
-              'Começar agora'
+              'Criar Conta Gratuitamente'
             )}
           </button>
+
+          <div className="mt-4 flex flex-col items-center gap-1 text-[11px] text-text-secondary select-none">
+            <span>✓ Sem cartão de crédito necessário</span>
+            <span>✓ Cancele a qualquer momento</span>
+          </div>
         </form>
 
         <p className="text-center text-xs text-text-secondary mt-6">
@@ -289,7 +332,7 @@ export default function CadastroProfissional() {
               Bem-vinda ao Lash Hub!
             </h2>
             <p className="text-sm text-text-secondary mb-6 leading-relaxed">
-              Seu espaço <span className="font-semibold text-rose-600">{form.nomeNegocio}</span> foi criado com sucesso. Agora é só configurar e começar a receber agendamentos.
+              Seu espaço <span className="font-semibold text-rose-600">{form.nome}</span> foi criado com sucesso. Agora é só configurar e começar a receber agendamentos.
             </p>
 
             <div className="w-full space-y-3 mb-7 text-left">

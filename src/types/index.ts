@@ -6,6 +6,7 @@ export interface Usuario {
   role: 'profissional' | 'cliente';
   cliente_id?: string | null;
   estabelecimento_id?: string | null;
+  telefone?: string | null;
   created_at?: string;
 }
 
