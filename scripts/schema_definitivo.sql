@@ -295,33 +295,33 @@ BEGIN
     RETURNING id INTO cat_man_id;
 
     -- 5. Criar serviços padrão — Extensão de Cílios
-    INSERT INTO public.servicos (estabelecimento_id, categoria_id, nome, descricao, duracao_minutos, valor, ativo)
+    INSERT INTO public.servicos (estabelecimento_id, categoria_id, nome, descricao, duracao_minutos, valor, ativo, imagem_url)
     VALUES
-      (new_est_id, cat_ext_id, 'Fio a Fio Clássico', 'Um fio sintético acoplado a cada cílio natural. Efeito natural e discreto para o dia a dia.', 120, 150.00, true),
-      (new_est_id, cat_ext_id, 'Volume Russo', 'Fans artesanais de 3 a 6 fios super finos aplicados em cada cílio. Efeito volumoso, denso e marcante.', 150, 200.00, true),
-      (new_est_id, cat_ext_id, 'Volume Híbrido', 'Mescla perfeita de Fio a Fio com Volume Russo. Oferece volume com textura e leveza.', 135, 180.00, true),
-      (new_est_id, cat_ext_id, 'Volume Brasileiro (Cílios Y)', 'Extensões em formato de Y aplicadas individualmente. Proporciona olhar preenchido e moderno.', 120, 160.00, true);
+      (new_est_id, cat_ext_id, 'Fio a Fio Clássico', 'Um fio sintético acoplado a cada cílio natural. Efeito natural e discreto para o dia a dia.', 120, 150.00, true, 'https://acsjornxtcjaufprsbuw.supabase.co/storage/v1/object/public/servicos-imagens/508cda55-2819-427d-9a11-bc0f17e680f4/servico-1782255826335.jpg'),
+      (new_est_id, cat_ext_id, 'Volume Russo', 'Fans artesanais de 3 a 6 fios super finos aplicados em cada cílio. Efeito volumoso, denso e marcante.', 150, 200.00, true, 'https://acsjornxtcjaufprsbuw.supabase.co/storage/v1/object/public/servicos-imagens/508cda55-2819-427d-9a11-bc0f17e680f4/servico-1782255890760.jpg'),
+      (new_est_id, cat_ext_id, 'Volume Híbrido', 'Mescla perfeita de Fio a Fio com Volume Russo. Oferece volume com textura e leveza.', 135, 180.00, true, 'https://acsjornxtcjaufprsbuw.supabase.co/storage/v1/object/public/servicos-imagens/508cda55-2819-427d-9a11-bc0f17e680f4/servico-1782255869354.jpg'),
+      (new_est_id, cat_ext_id, 'Volume Brasileiro (Cílios Y)', 'Extensões em formato de Y aplicadas individualmente. Proporciona olhar preenchido e moderno.', 120, 160.00, true, 'https://acsjornxtcjaufprsbuw.supabase.co/storage/v1/object/public/servicos-imagens/508cda55-2819-427d-9a11-bc0f17e680f4/servico-1782255852596.jpg');
 
     -- 5b. Serviços padrão — Lash Lifting & Tratamentos
-    INSERT INTO public.servicos (estabelecimento_id, categoria_id, nome, descricao, duracao_minutos, valor, ativo)
+    INSERT INTO public.servicos (estabelecimento_id, categoria_id, nome, descricao, duracao_minutos, valor, ativo, imagem_url)
     VALUES
-      (new_est_id, cat_lift_id, 'Lash Lifting Completo', 'Curvatura natural e elevação dos cílios com aplicação de nutrição (Lash Botox) e tintura escura.', 60, 120.00, true),
-      (new_est_id, cat_lift_id, 'Spa de Cílios', 'Higienização profunda dos fios, hidratação terapêutica e massagem relaxante na área dos olhos.', 30, 50.00, true);
+      (new_est_id, cat_lift_id, 'Lash Lifting Completo', 'Curvatura natural e elevação dos cílios com aplicação de nutrição (Lash Botox) e tintura escura.', 60, 120.00, true, 'https://acsjornxtcjaufprsbuw.supabase.co/storage/v1/object/public/servicos-imagens/508cda55-2819-427d-9a11-bc0f17e680f4/servico-1782255909251.jpg'),
+      (new_est_id, cat_lift_id, 'Spa de Cílios', 'Higienização profunda dos fios, hidratação terapêutica e massagem relaxante na área dos olhos.', 30, 50.00, true, 'https://acsjornxtcjaufprsbuw.supabase.co/storage/v1/object/public/servicos-imagens/508cda55-2819-427d-9a11-bc0f17e680f4/servico-1782255924503.jpg');
 
     -- 5c. Serviços padrão — Design de Sobrancelhas
-    INSERT INTO public.servicos (estabelecimento_id, categoria_id, nome, descricao, duracao_minutos, valor, ativo)
+    INSERT INTO public.servicos (estabelecimento_id, categoria_id, nome, descricao, duracao_minutos, valor, ativo, imagem_url)
     VALUES
-      (new_est_id, cat_des_id, 'Design de Sobrancelhas Simples', 'Modelagem personalizada respeitando a simetria e visagismo facial. Feito com pinça/linha.', 45, 50.00, true),
-      (new_est_id, cat_des_id, 'Design com Henna', 'Modelagem personalizada com aplicação de Henna de alta fixação para preencher falhas e destacar o design.', 60, 70.00, true),
-      (new_est_id, cat_des_id, 'Brow Lamination', 'Procedimento de alinhamento, estilização e nutrição química dos fios naturais das sobrancelhas.', 60, 130.00, true);
+      (new_est_id, cat_des_id, 'Design de Sobrancelhas Simples', 'Modelagem personalizada respeitando a simetria e visagismo facial. Feito com pinça/linha.', 45, 50.00, true, 'https://acsjornxtcjaufprsbuw.supabase.co/storage/v1/object/public/servicos-imagens/508cda55-2819-427d-9a11-bc0f17e680f4/servico-1782256014481.jpg'),
+      (new_est_id, cat_des_id, 'Design com Henna', 'Modelagem personalizada com aplicação de Henna de alta fixação para preencher falhas e destacar o design.', 60, 70.00, true, 'https://acsjornxtcjaufprsbuw.supabase.co/storage/v1/object/public/servicos-imagens/508cda55-2819-427d-9a11-bc0f17e680f4/servico-1782256001778.jpg'),
+      (new_est_id, cat_des_id, 'Brow Lamination', 'Procedimento de alinhamento, estilização e nutrição química dos fios naturais das sobrancelhas.', 60, 130.00, true, 'https://acsjornxtcjaufprsbuw.supabase.co/storage/v1/object/public/servicos-imagens/508cda55-2819-427d-9a11-bc0f17e680f4/servico-1782255982713.jpg');
 
     -- 5d. Serviços padrão — Manutenções e Remoções
-    INSERT INTO public.servicos (estabelecimento_id, categoria_id, nome, descricao, duracao_minutos, valor, ativo)
-    VALUES (new_est_id, cat_man_id, 'Manutenção de Extensão', 'Reposição dos fios crescidos ou caídos. Válido até 20 dias após a aplicação original.', 90, 100.00, true)
+    INSERT INTO public.servicos (estabelecimento_id, categoria_id, nome, descricao, duracao_minutos, valor, ativo, imagem_url)
+    VALUES (new_est_id, cat_man_id, 'Manutenção de Extensão', 'Reposição dos fios crescidos ou caídos. Válido até 20 dias após a aplicação original.', 90, 100.00, true, 'https://acsjornxtcjaufprsbuw.supabase.co/storage/v1/object/public/servicos-imagens/508cda55-2819-427d-9a11-bc0f17e680f4/servico-1782255946912.jpg')
     RETURNING id INTO srv_man_id;
 
-    INSERT INTO public.servicos (estabelecimento_id, categoria_id, nome, descricao, duracao_minutos, valor, ativo)
-    VALUES (new_est_id, cat_man_id, 'Remoção de Extensão', 'Retirada segura e indolor de extensões antigas usando removedor em gel profissional.', 45, 40.00, true);
+    INSERT INTO public.servicos (estabelecimento_id, categoria_id, nome, descricao, duracao_minutos, valor, ativo, imagem_url)
+    VALUES (new_est_id, cat_man_id, 'Remoção de Extensão', 'Retirada segura e indolor de extensões antigas usando removedor em gel profissional.', 45, 40.00, true, 'https://acsjornxtcjaufprsbuw.supabase.co/storage/v1/object/public/servicos-imagens/508cda55-2819-427d-9a11-bc0f17e680f4/servico-1782255957203.jpg');
 
     -- 6. Variações da Manutenção de Extensão
     INSERT INTO public.variacoes_servico (servico_id, nome, duracao_minutos, valor)
