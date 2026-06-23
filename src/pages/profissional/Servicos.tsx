@@ -809,9 +809,9 @@ export default function Servicos() {
               </button>
             </div>
 
-            <div className="flex flex-col lg:flex-row flex-1 overflow-hidden">
+            <div className="flex flex-col lg:flex-row flex-1 overflow-y-auto lg:overflow-hidden">
               {/* ── FORMULÁRIO ── */}
-              <form onSubmit={handleSaveServico} className="p-6 space-y-5 overflow-y-auto flex-1 lg:border-r lg:border-border">
+              <form onSubmit={handleSaveServico} className="p-6 space-y-5 lg:overflow-y-auto flex-1 lg:border-r lg:border-border">
                 {/* Nome */}
                 <div className="space-y-1.5">
                   <label className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
