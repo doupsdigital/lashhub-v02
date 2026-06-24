@@ -7,7 +7,7 @@ export default function PortalLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, profile, signOut } = useAuth();
-  const { nomeNegocio, logoUrl, slug, loading, nomeProfissional, plano, telefoneProfissional } = usePortal();
+  const { nomeNegocio, logoUrl, slug, loading, nomeProfissional, plano, telefoneProfissional, descricao, instagram, endereco } = usePortal();
   const isBasico = plano === 'basico';
   const isAuthPage = location.pathname.endsWith('/login') || location.pathname.endsWith('/cadastro');
 
@@ -60,12 +60,14 @@ export default function PortalLayout() {
       {/* Header */}
       <header className="h-[60px] bg-white border-b border-border flex items-center justify-between px-4 md:px-6 sticky top-0 z-30">
         <div className="flex items-center gap-2.5 min-w-0">
-          {logoUrl ? (
-            <img src={logoUrl} alt={nomeNegocio || 'Studio'} className="h-8 w-auto object-contain flex-shrink-0" />
-          ) : (
-            <div className="w-8 h-8 rounded-lg bg-rose-600 text-white flex items-center justify-center font-title font-semibold text-lg flex-shrink-0">
-              {profissionalInitials}
-            </div>
+          {!(descricao || instagram || endereco) && (
+            logoUrl ? (
+              <img src={logoUrl} alt={nomeNegocio || 'Studio'} className="h-8 w-auto object-contain flex-shrink-0" />
+            ) : (
+              <div className="w-8 h-8 rounded-lg bg-rose-600 text-white flex items-center justify-center font-title font-semibold text-lg flex-shrink-0">
+                {profissionalInitials}
+              </div>
+            )
           )}
           <span className="font-title font-semibold text-xl text-text-primary tracking-wide truncate">
             {nomeNegocio}
