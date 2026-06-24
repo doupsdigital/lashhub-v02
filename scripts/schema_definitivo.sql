@@ -730,7 +730,7 @@ CREATE POLICY "logs_profissional_insert"
 CREATE TABLE IF NOT EXISTS public.push_subscriptions (
   id                  UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id             UUID        NOT NULL REFERENCES public.usuarios(id) ON DELETE CASCADE,
-  estabelecimento_id  UUID        NOT NULL,
+  estabelecimento_id  UUID        NOT NULL REFERENCES public.estabelecimentos(id) ON DELETE CASCADE,
   endpoint            TEXT        NOT NULL,
   p256dh              TEXT        NOT NULL,
   auth                TEXT        NOT NULL,
@@ -754,13 +754,17 @@ CREATE POLICY "usuario_own_subscriptions"
 CREATE EXTENSION IF NOT EXISTS pg_net;
 
 -- Função que dispara a Edge Function quando um agendamento do portal é criado
+-- ATENÇÃO: substituir WEBHOOK_SECRET_AQUI pelo valor real configurado nos secrets da Edge Function
 CREATE OR REPLACE FUNCTION public.notify_new_agendamento()
 RETURNS TRIGGER LANGUAGE plpgsql SECURITY DEFINER AS $$
 BEGIN
   IF NEW.status = 'pendente' AND NEW.origem = 'portal' THEN
     PERFORM net.http_post(
-      url     := current_setting('app.supabase_url') || '/functions/v1/send-push',
-      headers := '{"Content-Type": "application/json"}'::jsonb,
+      url     := 'https://acsjornxtcjaufprsbuw.supabase.co/functions/v1/send-push',
+      headers := jsonb_build_object(
+        'Content-Type', 'application/json',
+        'x-webhook-secret', 'WEBHOOK_SECRET_AQUI'
+      ),
       body    := jsonb_build_object('record', row_to_json(NEW))
     );
   END IF;

@@ -9,7 +9,15 @@ const VAPID_SUBJECT     = Deno.env.get('VAPID_SUBJECT') ?? 'mailto:lashhubapp@gm
 
 webpush.setVapidDetails(VAPID_SUBJECT, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY);
 
+const WEBHOOK_SECRET = Deno.env.get('WEBHOOK_SECRET');
+
 serve(async (req) => {
+  // Valida o segredo compartilhado com o trigger do banco
+  const incomingSecret = req.headers.get('x-webhook-secret');
+  if (!WEBHOOK_SECRET || incomingSecret !== WEBHOOK_SECRET) {
+    return new Response('não autorizado', { status: 401 });
+  }
+
   try {
     const body = await req.json();
     const record = body.record;

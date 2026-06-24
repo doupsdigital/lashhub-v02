@@ -14,7 +14,7 @@ function urlBase64ToUint8Array(base64String: string): Uint8Array {
 export type PushPermissionState = 'unsupported' | 'denied' | 'granted' | 'default';
 
 export function usePushNotifications() {
-  const { user, estabelecimentoId } = useAuth();
+  const { user, estabelecimentoId, role } = useAuth();
   const [permission, setPermission] = useState<PushPermissionState>('default');
   const [loading, setLoading] = useState(false);
 
@@ -29,7 +29,7 @@ export function usePushNotifications() {
   }, [isSupported]);
 
   const subscribe = async (): Promise<boolean> => {
-    if (!isSupported || !user || !estabelecimentoId) return false;
+    if (!isSupported || !user || !estabelecimentoId || role !== 'profissional') return false;
     setLoading(true);
     try {
       const perm = await Notification.requestPermission();
