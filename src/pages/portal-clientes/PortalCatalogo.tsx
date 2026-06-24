@@ -69,12 +69,14 @@ interface ServicoCardProps {
   onAgendar: () => void;
   isBasico: boolean;
   nomeNegocio: string | null;
+  telefoneProfissional: string | null;
 }
 
-function ServicoCard({ servico, onAgendar, isBasico, nomeNegocio }: ServicoCardProps) {
+function ServicoCard({ servico, onAgendar, isBasico, nomeNegocio, telefoneProfissional }: ServicoCardProps) {
   if (isBasico) {
+    const phone = telefoneProfissional?.replace(/\D/g, '') ?? '';
     const whatsappText = `Olá! Gostaria de agendar o serviço *${servico.nome}* (${formatValor(servico.valor)}) no *${nomeNegocio || 'Estúdio'}*.`;
-    const whatsappUrl = `https://wa.me/5511999999999?text=${encodeURIComponent(whatsappText)}`;
+    const whatsappUrl = phone ? `https://wa.me/55${phone}?text=${encodeURIComponent(whatsappText)}` : '#';
     
     return (
       <div className="bg-white border border-border rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200 flex flex-col overflow-hidden">
@@ -192,7 +194,7 @@ function ServicoCard({ servico, onAgendar, isBasico, nomeNegocio }: ServicoCardP
 
 export default function PortalCatalogo() {
   const navigate = useNavigate();
-  const { establishmentId, slug, plano, nomeNegocio, logoUrl, descricao, instagram, endereco } = usePortal();
+  const { establishmentId, slug, plano, nomeNegocio, logoUrl, descricao, instagram, endereco, telefoneProfissional } = usePortal();
   const { autoStart } = useOnboarding('portal_catalogo');
   useEffect(() => { autoStart(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
   const [categorias, setCategorias] = useState<CategoriaComServicos[]>([]);
@@ -392,7 +394,7 @@ export default function PortalCatalogo() {
             </div>
           </div>
           <a
-            href={`https://wa.me/5511999999999?text=${encodeURIComponent(`Olá! Gostaria de agendar um serviço no *${nomeNegocio || 'Estúdio'}*.`)}`}
+            href={telefoneProfissional ? `https://wa.me/55${telefoneProfissional.replace(/\D/g, '')}?text=${encodeURIComponent(`Olá! Gostaria de agendar um serviço no *${nomeNegocio || 'Estúdio'}*.`)}` : '#'}
             target="_blank"
             rel="noopener noreferrer"
             className="px-5 py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-colors shrink-0 self-start md:self-auto"
@@ -445,6 +447,7 @@ export default function PortalCatalogo() {
                   onAgendar={() => navigate(`/portal/${slug}/agendar?servico=${serv.id}`)}
                   isBasico={isBasico}
                   nomeNegocio={nomeNegocio}
+                  telefoneProfissional={telefoneProfissional}
                 />
               ))}
             </div>
