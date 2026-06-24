@@ -351,8 +351,8 @@ export default function PortalCatalogo() {
                 </a>
               )}
               {endereco && (
-                <span className="flex items-center gap-1.5 text-xs text-text-muted">
-                  <MapPin className="w-3.5 h-3.5 flex-shrink-0" />
+                <span className="flex items-start gap-1.5 text-xs text-text-muted">
+                  <MapPin className="w-3.5 h-3.5 flex-shrink-0 text-rose-600 mt-0.5" />
                   {endereco}
                 </span>
               )}
