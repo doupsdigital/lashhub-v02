@@ -187,7 +187,8 @@ export default function PortalMeusAgendamentos() {
           status: 'cancelado',
           ...(motivo && { observacoes: motivo }),
         })
-        .eq('id', apptId);
+        .eq('id', apptId)
+        .eq('estabelecimento_id', establishmentId);
 
       if (cancelErr) throw cancelErr;
 
