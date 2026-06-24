@@ -89,7 +89,32 @@ USING (bucket_id = 'servicos-imagens') WITH CHECK (bucket_id = 'servicos-imagens
 
 ---
 
-### Passo 4 — Configurar Authentication
+### Passo 4 — Migrar imagens padrão dos serviços ⚠️ IMPORTANTE
+
+O trigger de onboarding cria serviços padrão com imagens que estão no storage do projeto `lashhub-desenv`. Se você deletar o projeto dev depois, essas imagens quebram em prod para todas as profissionais.
+
+**Antes de deletar o `lashhub-desenv`, siga estes passos:**
+
+1. Acesse o Supabase → `lashhub-desenv` → **Storage → servicos-imagens**
+2. Baixe as 11 imagens da pasta do estabelecimento de referência
+3. No `lashhub-prod` → **Storage → servicos-imagens**, faça upload dessas mesmas imagens em qualquer pasta (ex: `defaults/`)
+4. Copie as novas URLs públicas de cada imagem
+5. Atualize o trigger no `lashhub-prod` com as novas URLs rodando no SQL Editor:
+
+```sql
+CREATE OR REPLACE FUNCTION public.handle_new_user_onboarding()
+RETURNS TRIGGER LANGUAGE plpgsql SECURITY DEFINER AS $$
+-- ... cole aqui o conteúdo do trigger do schema_definitivo.sql
+-- substituindo todas as URLs de imagem pelas novas URLs do prod
+$$;
+```
+
+> **Dica:** As URLs seguem o padrão `https://<ref-do-prod>.supabase.co/storage/v1/object/public/servicos-imagens/<caminho>`.
+> Você pode usar busca e substituição: trocar `acsjornxtcjaufprsbuw` pelo ref do prod e `508cda55-2819-427d-9a11-bc0f17e680f4` pelo caminho da nova pasta.
+
+---
+
+### Passo 5 — Configurar Authentication
 
 1. No painel do prod → **Authentication → URL Configuration**
    - **Site URL**: URL do seu app em produção (ex: `https://lashhub.vercel.app`)
@@ -100,7 +125,7 @@ USING (bucket_id = 'servicos-imagens') WITH CHECK (bucket_id = 'servicos-imagens
 
 ---
 
-### Passo 5 — Atualizar o .env do projeto
+### Passo 6 — Atualizar o .env do projeto
 
 Crie um arquivo `.env.production` (ou variáveis de ambiente no Vercel/host) com as credenciais do banco de **produção**:
 
@@ -113,7 +138,7 @@ As credenciais do prod estão em: Supabase → `lashhub-prod` → **Project Sett
 
 ---
 
-### Passo 6 — Deploy do frontend
+### Passo 7 — Deploy do frontend
 
 Se estiver usando Vercel:
 1. Configure as variáveis de ambiente do prod no painel da Vercel
@@ -121,7 +146,7 @@ Se estiver usando Vercel:
 
 ---
 
-### Passo 7 — Teste rápido pós-deploy
+### Passo 8 — Teste rápido pós-deploy
 
 Antes de divulgar para clientes:
 
