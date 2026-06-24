@@ -287,7 +287,7 @@ export default function PerfilCliente() {
 
   useEffect(() => {
     fetchClienteData();
-  }, [id]);
+  }, [id, estabelecimentoId]); // eslint-disable-line react-hooks/exhaustive-deps
 
 
   // SAVE PERSONAL DATA
