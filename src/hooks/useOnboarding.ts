@@ -313,6 +313,8 @@ const DRIVER_CONFIG = (onComplete: () => void, doneBtnText = 'Concluir ✓') =>
     overlayOpacity: 0.6,
     stagePadding: 6,
     stageRadius: 12,
+    showProgress: true,
+    progressText: '{{current}}/{{total}}',
     popoverClass: 'lashhub-onboarding-popover',
     nextBtnText: 'Próximo →',
     prevBtnText: '← Anterior',

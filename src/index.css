@@ -380,11 +380,22 @@ input[type=number] {
 }
 .lashhub-onboarding-popover .driver-popover-close-btn {
   color: #9B5A66 !important;
-  font-size: 1rem !important;
+  font-size: 1.4rem !important;
+  width: 28px !important;
+  height: 28px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 6px !important;
+  transition: background 0.15s !important;
+}
+.lashhub-onboarding-popover .driver-popover-close-btn:hover {
+  background: #fdf0f1 !important;
 }
 .driver-popover-progress-text {
   color: #9B5A66 !important;
   font-size: 0.75rem !important;
+  font-weight: 600 !important;
 }
 
 /* iOS: impede o auto-zoom da viewport ao focar inputs com font-size < 16px.
