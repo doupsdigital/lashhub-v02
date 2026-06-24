@@ -323,7 +323,7 @@ export default function PortalCatalogo() {
 
       {/* Card de apresentação do estúdio */}
       {temInfoCard && (
-        <div className="bg-white border border-border rounded-2xl p-6 shadow-sm flex flex-col sm:flex-row gap-5 items-start">
+        <div className="bg-white border border-border rounded-2xl p-6 shadow-sm flex flex-col sm:flex-row gap-5 items-center sm:items-start">
           {logoUrl && (
             <img
               src={logoUrl}
@@ -331,14 +331,14 @@ export default function PortalCatalogo() {
               className="w-20 h-20 rounded-2xl object-cover flex-shrink-0 border border-border"
             />
           )}
-          <div className="flex-1 min-w-0 space-y-2">
+          <div className="flex-1 min-w-0 space-y-2 text-center sm:text-left">
             <h2 className="font-title font-bold text-2xl text-text-primary leading-tight">
               {nomeNegocio}
             </h2>
             {descricao && (
               <p className="text-sm text-text-secondary leading-relaxed">{descricao}</p>
             )}
-            <div className="flex flex-wrap gap-3 pt-1">
+            <div className="flex flex-wrap gap-3 pt-1 justify-center sm:justify-start">
               {instagram && (
                 <a
                   href={`https://instagram.com/${instagram.replace('@', '')}`}
