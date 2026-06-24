@@ -181,6 +181,7 @@ export default function PerfilCliente() {
         supabase
           .from('atendimentos')
           .select('*, servicos(nome), variacoes_servico(nome)')
+          .eq('estabelecimento_id', estabelecimentoId)
           .eq('cliente_id', id),
         supabase
           .from('agendamentos')
@@ -191,6 +192,7 @@ export default function PerfilCliente() {
               variacao:variacoes_servico(nome)
             )
           `)
+          .eq('estabelecimento_id', estabelecimentoId)
           .eq('cliente_id', id)
           .eq('status', 'concluido'),
         supabase
@@ -202,6 +204,7 @@ export default function PerfilCliente() {
               variacao:variacoes_servico(nome)
             )
           `)
+          .eq('estabelecimento_id', estabelecimentoId)
           .eq('cliente_id', id)
           .eq('status', 'falta')
           .order('data_hora', { ascending: false })
