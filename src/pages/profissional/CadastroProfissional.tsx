@@ -116,15 +116,21 @@ export default function CadastroProfissional() {
       if (updateError) throw updateError;
 
       // Seed dos horários padrão (Seg–Sex, 09:00–18:00) para o novo estabelecimento
-      const { data: userProfile } = await supabase
-        .from('usuarios')
-        .select('estabelecimento_id')
-        .eq('id', data.user.id)
-        .maybeSingle();
+      // Retry até 3× com 300ms de intervalo — o trigger pode não ter rodado ainda
+      let userProfile = null;
+      for (let attempt = 0; attempt < 3; attempt++) {
+        if (attempt > 0) await new Promise(r => setTimeout(r, 300));
+        const { data: profileData } = await supabase
+          .from('usuarios')
+          .select('estabelecimento_id')
+          .eq('id', data.user.id)
+          .maybeSingle();
+        if (profileData?.estabelecimento_id) { userProfile = profileData; break; }
+      }
 
       if (userProfile?.estabelecimento_id) {
         const defaultHorarios = [1, 2, 3, 4, 5].map(dia => ({
-          estabelecimento_id: userProfile.estabelecimento_id,
+          estabelecimento_id: userProfile!.estabelecimento_id,
           dia_semana: dia,
           hora_inicio: '09:00',
           hora_fim: '18:00',
