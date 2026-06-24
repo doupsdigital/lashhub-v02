@@ -81,6 +81,7 @@ function gerarSlots(
   agendamentos: { data_hora: string; duracao_minutos: number }[],
   bloqueiosDoDia: BloqueioAgenda[],
 ): string[] {
+  if (duracaoTotal <= 0) return [];
   const ini = toMin(horaInicio);
   const fim = toMin(horaFim);
   const slots: string[] = [];
