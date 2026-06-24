@@ -109,12 +109,11 @@ export default function CadastroCliente() {
           throw new Error(`Erro ao registrar dados do cliente: ${clientError.message}`);
         }
       } else {
-        // Cliente existente encontrada pelo telefone — sincroniza o email se estava vazio
-        await supabase
-          .from('clientes')
-          .update({ email: form.email.trim().toLowerCase() })
-          .eq('id', clientId)
-          .or('email.is.null,email.eq.');
+        // Cliente existente encontrada pelo telefone — sincroniza o email via RPC (anon não tem UPDATE em clientes)
+        await supabase.rpc('sync_cliente_email', {
+          p_cliente_id: clientId,
+          p_email: form.email.trim().toLowerCase(),
+        });
       }
 
       // Passo 3 — Criar usuário no Auth
