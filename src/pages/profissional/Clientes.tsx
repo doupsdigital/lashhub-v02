@@ -305,12 +305,16 @@ export default function Clientes() {
   // Filter clients
   const filterInterval = getPeriodInterval(periodFilter);
 
+  const normalize = (s: string) =>
+    s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+
   const filteredClientes = clientes.filter(client => {
-    // 1. Search text (name or whatsapp)
-    const fullName = `${client.nome} ${client.sobrenome}`.toLowerCase();
-    const searchMatch = 
-      fullName.includes(searchTerm.toLowerCase()) || 
-      (client.whatsapp || '').includes(searchTerm);
+    // 1. Search text (name or whatsapp) — com normalização de acentos
+    const fullName = normalize(`${client.nome} ${client.sobrenome || ''}`);
+    const searchDigits = searchTerm.replace(/\D/g, '');
+    const searchMatch =
+      fullName.includes(normalize(searchTerm)) ||
+      (searchDigits.length > 0 && (client.whatsapp || '').replace(/\D/g, '').includes(searchDigits));
 
     // 2. Status filter (no ativo field in schema — all clients are active)
     const statusMatch =
