@@ -747,7 +747,39 @@ CREATE POLICY "usuario_own_subscriptions"
 
 
 -- =========================================================================
--- 6. STORAGE BUCKETS E POLICIES
+-- 6. WEB PUSH NOTIFICATIONS — trigger via pg_net
+-- =========================================================================
+
+-- Extensão necessária para HTTP requests a partir do banco
+CREATE EXTENSION IF NOT EXISTS pg_net;
+
+-- Função que dispara a Edge Function quando um agendamento do portal é criado
+CREATE OR REPLACE FUNCTION public.notify_new_agendamento()
+RETURNS TRIGGER LANGUAGE plpgsql SECURITY DEFINER AS $$
+BEGIN
+  IF NEW.status = 'pendente' AND NEW.origem = 'portal' THEN
+    PERFORM net.http_post(
+      url     := current_setting('app.supabase_url') || '/functions/v1/send-push',
+      headers := '{"Content-Type": "application/json"}'::jsonb,
+      body    := jsonb_build_object('record', row_to_json(NEW))
+    );
+  END IF;
+  RETURN NEW;
+END;
+$$;
+
+-- Nota: substituir a URL pelo endereço real do projeto ao fazer o deploy em prod
+-- Exemplo: ALTER FUNCTION public.notify_new_agendamento() ...
+-- Ou ajustar a URL manualmente após rodar o schema no novo projeto.
+
+DROP TRIGGER IF EXISTS on_agendamento_insert ON public.agendamentos;
+CREATE TRIGGER on_agendamento_insert
+  AFTER INSERT ON public.agendamentos
+  FOR EACH ROW EXECUTE FUNCTION public.notify_new_agendamento();
+
+
+-- =========================================================================
+-- 7. STORAGE BUCKETS E POLICIES
 -- =========================================================================
 
 -- Bucket: avatares de usuários e logos de estúdio
