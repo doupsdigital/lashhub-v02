@@ -29,15 +29,20 @@ serve(async (req) => {
       hour: '2-digit', minute: '2-digit',
     });
 
-    // Busca nome da cliente
-    const { data: clienteData } = await supabase
-      .from('clientes')
-      .select('nome, sobrenome')
-      .eq('id', record.cliente_id)
-      .maybeSingle();
-    const nomeCliente = clienteData
-      ? `${clienteData.nome}${clienteData.sobrenome ? ' ' + clienteData.sobrenome : ''}`
+    // Busca nome da cliente e serviços em paralelo
+    const [clienteRes, servicosRes] = await Promise.all([
+      supabase.from('clientes').select('nome, sobrenome').eq('id', record.cliente_id).maybeSingle(),
+      supabase.from('agendamento_servicos').select('servico:servicos(nome)').eq('agendamento_id', record.id),
+    ]);
+
+    const nomeCliente = clienteRes.data
+      ? `${clienteRes.data.nome}${clienteRes.data.sobrenome ? ' ' + clienteRes.data.sobrenome : ''}`
       : 'Uma cliente';
+
+    const nomeServicos = (servicosRes.data ?? [])
+      .map((s: any) => s.servico?.nome)
+      .filter(Boolean)
+      .join(', ') || null;
 
     const { data: subs, error } = await supabase
       .from('push_subscriptions')
@@ -49,9 +54,13 @@ serve(async (req) => {
       return new Response('sem subscriptions', { status: 200 });
     }
 
+    const bodyText = nomeServicos
+      ? `${nomeCliente} • ${nomeServicos} • ${dataHora}`
+      : `${nomeCliente} agendou para ${dataHora}`;
+
     const payload = JSON.stringify({
       title: '📅 Novo agendamento!',
-      body: `${nomeCliente} agendou para ${dataHora}. Acesse para confirmar.`,
+      body: bodyText,
       url: '/agendamentos',
     });
 
