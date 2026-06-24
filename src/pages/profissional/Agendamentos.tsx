@@ -154,6 +154,17 @@ export default function Agendamentos() {
     }
   }, []);
 
+  // "Novo Agendamento" from PerfilCliente: open modal with client pre-selected
+  useEffect(() => {
+    const state = location.state as { novoAgendamento?: boolean; clientePreSelecionado?: Cliente } | null;
+    if (state?.novoAgendamento && state.clientePreSelecionado) {
+      handleOpenForm();
+      setSelectedCliente(state.clientePreSelecionado);
+      setClientSearchQuery(`${state.clientePreSelecionado.nome} ${state.clientePreSelecionado.sobrenome || ''}`.trim());
+      window.history.replaceState({}, '');
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   const [rejectModalAppt, setRejectModalAppt] = useState<AgendamentoWithRelations | null>(null);
   const [rejectMotivo, setRejectMotivo] = useState('');
   const [rejectSaving, setRejectSaving] = useState(false);

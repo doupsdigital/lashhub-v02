@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import {
@@ -60,6 +60,7 @@ function applyCpfMask(value: string): string {
 export default function PerfilCliente() {
   const { id } = useParams<{ id: string }>();
   const { estabelecimentoId } = useAuth();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'dados' | 'anamnese' | 'historico'>('dados');
   
   // Data States
@@ -582,11 +583,20 @@ export default function PerfilCliente() {
         {/* Action Controls */}
         <div className="flex flex-wrap items-center gap-3">
 
-          {/* Static New Appointment */}
           <button
-            disabled
-            className="px-4 py-2 bg-rose-100 text-rose-400 border border-rose-200 rounded-lg text-xs font-semibold cursor-not-allowed"
-            title="Agendamento disponível na próxima etapa"
+            onClick={() => navigate('/agendamentos', {
+              state: {
+                novoAgendamento: true,
+                clientePreSelecionado: {
+                  id: cliente.id,
+                  nome: cliente.nome,
+                  sobrenome: cliente.sobrenome,
+                  whatsapp: cliente.whatsapp,
+                  email: cliente.email,
+                }
+              }
+            })}
+            className="px-4 py-2 bg-rose-600 hover:bg-rose-800 text-white rounded-lg text-xs font-semibold transition-colors cursor-pointer"
           >
             Novo Agendamento
           </button>
