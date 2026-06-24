@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import type { FormEvent } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
+import { useOnboarding } from '../../hooks/useOnboarding';
 import { PALETTES_LIST, applyPalette } from '../../utils/theme';
 import ConfirmModal from '../../components/common/ConfirmModal';
 import {
@@ -27,6 +28,8 @@ import {
 
 export default function Configuracoes() {
   const { profile, user, refreshProfile, estabelecimentoId } = useAuth();
+  const { autoStart } = useOnboarding('configuracoes');
+  useEffect(() => { if (profile) autoStart(); }, [profile]); // eslint-disable-line react-hooks/exhaustive-deps
   const fileInputRef = useRef<HTMLInputElement>(null);
   const logoFileInputRef = useRef<HTMLInputElement>(null);
 
@@ -566,7 +569,7 @@ export default function Configuracoes() {
         {/* Right Side: Forms Panel */}
         <div className="md:col-span-2 space-y-6">
           {/* Section 1: Profile Details */}
-          <div className="bg-white border border-border rounded-[14px] p-6 shadow-sm">
+          <div id="ob-config-perfil" className="bg-white border border-border rounded-[14px] p-6 shadow-sm">
             <h3 className="font-title font-bold text-lg text-text-primary flex items-center gap-2 border-b border-border pb-3">
               <User className="w-5 h-5 text-rose-600" />
               Dados do Perfil
@@ -742,7 +745,7 @@ export default function Configuracoes() {
       </div>
 
       {/* Section 3: Dados do Meu Negócio */}
-      <div className="bg-white border border-border rounded-[14px] p-6 shadow-sm">
+      <div id="ob-config-negocio" className="bg-white border border-border rounded-[14px] p-6 shadow-sm">
         <h3 className="font-title font-bold text-lg text-text-primary flex items-center gap-2 border-b border-border pb-3">
           <Building2 className="w-5 h-5 text-rose-600" />
           Dados do Meu Negócio
@@ -918,7 +921,7 @@ export default function Configuracoes() {
       </div>
 
       {/* Section 4: Identidade Visual e Cores */}
-      <div className="bg-white border border-border rounded-[14px] p-6 shadow-sm">
+      <div id="ob-config-visual" className="bg-white border border-border rounded-[14px] p-6 shadow-sm">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border pb-3">
           <h3 className="font-title font-bold text-lg text-text-primary flex items-center gap-2">
             <Palette className="w-5 h-5 text-rose-600" />
