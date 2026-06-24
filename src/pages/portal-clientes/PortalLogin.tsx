@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { usePortal } from '../../contexts/PortalContext';
@@ -14,6 +14,8 @@ export default function PortalLogin() {
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  // Ref para detectar se a autenticação veio do formulário (evita race condition com stale closure)
+  const justSubmittedRef = useRef(false);
 
   // Redireciona usuário já autenticado — ou bloqueia se for cliente de outro estúdio
   useEffect(() => {
@@ -21,8 +23,9 @@ export default function PortalLogin() {
     if (!user) return;
 
     if (!isCliente) {
-      if (submitting) {
+      if (justSubmittedRef.current) {
         // Profissional tentou logar pelo formulário do portal → rejeitar
+        justSubmittedRef.current = false;
         signOut();
         setErrorMsg('Este portal é exclusivo para clientes. Para acessar seu painel, use o link de login da profissional.');
         setSubmitting(false);
@@ -47,11 +50,13 @@ export default function PortalLogin() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
+    justSubmittedRef.current = true;
     setSubmitting(true);
 
     try {
       await signIn(email.trim().toLowerCase(), password);
     } catch (err: unknown) {
+      justSubmittedRef.current = false;
       const message = err instanceof Error ? err.message : 'Erro ao fazer login.';
       setErrorMsg(
         message === 'Invalid login credentials'
