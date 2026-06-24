@@ -624,8 +624,9 @@ export default function Clientes() {
                   <label className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
                     WhatsApp <span className="text-red-500">*</span>
                   </label>
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
+                    inputMode="numeric"
                     required
                     placeholder="Ex: (11) 99999-9999"
                     value={whatsapp}
@@ -671,8 +672,9 @@ export default function Clientes() {
                     <label className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
                       CPF
                     </label>
-                    <input 
-                      type="text" 
+                    <input
+                      type="text"
+                      inputMode="numeric"
                       placeholder="000.000.000-00"
                       value={cpf}
                       onChange={(e) => setCpf(applyCpfMask(e.target.value))}

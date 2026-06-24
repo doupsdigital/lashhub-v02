@@ -217,6 +217,7 @@ export default function CadastroProfissional() {
                 <input
                   name="telefone"
                   type="text"
+                  inputMode="numeric"
                   required
                   placeholder="Seu número de WhatsApp"
                   value={form.telefone}
