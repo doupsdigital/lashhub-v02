@@ -1,5 +1,5 @@
 import { Link, NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { BookOpen, Calendar, ClipboardList, User, LogOut } from 'lucide-react';
+import { BookOpen, Calendar, ClipboardList, User, LogOut, MessageCircle } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { usePortal } from '../../contexts/PortalContext';
 
@@ -7,7 +7,7 @@ export default function PortalLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, profile, signOut } = useAuth();
-  const { nomeNegocio, logoUrl, slug, loading, nomeProfissional, plano } = usePortal();
+  const { nomeNegocio, logoUrl, slug, loading, nomeProfissional, plano, telefoneProfissional } = usePortal();
   const isBasico = plano === 'basico';
   const isAuthPage = location.pathname.endsWith('/login') || location.pathname.endsWith('/cadastro');
 
@@ -155,6 +155,20 @@ export default function PortalLayout() {
             );
           })}
         </nav>
+      )}
+
+      {/* Botão flutuante de WhatsApp */}
+      {!isAuthPage && telefoneProfissional && (
+        <a
+          href={`https://wa.me/55${telefoneProfissional.replace(/\D/g, '')}?text=${encodeURIComponent('Olá! Vi seu catálogo e gostaria de mais informações.')}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="fixed bottom-20 md:bottom-6 right-4 z-40 w-13 h-13 bg-green-500 hover:bg-green-600 text-white rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-110 active:scale-95"
+          title="Falar no WhatsApp"
+          style={{ width: '52px', height: '52px' }}
+        >
+          <MessageCircle className="w-6 h-6" />
+        </a>
       )}
     </div>
   );

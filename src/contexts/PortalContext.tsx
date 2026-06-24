@@ -12,6 +12,10 @@ interface PortalContextType {
   slug: string | null;
   plano: string | null;
   nomeProfissional: string | null;
+  descricao: string | null;
+  instagram: string | null;
+  endereco: string | null;
+  telefoneProfissional: string | null;
 }
 
 const PortalContext = createContext<PortalContextType | undefined>(undefined);
@@ -25,6 +29,10 @@ export function PortalProvider({ children }: { children: React.ReactNode }) {
   const [paletaCores, setPaletaCores] = useState<string | null>(null);
   const [plano, setPlano] = useState<string | null>(null);
   const [nomeProfissional, setNomeProfissional] = useState<string | null>(null);
+  const [descricao, setDescricao] = useState<string | null>(null);
+  const [instagram, setInstagram] = useState<string | null>(null);
+  const [endereco, setEndereco] = useState<string | null>(null);
+  const [telefoneProfissional, setTelefoneProfissional] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -45,7 +53,6 @@ export function PortalProvider({ children }: { children: React.ReactNode }) {
 
         if (estError || !est) {
           console.error('Estabelecimento não encontrado para o slug:', slug);
-          // Redireciona para o login global de profissionais se o estúdio não for encontrado
           navigate('/login', { replace: true });
           return;
         }
@@ -54,30 +61,30 @@ export function PortalProvider({ children }: { children: React.ReactNode }) {
         setNomeNegocio(est.nome_negocio);
         setPlano(est.plano || 'basico');
 
-        // 2. Buscar configurações visuais do estabelecimento
+        // 2. Buscar configurações do estabelecimento
         const { data: config, error: configError } = await supabase
           .from('configuracao_negocio')
-          .select('logo_url, paleta_cores, modo_escuro')
+          .select('logo_url, paleta_cores, modo_escuro, descricao, instagram, endereco')
           .eq('estabelecimento_id', est.id)
           .maybeSingle();
 
         if (!configError && config) {
           setLogoUrl(config.logo_url);
           setPaletaCores(config.paleta_cores || 'rosa_rose');
-          
-          // Aplicar a paleta de cores correspondente do estúdio no DOM
+          setDescricao(config.descricao || null);
+          setInstagram(config.instagram || null);
+          setEndereco(config.endereco || null);
           applyPalette(config.paleta_cores || 'rosa_rose', config.modo_escuro || false);
         } else {
-          // Defaults caso não haja configuração personalizada
           setLogoUrl(null);
           setPaletaCores('rosa_rose');
           applyPalette('rosa_rose', false);
         }
 
-        // 3. Buscar nome da profissional (dona do estúdio)
+        // 3. Buscar nome e telefone da profissional
         const { data: profData, error: profError } = await supabase
           .from('usuarios')
-          .select('nome')
+          .select('nome, telefone')
           .eq('estabelecimento_id', est.id)
           .eq('role', 'profissional')
           .limit(1)
@@ -85,8 +92,10 @@ export function PortalProvider({ children }: { children: React.ReactNode }) {
 
         if (!profError && profData) {
           setNomeProfissional(profData.nome);
+          setTelefoneProfissional(profData.telefone || null);
         } else {
           setNomeProfissional(null);
+          setTelefoneProfissional(null);
         }
       } catch (err) {
         console.error('Erro ao carregar dados do portal:', err);
@@ -109,6 +118,10 @@ export function PortalProvider({ children }: { children: React.ReactNode }) {
         slug: slug || null,
         plano,
         nomeProfissional,
+        descricao,
+        instagram,
+        endereco,
+        telefoneProfissional,
       }}
     >
       {children}

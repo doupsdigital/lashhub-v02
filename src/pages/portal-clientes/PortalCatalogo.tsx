@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Clock, Tag, Calendar, AlertCircle, Sparkles, RefreshCw, MessageSquare, ChevronDown, HelpCircle } from 'lucide-react';
+import { Clock, Tag, Calendar, AlertCircle, Sparkles, RefreshCw, MessageSquare, ChevronDown, HelpCircle, MapPin, AtSign } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import type { CategoriaServico, Servico, VariacaoServico } from '../../types';
 import { usePortal } from '../../contexts/PortalContext';
@@ -191,7 +191,7 @@ function ServicoCard({ servico, onAgendar, isBasico, nomeNegocio }: ServicoCardP
 
 export default function PortalCatalogo() {
   const navigate = useNavigate();
-  const { establishmentId, slug, plano, nomeNegocio } = usePortal();
+  const { establishmentId, slug, plano, nomeNegocio, logoUrl, descricao, instagram, endereco } = usePortal();
   const [categorias, setCategorias] = useState<CategoriaComServicos[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -316,8 +316,51 @@ export default function PortalCatalogo() {
     );
   }
 
+  const temInfoCard = descricao || instagram || endereco;
+
   return (
     <div className="space-y-6">
+
+      {/* Card de apresentação do estúdio */}
+      {temInfoCard && (
+        <div className="bg-white border border-border rounded-2xl p-6 shadow-sm flex flex-col sm:flex-row gap-5 items-start">
+          {logoUrl && (
+            <img
+              src={logoUrl}
+              alt={nomeNegocio || 'Studio'}
+              className="w-20 h-20 rounded-2xl object-cover flex-shrink-0 border border-border"
+            />
+          )}
+          <div className="flex-1 min-w-0 space-y-2">
+            <h2 className="font-title font-bold text-2xl text-text-primary leading-tight">
+              {nomeNegocio}
+            </h2>
+            {descricao && (
+              <p className="text-sm text-text-secondary leading-relaxed">{descricao}</p>
+            )}
+            <div className="flex flex-wrap gap-3 pt-1">
+              {instagram && (
+                <a
+                  href={`https://instagram.com/${instagram.replace('@', '')}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 text-xs font-medium text-rose-600 hover:text-rose-800 transition-colors"
+                >
+                  <AtSign className="w-3.5 h-3.5" />
+                  {instagram.startsWith('@') ? instagram : `@${instagram}`}
+                </a>
+              )}
+              {endereco && (
+                <span className="flex items-center gap-1.5 text-xs text-text-muted">
+                  <MapPin className="w-3.5 h-3.5 flex-shrink-0" />
+                  {endereco}
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="flex items-center justify-between gap-3">
         <h1 className="font-title font-bold text-3xl text-text-primary">Meus Serviços</h1>
         <button
