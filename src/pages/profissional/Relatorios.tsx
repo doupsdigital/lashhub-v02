@@ -126,11 +126,12 @@ export default function Relatorios() {
       const serviceMap = new Map<string, { nome: string }>();
       servsRes.data?.forEach(s => serviceMap.set(s.id, { nome: s.nome }));
 
-      const [clientsRes, apptsRes, concludedRes, pendingRes] = await Promise.all([
+      const [clientsRes, apptsRes, concludedRes, pendingRes, atendimentosRes] = await Promise.all([
         supabase.from('clientes').select('id, created_at').eq('estabelecimento_id', estabelecimentoId).gte('created_at', startIso).lte('created_at', endIso),
         supabase.from('agendamentos').select('id, data_hora, status').eq('estabelecimento_id', estabelecimentoId).gte('data_hora', startIso).lte('data_hora', endIso),
         supabase.from('agendamentos').select('id, cliente_id, data_hora, valor_cobrado, agendamento_servicos(servico_id, valor_cobrado)').eq('estabelecimento_id', estabelecimentoId).eq('status', 'concluido').gte('data_hora', startIso).lte('data_hora', endIso),
         supabase.from('agendamentos').select('id', { count: 'exact', head: true }).eq('estabelecimento_id', estabelecimentoId).eq('status', 'pendente'),
+        supabase.from('atendimentos').select('id, data_atendimento, valor_cobrado').eq('estabelecimento_id', estabelecimentoId).gte('data_atendimento', startIso.split('T')[0]).lte('data_atendimento', endIso.split('T')[0]),
       ]);
 
       if (clientsRes.error) throw clientsRes.error;
@@ -140,11 +141,15 @@ export default function Relatorios() {
       const clientRecords = clientsRes.data || [];
       const apptRecords = apptsRes.data || [];
       const concludedRecords = concludedRes.data || [];
+      const atendimentoRecords = atendimentosRes.data || [];
+
+      const agendamentosRevenue = concludedRecords.reduce((sum, a) => sum + Number(a.valor_cobrado || 0), 0);
+      const atendimentosRevenue = atendimentoRecords.reduce((sum, a) => sum + Number(a.valor_cobrado || 0), 0);
 
       setTotalClients(clientRecords.length);
       setTotalAppointments(apptRecords.length);
       setPendingAppointments(pendingRes.count ?? 0);
-      setTotalEarned(concludedRecords.reduce((sum, a) => sum + Number(a.valor_cobrado || 0), 0));
+      setTotalEarned(agendamentosRevenue + atendimentosRevenue);
 
       // Revenue over time
       const diffDays = Math.ceil(Math.abs(end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
@@ -154,6 +159,10 @@ export default function Relatorios() {
         while (cur <= end) { dailyMap.set(formatDateStr(cur), 0); cur.setDate(cur.getDate() + 1); }
         concludedRecords.forEach(a => {
           const k = formatDateStr(new Date(a.data_hora));
+          if (dailyMap.has(k)) dailyMap.set(k, dailyMap.get(k)! + Number(a.valor_cobrado || 0));
+        });
+        atendimentoRecords.forEach(a => {
+          const k = a.data_atendimento;
           if (dailyMap.has(k)) dailyMap.set(k, dailyMap.get(k)! + Number(a.valor_cobrado || 0));
         });
         setRevenueTimeData(
@@ -173,6 +182,10 @@ export default function Relatorios() {
         }
         concludedRecords.forEach(a => {
           const mKey = formatDateStr(new Date(a.data_hora)).substring(0, 7);
+          if (monthlyMap.has(mKey)) monthlyMap.set(mKey, monthlyMap.get(mKey)! + Number(a.valor_cobrado || 0));
+        });
+        atendimentoRecords.forEach(a => {
+          const mKey = a.data_atendimento.substring(0, 7);
           if (monthlyMap.has(mKey)) monthlyMap.set(mKey, monthlyMap.get(mKey)! + Number(a.valor_cobrado || 0));
         });
         setRevenueTimeData(

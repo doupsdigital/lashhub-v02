@@ -88,22 +88,37 @@ export default function Dashboard() {
       const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0).toISOString();
       const todayEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999).toISOString();
 
-      const [monthRevRes, newClientsRes, last7Res, prev7Res, pendingRes, todayRes] = await Promise.all([
+      const monthStartDate = monthStart.split('T')[0];
+      const monthEndDate = monthEnd.split('T')[0];
+      const last7StartDate = formatDateStr(last7Start);
+      const last7EndDate = formatDateStr(last7End);
+      const prev7StartDate = formatDateStr(prev7Start);
+      const prev7EndDate = formatDateStr(prev7End);
+
+      const [monthRevRes, newClientsRes, last7Res, prev7Res, pendingRes, todayRes,
+             monthAtendRes, last7AtendRes, prev7AtendRes] = await Promise.all([
         supabase.from('agendamentos').select('valor_cobrado').eq('estabelecimento_id', estabelecimentoId).eq('status', 'concluido').gte('data_hora', monthStart).lte('data_hora', monthEnd),
         supabase.from('clientes').select('id', { count: 'exact', head: true }).eq('estabelecimento_id', estabelecimentoId).gte('created_at', monthStart).lte('created_at', monthEnd),
         supabase.from('agendamentos').select('data_hora, valor_cobrado').eq('estabelecimento_id', estabelecimentoId).eq('status', 'concluido').gte('data_hora', last7Start.toISOString()).lte('data_hora', last7End.toISOString()),
         supabase.from('agendamentos').select('valor_cobrado').eq('estabelecimento_id', estabelecimentoId).eq('status', 'concluido').gte('data_hora', prev7Start.toISOString()).lte('data_hora', prev7End.toISOString()),
         supabase.from('agendamentos').select('id', { count: 'exact', head: true }).eq('estabelecimento_id', estabelecimentoId).eq('status', 'pendente'),
         supabase.from('agendamentos').select(`id, data_hora, status, cliente:clientes(id, nome, sobrenome), agendamento_servicos(servico:servicos(nome))`).eq('estabelecimento_id', estabelecimentoId).gte('data_hora', todayStart).lte('data_hora', todayEnd).neq('status', 'cancelado').order('data_hora', { ascending: true }),
+        supabase.from('atendimentos').select('valor_cobrado').eq('estabelecimento_id', estabelecimentoId).gte('data_atendimento', monthStartDate).lte('data_atendimento', monthEndDate),
+        supabase.from('atendimentos').select('data_atendimento, valor_cobrado').eq('estabelecimento_id', estabelecimentoId).gte('data_atendimento', last7StartDate).lte('data_atendimento', last7EndDate),
+        supabase.from('atendimentos').select('valor_cobrado').eq('estabelecimento_id', estabelecimentoId).gte('data_atendimento', prev7StartDate).lte('data_atendimento', prev7EndDate),
       ]);
 
-      setHeroRevenue((monthRevRes.data || []).reduce((sum, a) => sum + Number(a.valor_cobrado || 0), 0));
+      const agendMonthRev = (monthRevRes.data || []).reduce((sum, a) => sum + Number(a.valor_cobrado || 0), 0);
+      const atendMonthRev = (monthAtendRes.data || []).reduce((sum, a) => sum + Number(a.valor_cobrado || 0), 0);
+      setHeroRevenue(agendMonthRev + atendMonthRev);
       setHeroNewClients(newClientsRes.count ?? 0);
       setPendingAppointments(pendingRes.count ?? 0);
       setTodayAppointments(todayRes.data || []);
 
-      const last7Rev = (last7Res.data || []).reduce((sum, a) => sum + Number(a.valor_cobrado || 0), 0);
-      const prev7Rev = (prev7Res.data || []).reduce((sum, a) => sum + Number(a.valor_cobrado || 0), 0);
+      const last7Rev = (last7Res.data || []).reduce((sum, a) => sum + Number(a.valor_cobrado || 0), 0)
+                     + (last7AtendRes.data || []).reduce((sum, a) => sum + Number(a.valor_cobrado || 0), 0);
+      const prev7Rev = (prev7Res.data || []).reduce((sum, a) => sum + Number(a.valor_cobrado || 0), 0)
+                     + (prev7AtendRes.data || []).reduce((sum, a) => sum + Number(a.valor_cobrado || 0), 0);
       if (prev7Rev > 0) setRevenueGrowth(((last7Rev - prev7Rev) / prev7Rev) * 100);
       else if (last7Rev > 0) setRevenueGrowth(100);
       else setRevenueGrowth(null);
@@ -116,6 +131,10 @@ export default function Dashboard() {
       }
       (last7Res.data || []).forEach(a => {
         const k = formatDateStr(new Date(a.data_hora));
+        if (dailyMap.has(k)) dailyMap.set(k, dailyMap.get(k)! + Number(a.valor_cobrado || 0));
+      });
+      (last7AtendRes.data || []).forEach(a => {
+        const k = a.data_atendimento;
         if (dailyMap.has(k)) dailyMap.set(k, dailyMap.get(k)! + Number(a.valor_cobrado || 0));
       });
       setLast7DaysRevData(
