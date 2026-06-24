@@ -267,6 +267,7 @@ export default function PerfilCliente() {
       const { data: srvData, error: srvError } = await supabase
         .from('servicos')
         .select('*, variacoes_servico(*)')
+        .eq('estabelecimento_id', estabelecimentoId)
         .eq('ativo', true)
         .order('nome', { ascending: true });
 
