@@ -2,6 +2,7 @@ import { Link, NavLink, Outlet, useNavigate, useLocation } from 'react-router-do
 import { BookOpen, Calendar, ClipboardList, User, LogOut, MessageCircle } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { usePortal } from '../../contexts/PortalContext';
+import PortalFloatingHelpButton from '../common/PortalFloatingHelpButton';
 
 export default function PortalLayout() {
   const navigate = useNavigate();
@@ -138,7 +139,7 @@ export default function PortalLayout() {
 
       {/* Bottom nav (mobile) */}
       {!isAuthPage && (
-        <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-border flex z-30">
+        <nav id="ob-portal-nav" className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-border flex z-30">
           {navItems.map((item) => {
             const Icon = item.icon;
             return (
@@ -158,6 +159,9 @@ export default function PortalLayout() {
           })}
         </nav>
       )}
+
+      {/* Botão de ajuda flutuante do portal */}
+      {!isAuthPage && <PortalFloatingHelpButton />}
 
       {/* Botão flutuante de WhatsApp */}
       {!isAuthPage && telefoneProfissional && (

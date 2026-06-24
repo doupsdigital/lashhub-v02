@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useOnboarding } from '../../hooks/useOnboarding';
 import { Clock, Tag, Calendar, AlertCircle, Sparkles, RefreshCw, MessageSquare, ChevronDown, HelpCircle, MapPin, AtSign } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import type { CategoriaServico, Servico, VariacaoServico } from '../../types';
@@ -192,6 +193,8 @@ function ServicoCard({ servico, onAgendar, isBasico, nomeNegocio }: ServicoCardP
 export default function PortalCatalogo() {
   const navigate = useNavigate();
   const { establishmentId, slug, plano, nomeNegocio, logoUrl, descricao, instagram, endereco } = usePortal();
+  const { autoStart } = useOnboarding('portal_catalogo');
+  useEffect(() => { autoStart(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
   const [categorias, setCategorias] = useState<CategoriaComServicos[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -401,7 +404,7 @@ export default function PortalCatalogo() {
       )}
 
       {/* Pills de categoria */}
-      <div className="flex gap-2 overflow-x-auto pb-2">
+      <div id="ob-portal-filtros" className="flex gap-2 overflow-x-auto pb-2">
         <button
           onClick={() => setCategoriaAtiva('todas')}
           className={`px-4 py-1.5 rounded-full text-sm font-medium whitespace-nowrap shrink-0 transition-colors cursor-pointer ${
@@ -428,7 +431,7 @@ export default function PortalCatalogo() {
       </div>
 
       {/* Seções por categoria */}
-      <div className="space-y-10">
+      <div id="ob-portal-servicos-grid" className="space-y-10">
         {categoriasExibidas.map(cat => (
           <section key={cat.id}>
             <h2 className="font-title font-semibold text-2xl text-text-primary mb-4 pb-2 border-b border-border">

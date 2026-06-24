@@ -4,6 +4,7 @@ import { Calendar, Clock, Tag, AlertCircle, Loader2, ClipboardList, Info, X, Ale
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import { usePortal } from '../../contexts/PortalContext';
+import { useOnboarding } from '../../hooks/useOnboarding';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -88,6 +89,8 @@ export default function PortalMeusAgendamentos() {
   const navigate = useNavigate();
   const { clienteId } = useAuth();
   const { establishmentId, slug } = usePortal();
+  const { autoStart } = useOnboarding('portal_agendamentos');
+  useEffect(() => { autoStart(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const [agendamentos, setAgendamentos] = useState<AgendamentoWithServices[]>([]);
   const [loading, setLoading] = useState(true);
@@ -265,7 +268,7 @@ export default function PortalMeusAgendamentos() {
       </div>
 
       {/* PRÓXIMOS AGENDAMENTOS */}
-      <section className="space-y-4">
+      <section id="ob-portal-proximos" className="space-y-4">
         <h2 className="font-title font-semibold text-2xl text-text-primary border-b border-border pb-2">
           Próximos Agendamentos
         </h2>
@@ -384,7 +387,7 @@ export default function PortalMeusAgendamentos() {
       </section>
 
       {/* HISTÓRICO / PASSADOS */}
-      <section className="space-y-4">
+      <section id="ob-portal-historico" className="space-y-4">
         <h2 className="font-title font-semibold text-2xl text-text-primary border-b border-border pb-2">
           Histórico
         </h2>

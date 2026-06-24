@@ -8,6 +8,7 @@ import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import type { CategoriaServico, Servico, VariacaoServico, HorarioAtendimento, BloqueioAgenda } from '../../types';
 import { usePortal } from '../../contexts/PortalContext';
+import { useOnboarding } from '../../hooks/useOnboarding';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -158,6 +159,8 @@ export default function PortalAgendar() {
   const [searchParams] = useSearchParams();
   const { clienteId } = useAuth();
   const { establishmentId, slug, plano, loading: loadingPortal } = usePortal();
+  const { autoStart } = useOnboarding('portal_agendar');
+  useEffect(() => { autoStart(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Redirect to catalog if salon is on basic plan
   useEffect(() => {
@@ -576,7 +579,7 @@ export default function PortalAgendar() {
 
       {/* ─── ETAPA 1 — Serviços ───────────────────────────────────────────────── */}
       {etapa === 1 && (
-        <div className="space-y-5">
+        <div id="ob-portal-servico-select" className="space-y-5">
           {loadingServicos ? (
             <div className="flex flex-col items-center py-16 gap-3 text-text-secondary">
               <Loader2 className="w-8 h-8 animate-spin text-rose-400" />
@@ -700,7 +703,7 @@ export default function PortalAgendar() {
 
       {/* ─── ETAPA 2 — Calendário ─────────────────────────────────────────────── */}
       {etapa === 2 && (
-        <div className="space-y-5">
+        <div id="ob-portal-calendario" className="space-y-5">
           <div className="bg-white border border-border rounded-2xl p-5">
             {loadingCalendario ? (
               <div className="flex items-center justify-center py-16">
@@ -788,7 +791,7 @@ export default function PortalAgendar() {
 
       {/* ─── ETAPA 3 — Horários ───────────────────────────────────────────────── */}
       {etapa === 3 && (
-        <div className="space-y-5">
+        <div id="ob-portal-horarios" className="space-y-5">
           <div className="bg-white border border-border rounded-2xl p-5">
             <div className="flex items-center gap-2 mb-5 pb-4 border-b border-border">
               <Calendar className="w-4 h-4 text-rose-400 shrink-0" />

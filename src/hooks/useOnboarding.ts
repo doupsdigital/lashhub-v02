@@ -10,7 +10,11 @@ export type OnboardingPageKey =
   | 'meus_horarios'
   | 'relatorios'
   | 'link_agendamento'
-  | 'configuracoes';
+  | 'configuracoes'
+  | 'portal_catalogo'
+  | 'portal_agendar'
+  | 'portal_agendamentos'
+  | 'portal_perfil';
 
 import type { DriveStep } from 'driver.js';
 const STEPS: Record<OnboardingPageKey, DriveStep[]> = {
@@ -300,6 +304,118 @@ const STEPS: Record<OnboardingPageKey, DriveStep[]> = {
       popover: {
         title: 'Identidade visual',
         description: 'Escolha a paleta de cores do sistema e faça upload da logo do seu estúdio. O portal das clientes vai refletir a sua identidade.',
+      },
+    },
+  ],
+
+  // ── PORTAL DA CLIENTE ──────────────────────────────────────────────────────
+
+  portal_catalogo: [
+    {
+      popover: {
+        title: 'Bem-vinda ao portal! 👋',
+        description: 'Aqui você encontra todos os serviços disponíveis e pode agendar seu horário de forma rápida e fácil.',
+        side: 'over' as any, align: 'center',
+      },
+    },
+    {
+      element: '#ob-portal-filtros',
+      popover: {
+        title: 'Filtrar por categoria',
+        description: 'Use esses botões para ver só os serviços de uma categoria específica — como extensão de cílios ou design de sobrancelhas.',
+      },
+    },
+    {
+      element: '#ob-portal-servicos-grid',
+      popover: {
+        title: 'Catálogo de serviços',
+        description: 'Cada card mostra o serviço com foto, preço e duração. Clique em "Agendar" no serviço que te interessar para escolher o dia e horário.',
+      },
+    },
+    {
+      element: '#ob-portal-nav',
+      popover: {
+        title: 'Navegação',
+        description: 'Pelo menu você acessa o catálogo, agenda um horário, vê seus agendamentos e atualiza seu perfil.',
+      },
+    },
+  ],
+
+  portal_agendar: [
+    {
+      popover: {
+        title: 'Agendar um horário 📅',
+        description: 'Siga os passos para escolher o serviço, o dia e o horário que preferir.',
+        side: 'over' as any, align: 'center',
+      },
+    },
+    {
+      element: '#ob-portal-servico-select',
+      popover: {
+        title: 'Escolha o serviço',
+        description: 'Selecione o serviço que deseja agendar. Se tiver variações (como tipo ou duração diferentes), escolha a opção desejada.',
+      },
+    },
+    {
+      element: '#ob-portal-calendario',
+      popover: {
+        title: 'Escolha a data',
+        description: 'Selecione um dia disponível no calendário. Dias em cinza não têm horários disponíveis.',
+      },
+    },
+    {
+      element: '#ob-portal-horarios',
+      popover: {
+        title: 'Escolha o horário',
+        description: 'Clique no horário que preferir. Horários já ocupados aparecem desabilitados.',
+      },
+    },
+  ],
+
+  portal_agendamentos: [
+    {
+      popover: {
+        title: 'Meus Agendamentos 🗓',
+        description: 'Aqui você acompanha todos os seus horários marcados — os próximos e o histórico de atendimentos.',
+        side: 'over' as any, align: 'center',
+      },
+    },
+    {
+      element: '#ob-portal-proximos',
+      popover: {
+        title: 'Próximos atendimentos',
+        description: 'Seus agendamentos futuros aparecem aqui. O status indica se está pendente de confirmação, confirmado ou cancelado.',
+      },
+    },
+    {
+      element: '#ob-portal-historico',
+      popover: {
+        title: 'Histórico',
+        description: 'Todos os seus atendimentos anteriores ficam registrados aqui para você consultar quando quiser.',
+      },
+    },
+  ],
+
+  portal_perfil: [
+    {
+      popover: {
+        title: 'Meu Perfil 👤',
+        description: 'Aqui você mantém seus dados atualizados para facilitar o agendamento.',
+        side: 'over' as any, align: 'center',
+      },
+    },
+    {
+      element: '#ob-portal-dados-pessoais',
+      popover: {
+        title: 'Dados pessoais',
+        description: 'Mantenha seu nome, WhatsApp e e-mail atualizados. Essas informações são usadas para confirmar seus agendamentos.',
+      },
+    },
+    {
+      element: '#ob-portal-senha',
+      popover: {
+        title: 'Senha de acesso',
+        description: 'Altere sua senha quando quiser. Use uma senha segura que só você saiba.',
       },
     },
   ],

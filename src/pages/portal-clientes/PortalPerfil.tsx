@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { User, Phone, Mail, Lock, ShieldAlert, Loader2, CheckCircle2, AlertCircle, Camera, Trash2 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
+import { useOnboarding } from '../../hooks/useOnboarding';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -17,6 +18,8 @@ function formatWhatsApp(value: string): string {
 
 export default function PortalPerfil() {
   const { user, profile, clienteId, refreshProfile } = useAuth();
+  const { autoStart } = useOnboarding('portal_perfil');
+  useEffect(() => { autoStart(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Modal de sucesso centralizado
   const [successModal, setSuccessModal] = useState<{ isOpen: boolean; title: string; message: string }>({
@@ -366,7 +369,7 @@ export default function PortalPerfil() {
       </section>
 
       {/* SEÇÃO 1: DADOS PESSOAIS */}
-      <section className="bg-white border border-border rounded-2xl shadow-sm overflow-hidden">
+      <section id="ob-portal-dados-pessoais" className="bg-white border border-border rounded-2xl shadow-sm overflow-hidden">
         <div className="bg-rose-50/20 px-6 py-4 border-b border-border flex items-center gap-2">
           <User className="w-5 h-5 text-rose-600 shrink-0" />
           <h2 className="font-title font-semibold text-xl text-text-primary">Dados Pessoais</h2>
@@ -467,7 +470,7 @@ export default function PortalPerfil() {
       </section>
 
       {/* SEÇÃO 2: ALTERAR SENHA */}
-      <section className="bg-white border border-border rounded-2xl shadow-sm overflow-hidden">
+      <section id="ob-portal-senha" className="bg-white border border-border rounded-2xl shadow-sm overflow-hidden">
         <div className="bg-rose-50/20 px-6 py-4 border-b border-border flex items-center gap-2">
           <Lock className="w-5 h-5 text-rose-600 shrink-0" />
           <h2 className="font-title font-semibold text-xl text-text-primary">Alterar Senha</h2>
