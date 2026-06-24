@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
+import { useOnboarding } from '../../hooks/useOnboarding';
 import {
   Users,
   CalendarDays,
@@ -83,7 +84,9 @@ const getWeekLabel = (date: Date, start: Date) => {
 };
 
 export default function Relatorios() {
-  const { estabelecimentoId } = useAuth();
+  const { estabelecimentoId, profile } = useAuth();
+  const { autoStart } = useOnboarding('relatorios');
+  useEffect(() => { if (profile) autoStart(); }, [profile]); // eslint-disable-line react-hooks/exhaustive-deps
   const [period, setPeriod] = useState<PeriodType>('esteMes');
   const [customStartDate, setCustomStartDate] = useState(() =>
     formatDateStr(new Date(new Date().getFullYear(), new Date().getMonth(), 1))
@@ -347,7 +350,7 @@ export default function Relatorios() {
       ) : (
         <>
           {/* KPI Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div id="ob-relatorios-kpis" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
 
             <div className="bg-white border border-border rounded-[14px] p-5 flex items-center justify-between shadow-sm">
               <div className="space-y-1">
@@ -398,7 +401,7 @@ export default function Relatorios() {
           </div>
 
           {/* Receita ao longo do tempo */}
-          <div className="bg-white border border-border rounded-[14px] p-5 shadow-sm">
+          <div id="ob-relatorios-graficos" className="bg-white border border-border rounded-[14px] p-5 shadow-sm">
             <h3 className="font-title font-semibold text-lg text-text-primary flex items-center gap-2 mb-4">
               <TrendingUp className="w-5 h-5 text-rose-600" />
               Receita ao longo do tempo

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useOnboarding } from '../../hooks/useOnboarding';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import {
@@ -40,7 +41,9 @@ interface CategoriaWithRelations extends CategoriaServico {
 }
 
 export default function Servicos() {
-  const { estabelecimentoId } = useAuth();
+  const { estabelecimentoId, profile } = useAuth();
+  const { autoStart } = useOnboarding('servicos');
+  useEffect(() => { if (profile) autoStart(); }, [profile]); // eslint-disable-line react-hooks/exhaustive-deps
   const [categorias, setCategorias] = useState<CategoriaWithRelations[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -570,14 +573,16 @@ export default function Servicos() {
         {/* Action Buttons */}
         <div className="flex items-center gap-3">
           <button
+            id="ob-servicos-nova-cat"
             onClick={() => handleOpenCategoriaModal()}
             className="flex items-center justify-center gap-1.5 px-4 py-2 border border-rose-200 hover:bg-rose-50 text-rose-600 rounded-lg text-sm font-medium transition-colors cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             Nova Categoria
           </button>
-          
+
           <button
+            id="ob-servicos-novo-btn"
             onClick={() => handleOpenServicoModal()}
             disabled={activeCategoriesCount === 0}
             className="flex items-center justify-center gap-1.5 px-4 py-2 bg-rose-600 hover:bg-rose-800 disabled:bg-rose-200 disabled:cursor-not-allowed text-white rounded-lg text-sm font-medium transition-colors cursor-pointer"
@@ -602,7 +607,7 @@ export default function Servicos() {
         </div>
       ) : (
         /* Categorias Grouped List */
-        <div className="space-y-8">
+        <div id="ob-servicos-lista" className="space-y-8">
           {filteredCategorias.map(cat => (
             <div
               key={cat.id}

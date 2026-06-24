@@ -18,6 +18,8 @@ interface AuthContextType {
   estabelecimentoSlug: string | null;
   trialEndsAt: string | null;
   loading: boolean;
+  isPaginaVista: (key: string) => boolean;
+  markPageSeen: (key: string) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
@@ -55,7 +57,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       setUser(session.user);
-      
+
       if (!profileRef.current) {
         setLoading(true);
       }
@@ -86,7 +88,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const profileData = data as any;
       if (!profileData) {
         console.warn('[AuthContext] No profile found for', session.user.email, 'signing out. Error:', error);
-        // Usuário autenticado mas sem registro em usuarios → logout automático
         await supabase.auth.signOut();
         return;
       }
@@ -123,7 +124,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .select('*, estabelecimentos(plano, status_assinatura, slug, trial_ends_at)')
       .eq('id', user.id)
       .maybeSingle();
-    
+
     const profileData = data as any;
     if (profileData) {
       setProfile(profileData);
@@ -136,75 +137,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const markPageSeen = async (key: string) => {
+    if (!user) return;
+    const current = profileRef.current?.onboarding_paginas_vistas ?? [];
+    if (current.includes(key)) return;
+    const updated = [...current, key];
+    await supabase
+      .from('usuarios')
+      .update({ onboarding_paginas_vistas: updated })
+      .eq('id', user.id);
+    // Atualiza o profile local sem roundtrip ao banco
+    if (profileRef.current) {
+      setProfile({ ...profileRef.current, onboarding_paginas_vistas: updated });
+    }
+  };
+
+  const isPaginaVista = (key: string): boolean => {
+    return (profile?.onboarding_paginas_vistas ?? []).includes(key);
+  };
+
   const role: 'profissional' | 'cliente' | null = profile?.role ?? null;
   const isProfissional = role === 'profissional';
   const isCliente = role === 'cliente';
   const clienteId = profile?.cliente_id ?? null;
 
   return (
-    <AuthProviderHelper
-      user={user}
-      profile={profile}
-      role={role}
-      isProfissional={isProfissional}
-      isCliente={isCliente}
-      clienteId={clienteId}
-      estabelecimentoId={estabelecimentoId}
-      plano={plano}
-      statusAssinatura={statusAssinatura}
-      estabelecimentoSlug={estabelecimentoSlug}
-      trialEndsAt={trialEndsAt}
-      loading={loading}
-      signIn={signIn}
-      signOut={signOut}
-      refreshProfile={refreshProfile}
-    >
-      {children}
-    </AuthProviderHelper>
-  );
-}
-
-// Pequeno helper para envelopar o Provider de forma organizada
-function AuthProviderHelper({
-  children,
-  user,
-  profile,
-  role,
-  isProfissional,
-  isCliente,
-  clienteId,
-  estabelecimentoId,
-  plano,
-  statusAssinatura,
-  estabelecimentoSlug,
-  trialEndsAt,
-  loading,
-  signIn,
-  signOut,
-  refreshProfile,
-}: {
-  children: ReactNode;
-  user: User | null;
-  profile: Usuario | null;
-  role: 'profissional' | 'cliente' | null;
-  isProfissional: boolean;
-  isCliente: boolean;
-  clienteId: string | null;
-  estabelecimentoId: string | null;
-  plano: string | null;
-  statusAssinatura: string | null;
-  estabelecimentoSlug: string | null;
-  trialEndsAt: string | null;
-  loading: boolean;
-  signIn: (email: string, password: string) => Promise<void>;
-  signOut: () => Promise<void>;
-  refreshProfile: () => Promise<void>;
-}) {
-  return (
     <AuthContext.Provider value={{
       user, profile, role, isProfissional, isCliente, clienteId,
       estabelecimentoId, plano, statusAssinatura, estabelecimentoSlug,
-      trialEndsAt, loading, signIn, signOut, refreshProfile,
+      trialEndsAt, loading, isPaginaVista, markPageSeen,
+      signIn, signOut, refreshProfile,
     }}>
       {children}
     </AuthContext.Provider>

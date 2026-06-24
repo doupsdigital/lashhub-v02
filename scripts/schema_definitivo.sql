@@ -61,6 +61,7 @@ CREATE TABLE IF NOT EXISTS public.usuarios (
   email             TEXT        UNIQUE NOT NULL,
   avatar_url        TEXT,
   telefone          TEXT,
+  onboarding_paginas_vistas TEXT[] DEFAULT '{}',
   role              TEXT        NOT NULL DEFAULT 'cliente'
                     CHECK (role IN ('profissional', 'cliente')),
   cliente_id        UUID        REFERENCES public.clientes(id),

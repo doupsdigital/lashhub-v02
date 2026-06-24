@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
+import { useOnboarding } from '../../hooks/useOnboarding';
 import { Clock, CalendarOff, Plus, Trash2, AlertCircle, CheckCircle } from 'lucide-react';
 import type { HorarioAtendimento, BloqueioAgenda } from '../../types';
 import ConfirmModal from '../../components/common/ConfirmModal';
@@ -31,7 +32,9 @@ function formatDate(dateStr: string) {
 }
 
 export default function MeusHorarios() {
-  const { estabelecimentoId } = useAuth();
+  const { estabelecimentoId, profile } = useAuth();
+  const { autoStart } = useOnboarding('meus_horarios');
+  useEffect(() => { if (profile) autoStart(); }, [profile]); // eslint-disable-line react-hooks/exhaustive-deps
   const [dias, setDias] = useState<DiaConfig[]>(createDefaultDias);
   const [loadingHorarios, setLoadingHorarios] = useState(true);
   const [savingHorarios, setSavingHorarios] = useState(false);
@@ -291,7 +294,7 @@ export default function MeusHorarios() {
       </div>
 
       {/* Seção 1: Expediente Semanal */}
-      <div className="bg-white border border-border rounded-[14px] p-6 shadow-sm">
+      <div id="ob-horarios-grid" className="bg-white border border-border rounded-[14px] p-6 shadow-sm">
         <h3 className="font-title font-bold text-lg text-text-primary flex items-center gap-2 border-b border-border pb-3">
           <Clock className="w-5 h-5 text-rose-600" />
           Expediente Semanal
@@ -371,7 +374,7 @@ export default function MeusHorarios() {
       </div>
 
       {/* Seção 2: Bloqueios e Folgas */}
-      <div className="bg-white border border-border rounded-[14px] p-6 shadow-sm">
+      <div id="ob-horarios-bloqueios" className="bg-white border border-border rounded-[14px] p-6 shadow-sm">
         <h3 className="font-title font-bold text-lg text-text-primary flex items-center gap-2 border-b border-border pb-3">
           <CalendarOff className="w-5 h-5 text-rose-600" />
           Bloqueios e Folgas

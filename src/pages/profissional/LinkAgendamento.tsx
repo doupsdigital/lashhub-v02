@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
+import { useOnboarding } from '../../hooks/useOnboarding';
 import ConfirmModal from '../../components/common/ConfirmModal';
 import {
   Link2,
@@ -12,7 +13,9 @@ import {
 } from 'lucide-react';
 
 export default function LinkAgendamento() {
-  const { estabelecimentoId, estabelecimentoSlug, refreshProfile } = useAuth();
+  const { estabelecimentoId, estabelecimentoSlug, refreshProfile, profile } = useAuth();
+  const { autoStart } = useOnboarding('link_agendamento');
+  useEffect(() => { if (profile) autoStart(); }, [profile]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const [slugEdit, setSlugEdit] = useState('');
   const [savingSlug, setSavingSlug] = useState(false);
@@ -122,7 +125,7 @@ export default function LinkAgendamento() {
         </p>
 
         {/* Link atual */}
-        <div className="flex items-center gap-0 p-3 bg-bg rounded-xl border border-border overflow-hidden">
+        <div id="ob-link-display" className="flex items-center gap-0 p-3 bg-bg rounded-xl border border-border overflow-hidden">
           <span className="text-xs text-text-muted flex-shrink-0 hidden sm:block">
             {window.location.origin}/portal/
           </span>
@@ -132,7 +135,7 @@ export default function LinkAgendamento() {
         </div>
 
         {/* Botões de ação */}
-        <div className="flex flex-wrap gap-2">
+        <div id="ob-link-acoes" className="flex flex-wrap gap-2">
           <button
             type="button"
             onClick={handleCopyLink}
@@ -168,7 +171,7 @@ export default function LinkAgendamento() {
         </div>
 
         {/* Personalizar slug */}
-        <div className="border-t border-border pt-5">
+        <div id="ob-link-personalizar" className="border-t border-border pt-5">
           <label className="text-xs font-semibold uppercase tracking-wider text-text-secondary block mb-1">
             Personalizar link
           </label>

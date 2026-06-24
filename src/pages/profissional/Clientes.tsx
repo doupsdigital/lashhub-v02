@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { useOnboarding } from '../../hooks/useOnboarding';
 import { supabase } from '../../lib/supabase';
 import { 
   Plus, 
@@ -43,7 +44,9 @@ function applyCpfMask(value: string): string {
 
 export default function Clientes() {
   const navigate = useNavigate();
-  const { estabelecimentoId } = useAuth();
+  const { estabelecimentoId, profile } = useAuth();
+  const { autoStart } = useOnboarding('clientes');
+  useEffect(() => { if (profile) autoStart(); }, [profile]); // eslint-disable-line react-hooks/exhaustive-deps
   const [clientes, setClientes] = useState<ClienteWithAttendances[]>([]);
   const [portalClienteIds, setPortalClienteIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
@@ -404,10 +407,10 @@ export default function Clientes() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white border border-border rounded-[14px] p-5 shadow-sm">
         {/* Search */}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 flex-1">
-          <div className="relative flex-1 max-w-md">
+          <div id="ob-clientes-search" className="relative flex-1 max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-text-muted" />
-            <input 
-              type="text" 
+            <input
+              type="text"
               placeholder="Buscar por nome ou WhatsApp..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -429,6 +432,7 @@ export default function Clientes() {
 
         {/* Create button */}
         <button
+          id="ob-clientes-add-btn"
           onClick={handleOpenModal}
           className="flex items-center justify-center gap-1.5 px-4 py-2 bg-rose-600 hover:bg-rose-800 text-white rounded-lg text-sm font-medium transition-colors cursor-pointer"
         >
@@ -450,7 +454,7 @@ export default function Clientes() {
           <p className="text-sm text-text-muted mt-1">Experimente alterar os filtros ou cadastrar novos clientes.</p>
         </div>
       ) : (
-        <div className="bg-white border border-border rounded-[14px] overflow-hidden shadow-sm flex flex-col justify-between">
+        <div id="ob-clientes-lista" className="bg-white border border-border rounded-[14px] overflow-hidden shadow-sm flex flex-col justify-between">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>

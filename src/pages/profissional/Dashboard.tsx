@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
+import { useOnboarding } from '../../hooks/useOnboarding';
 import {
   CalendarDays,
   CalendarCheck,
@@ -48,6 +49,7 @@ const getDateString = () => {
 export default function Dashboard() {
   const { estabelecimentoId, profile } = useAuth();
   const navigate = useNavigate();
+  const { autoStart } = useOnboarding('meu_estudio');
 
   const [pendingAppointments, setPendingAppointments] = useState(0);
   const [todayAppointments, setTodayAppointments] = useState<any[]>([]);
@@ -61,6 +63,12 @@ export default function Dashboard() {
   const [heroLoading, setHeroLoading] = useState(true);
 
   const firstName = profile?.nome?.split(' ')[0] || '';
+
+  // Dispara o tour de onboarding na primeira visita
+  useEffect(() => {
+    if (!profile) return;
+    autoStart();
+  }, [profile]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchData = async () => {
     if (!estabelecimentoId) return;
@@ -131,10 +139,10 @@ export default function Dashboard() {
   }, [estabelecimentoId]);
 
   const quickActions = [
-    { label: 'Novo Agendamento', Icon: CalendarCheck, to: '/agendamentos', state: {} },
-    { label: 'Bloquear Horário', Icon: CalendarX, to: '/meus-horarios', state: {} },
-    { label: 'Novo Serviço', Icon: Tag, to: '/servicos', state: {} },
-    { label: 'Ver Agenda do Dia', Icon: CalendarDays, to: '/agendamentos', state: { filterToday: true } },
+    { label: 'Novo Agendamento', id: 'onboarding-btn-novo-agendamento', Icon: CalendarCheck, to: '/agendamentos', state: {} },
+    { label: 'Bloquear Horário', id: 'onboarding-btn-bloquear', Icon: CalendarX, to: '/meus-horarios', state: {} },
+    { label: 'Novo Serviço', id: 'onboarding-btn-novo-servico', Icon: Tag, to: '/servicos', state: {} },
+    { label: 'Ver Agenda do Dia', id: 'onboarding-btn-agenda-dia', Icon: CalendarDays, to: '/agendamentos', state: { filterToday: true } },
   ];
 
   return (
@@ -163,7 +171,7 @@ export default function Dashboard() {
       {/* ── KPI CARDS ── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
 
-        <div className="bg-white border border-border rounded-2xl p-4 flex items-start justify-between shadow-sm">
+        <div id="onboarding-card-faturamento" className="bg-white border border-border rounded-2xl p-4 flex items-start justify-between shadow-sm">
           <div className="min-w-0">
             <p className="text-[10px] font-bold uppercase tracking-wider text-text-muted leading-tight">Faturamento do Mês</p>
             <p className="font-title font-semibold text-2xl text-rose-600 mt-1.5">
@@ -175,7 +183,11 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="bg-white border border-border rounded-2xl p-4 flex items-start justify-between shadow-sm">
+        <div
+          id="onboarding-card-hoje"
+          onClick={() => navigate('/agendamentos', { state: { filterToday: true } })}
+          className="bg-white border border-border rounded-2xl p-4 flex items-start justify-between shadow-sm cursor-pointer hover:border-rose-200 hover:shadow-md transition-all"
+        >
           <div className="min-w-0">
             <p className="text-[10px] font-bold uppercase tracking-wider text-text-muted leading-tight">Agendamentos Hoje</p>
             <p className="font-title font-semibold text-2xl text-text-primary mt-1.5">
@@ -188,6 +200,7 @@ export default function Dashboard() {
         </div>
 
         <div
+          id="onboarding-card-pendentes"
           onClick={() => pendingAppointments > 0 && navigate('/agendamentos', { state: { openPending: true } })}
           className={`bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-start justify-between shadow-sm ${pendingAppointments > 0 ? 'cursor-pointer hover:bg-amber-100/60 transition-colors' : ''}`}
         >
@@ -202,7 +215,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="bg-white border border-border rounded-2xl p-4 flex items-start justify-between shadow-sm">
+        <div id="onboarding-card-clientes" className="bg-white border border-border rounded-2xl p-4 flex items-start justify-between shadow-sm">
           <div className="min-w-0">
             <p className="text-[10px] font-bold uppercase tracking-wider text-text-muted leading-tight">Novas Clientes</p>
             <p className="font-title font-semibold text-2xl text-text-primary mt-1.5">
@@ -226,9 +239,10 @@ export default function Dashboard() {
           <div>
             <h2 className="font-sans font-semibold text-base text-text-primary mb-3">Ações Rápidas</h2>
             <div className="grid grid-cols-2 gap-3">
-              {quickActions.map(({ label, Icon, to, state }) => (
+              {quickActions.map(({ label, id, Icon, to, state }) => (
                 <button
                   key={label}
+                  id={id}
                   onClick={() => navigate(to, { state })}
                   className="hover:brightness-95 active:brightness-90 text-white rounded-2xl p-5 flex flex-col items-start gap-4 transition-all cursor-pointer shadow-sm text-left"
                   style={{ background: 'linear-gradient(to bottom right, var(--rose-600) 75%, var(--rose-400) 100%)' }}

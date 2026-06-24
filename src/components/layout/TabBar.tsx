@@ -22,6 +22,7 @@ export default function TabBar({ onMoreClick }: TabBarProps) {
   return (
     <>
       <nav
+        id="onboarding-tabbar"
         className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-border md:hidden"
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
       >

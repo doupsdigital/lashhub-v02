@@ -7,6 +7,7 @@ export interface Usuario {
   cliente_id?: string | null;
   estabelecimento_id?: string | null;
   telefone?: string | null;
+  onboarding_paginas_vistas?: string[];
   created_at?: string;
 }
 

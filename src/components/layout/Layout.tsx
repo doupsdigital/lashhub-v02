@@ -4,6 +4,7 @@ import Sidebar from './Sidebar';
 import Header from './Header';
 import TabBar from './TabBar';
 import TrialBanner from '../common/TrialBanner';
+import FloatingHelpButton from '../common/FloatingHelpButton';
 import { Sparkles } from 'lucide-react';
 
 const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
@@ -85,6 +86,9 @@ export default function Layout() {
 
       {/* TabBar — mobile only */}
       <TabBar onMoreClick={() => setMobileOpen(true)} />
+
+      {/* Botão de ajuda flutuante */}
+      <FloatingHelpButton />
     </div>
   );
 }

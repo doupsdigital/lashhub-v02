@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { useOnboarding } from '../../hooks/useOnboarding';
 import { supabase } from '../../lib/supabase';
 import {
   Plus,
@@ -60,8 +61,10 @@ const DIAS_SEMANA = [
 ];
 
 export default function Agendamentos() {
-  const { isProfissional, estabelecimentoId } = useAuth();
+  const { isProfissional, estabelecimentoId, profile } = useAuth();
   const location = useLocation();
+  const { autoStart } = useOnboarding('agendamentos');
+  useEffect(() => { if (profile) autoStart(); }, [profile]); // eslint-disable-line react-hooks/exhaustive-deps
   const [viewMode, setViewMode] = useState<'mensal' | 'semanal' | 'diaria'>(() => {
     if (typeof window !== 'undefined' && window.innerWidth < 1024) {
       return 'diaria';
@@ -1109,7 +1112,7 @@ export default function Agendamentos() {
           <div className="flex flex-col lg:flex-row lg:items-center gap-3">
 
             {/* View switcher */}
-            <div className="flex w-full lg:w-auto bg-bg rounded-lg p-0.5 border border-border/40">
+            <div id="ob-agend-view-toggle" className="flex w-full lg:w-auto bg-bg rounded-lg p-0.5 border border-border/40">
               {[
                 { id: 'diaria', label: 'Dia' },
                 { id: 'semanal', label: 'Semana' },
@@ -1129,6 +1132,7 @@ export default function Agendamentos() {
 
             {/* Create button */}
             <button
+              id="ob-agend-novo-btn"
               onClick={() => handleOpenForm(currentDate)}
               className="flex items-center justify-center gap-1 w-full lg:w-auto px-3 py-2.5 bg-rose-600 hover:bg-rose-800 text-white rounded-lg text-xs font-semibold transition-colors cursor-pointer"
             >
@@ -1141,7 +1145,7 @@ export default function Agendamentos() {
 
       {/* Pending Appointments Panel */}
       {pendingAppts.length > 0 && (
-        <div className="bg-white border border-amber-200 rounded-[14px] shadow-sm overflow-hidden">
+        <div id="ob-agend-pendentes" className="bg-white border border-amber-200 rounded-[14px] shadow-sm overflow-hidden">
           <button
             onClick={() => setPendingOpen(o => !o)}
             className="w-full flex items-center justify-between px-5 py-4 hover:bg-amber-50/50 transition-colors cursor-pointer"
@@ -1207,7 +1211,7 @@ export default function Agendamentos() {
       ) : (
         /* VISUALIZAÇÃO SEMANAL */
         viewMode === 'semanal' && (
-          <div className="bg-white border border-border rounded-[14px] overflow-hidden shadow-sm flex flex-col">
+          <div id="ob-agend-grid" className="bg-white border border-border rounded-[14px] overflow-hidden shadow-sm flex flex-col">
             {/* Grid Header */}
             <div className="grid grid-cols-[60px_repeat(7,1fr)] border-b border-border bg-rose-50/10 text-center">
               <div className="py-3 border-r border-border" />
