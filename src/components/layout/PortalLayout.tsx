@@ -88,7 +88,7 @@ export default function PortalLayout() {
                   {initials}
                 </div>
               )}
-              <span className="text-sm text-text-secondary hidden sm:block">
+              <span className="text-sm text-text-secondary">
                 Olá, <span className="font-semibold text-text-primary">{clientName}</span>
               </span>
               <button
