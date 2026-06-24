@@ -347,7 +347,7 @@ export default function PortalCatalogo() {
                   className="flex items-center gap-1.5 text-xs font-medium text-rose-600 hover:text-rose-800 transition-colors"
                 >
                   <AtSign className="w-3.5 h-3.5" />
-                  {instagram.startsWith('@') ? instagram : `@${instagram}`}
+                  {instagram.replace(/^@/, '')}
                 </a>
               )}
               {endereco && (
