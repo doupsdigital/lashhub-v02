@@ -334,6 +334,17 @@ BEGIN
       (srv_man_id, 'Manutenção Volume Híbrido',     100, 110.00),
       (srv_man_id, 'Manutenção Volume Russo',        120, 120.00);
 
+    -- 7. Criar horários de atendimento padrão (Seg–Sex, 09:00–18:00)
+    -- ON CONFLICT DO NOTHING garante idempotência caso o frontend também execute o seed
+    INSERT INTO public.horarios_atendimento (estabelecimento_id, dia_semana, hora_inicio, hora_fim)
+    VALUES
+      (new_est_id, 1, '09:00', '18:00'),
+      (new_est_id, 2, '09:00', '18:00'),
+      (new_est_id, 3, '09:00', '18:00'),
+      (new_est_id, 4, '09:00', '18:00'),
+      (new_est_id, 5, '09:00', '18:00')
+    ON CONFLICT (estabelecimento_id, dia_semana) DO NOTHING;
+
   ELSIF user_role = 'cliente' THEN
 
     client_uuid := (new.raw_user_meta_data ->> 'cliente_id')::UUID;
