@@ -1,5 +1,5 @@
 -- =========================================================================
--- LASH HUB — SCHEMA DEFINITIVO v1.0
+-- LASH HUB — SCHEMA DEFINITIVO v1.3
 -- =========================================================================
 -- Execute este script completo no SQL Editor de qualquer novo projeto
 -- Supabase para recriar toda a estrutura do banco do zero.
@@ -60,6 +60,7 @@ CREATE TABLE IF NOT EXISTS public.usuarios (
   nome              TEXT        NOT NULL,
   email             TEXT        UNIQUE NOT NULL,
   avatar_url        TEXT,
+  telefone          TEXT,
   role              TEXT        NOT NULL DEFAULT 'cliente'
                     CHECK (role IN ('profissional', 'cliente')),
   cliente_id        UUID        REFERENCES public.clientes(id),
@@ -86,6 +87,7 @@ CREATE TABLE IF NOT EXISTS public.servicos (
   duracao_minutos   INTEGER     NOT NULL DEFAULT 60,
   valor             NUMERIC(10,2) NOT NULL DEFAULT 0,
   ativo             BOOLEAN     DEFAULT true,
+  imagem_url        TEXT,
   created_at        TIMESTAMPTZ DEFAULT now()
 );
 
@@ -482,6 +484,28 @@ $$;
 
 GRANT EXECUTE ON FUNCTION public.get_cliente_id_by_email_or_whatsapp TO anon;
 
+-- Função RPC usada no cadastro do portal para sincronizar o email da cliente
+-- quando ela se cadastra e já existe um registro manual sem email.
+-- SECURITY DEFINER: contorna RLS (anon não tem UPDATE em clientes).
+CREATE OR REPLACE FUNCTION public.sync_cliente_email(
+  p_cliente_id UUID,
+  p_email      TEXT
+)
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+  UPDATE public.clientes
+  SET email = p_email
+  WHERE id = p_cliente_id
+    AND (email IS NULL OR email = '');
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.sync_cliente_email TO anon;
+
 -- CATEGORIAS DE SERVIÇO
 CREATE POLICY "categorias_public_select"
   ON public.categorias_servico FOR SELECT TO anon, authenticated
@@ -691,9 +715,10 @@ CREATE POLICY "logs_profissional_insert"
 
 
 -- =========================================================================
--- 6. STORAGE BUCKET — avatares e logos
+-- 6. STORAGE BUCKETS E POLICIES
 -- =========================================================================
 
+-- Bucket: avatares de usuários e logos de estúdio
 INSERT INTO storage.buckets (id, name, public)
 VALUES ('avatars', 'avatars', true)
 ON CONFLICT (id) DO NOTHING;
@@ -703,6 +728,17 @@ CREATE POLICY "avatars_public_access"
   ON storage.objects FOR ALL TO public
   USING (bucket_id = 'avatars')
   WITH CHECK (bucket_id = 'avatars');
+
+-- Bucket: imagens dos serviços (portal da cliente)
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('servicos-imagens', 'servicos-imagens', true)
+ON CONFLICT (id) DO NOTHING;
+
+DROP POLICY IF EXISTS "servicos_imagens_public_access" ON storage.objects;
+CREATE POLICY "servicos_imagens_public_access"
+  ON storage.objects FOR ALL TO public
+  USING (bucket_id = 'servicos-imagens')
+  WITH CHECK (bucket_id = 'servicos-imagens');
 
 
 -- =========================================================================
