@@ -29,6 +29,16 @@ serve(async (req) => {
       hour: '2-digit', minute: '2-digit',
     });
 
+    // Busca nome da cliente
+    const { data: clienteData } = await supabase
+      .from('clientes')
+      .select('nome, sobrenome')
+      .eq('id', record.cliente_id)
+      .maybeSingle();
+    const nomeCliente = clienteData
+      ? `${clienteData.nome}${clienteData.sobrenome ? ' ' + clienteData.sobrenome : ''}`
+      : 'Uma cliente';
+
     const { data: subs, error } = await supabase
       .from('push_subscriptions')
       .select('endpoint, p256dh, auth')
@@ -41,7 +51,7 @@ serve(async (req) => {
 
     const payload = JSON.stringify({
       title: '📅 Novo agendamento!',
-      body: `Uma cliente agendou para ${dataHora}. Acesse para confirmar.`,
+      body: `${nomeCliente} agendou para ${dataHora}. Acesse para confirmar.`,
       url: '/agendamentos',
     });
 
