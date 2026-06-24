@@ -443,6 +443,7 @@ export default function PortalAgendar() {
           status: aprovAuto ? 'confirmado' : 'pendente',
           origem: 'portal',
           observacoes: observacoes.trim() || null,
+          valor_cobrado: valorTotal,
         });
 
       if (agError) throw agError;
