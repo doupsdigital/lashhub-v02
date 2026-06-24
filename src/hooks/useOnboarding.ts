@@ -439,7 +439,7 @@ const DRIVER_CONFIG = (onComplete: () => void, doneBtnText = 'Concluir ✓') =>
   } as Parameters<typeof driver>[0]);
 
 export function useOnboarding(pageKey: OnboardingPageKey) {
-  const { isPaginaVista, markPageSeen } = useAuth();
+  const { isPaginaVista, markPageSeen, loading } = useAuth();
 
   const startTour = () => {
     const steps = STEPS[pageKey];
@@ -457,9 +457,10 @@ export function useOnboarding(pageKey: OnboardingPageKey) {
   };
 
   const autoStart = () => {
+    if (loading) return; // aguarda o profile carregar antes de avaliar
     if (isPaginaVista(pageKey)) return;
     setTimeout(() => startTour(), 500);
   };
 
-  return { startTour, autoStart, isPaginaVista: () => isPaginaVista(pageKey) };
+  return { startTour, autoStart, loading, isPaginaVista: () => isPaginaVista(pageKey) };
 }

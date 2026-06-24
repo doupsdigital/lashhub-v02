@@ -18,8 +18,8 @@ function formatWhatsApp(value: string): string {
 
 export default function PortalPerfil() {
   const { user, profile, clienteId, refreshProfile } = useAuth();
-  const { autoStart } = useOnboarding('portal_perfil');
-  useEffect(() => { autoStart(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  const { autoStart, loading: onboardingLoading } = useOnboarding('portal_perfil');
+  useEffect(() => { autoStart(); }, [onboardingLoading]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Modal de sucesso centralizado
   const [successModal, setSuccessModal] = useState<{ isOpen: boolean; title: string; message: string }>({

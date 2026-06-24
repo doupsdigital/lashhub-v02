@@ -159,8 +159,8 @@ export default function PortalAgendar() {
   const [searchParams] = useSearchParams();
   const { clienteId } = useAuth();
   const { establishmentId, slug, plano, loading: loadingPortal } = usePortal();
-  const { autoStart } = useOnboarding('portal_agendar');
-  useEffect(() => { autoStart(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  const { autoStart, loading: onboardingLoading } = useOnboarding('portal_agendar');
+  useEffect(() => { autoStart(); }, [onboardingLoading]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Redirect to catalog if salon is on basic plan
   useEffect(() => {
