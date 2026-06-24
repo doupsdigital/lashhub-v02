@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import { useOnboarding } from '../../hooks/useOnboarding';
+import PushPermissionBanner from '../../components/common/PushPermissionBanner';
 import {
   CalendarDays,
   CalendarCheck,
@@ -166,6 +167,8 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
+
+      <PushPermissionBanner />
 
       {errorMsg && (
         <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg flex items-center gap-3">

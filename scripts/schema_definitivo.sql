@@ -726,6 +726,26 @@ CREATE POLICY "logs_profissional_insert"
   );
 
 
+-- Subscriptions de Push Notifications (Web Push)
+CREATE TABLE IF NOT EXISTS public.push_subscriptions (
+  id                  UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id             UUID        NOT NULL REFERENCES public.usuarios(id) ON DELETE CASCADE,
+  estabelecimento_id  UUID        NOT NULL,
+  endpoint            TEXT        NOT NULL,
+  p256dh              TEXT        NOT NULL,
+  auth                TEXT        NOT NULL,
+  created_at          TIMESTAMPTZ DEFAULT now(),
+  UNIQUE(user_id, endpoint)
+);
+
+ALTER TABLE public.push_subscriptions ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "usuario_own_subscriptions"
+  ON public.push_subscriptions FOR ALL TO authenticated
+  USING (user_id = auth.uid())
+  WITH CHECK (user_id = auth.uid());
+
+
 -- =========================================================================
 -- 6. STORAGE BUCKETS E POLICIES
 -- =========================================================================
