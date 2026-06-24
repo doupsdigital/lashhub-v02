@@ -258,7 +258,7 @@ export default function PerfilCliente() {
       });
 
       const combined = [...manualItems, ...apptItems, ...faltaItems].sort((a, b) => {
-        return new Date(a.data).getTime() - new Date(b.data).getTime();
+        return new Date(b.data).getTime() - new Date(a.data).getTime();
       });
 
       setAtendimentos(combined);
