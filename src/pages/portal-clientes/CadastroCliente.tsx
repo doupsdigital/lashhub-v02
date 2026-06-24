@@ -110,10 +110,11 @@ export default function CadastroCliente() {
         }
       } else {
         // Cliente existente encontrada pelo telefone — sincroniza o email via RPC (anon não tem UPDATE em clientes)
-        await supabase.rpc('sync_cliente_email', {
+        const { error: syncError } = await supabase.rpc('sync_cliente_email', {
           p_cliente_id: clientId,
           p_email: form.email.trim().toLowerCase(),
         });
+        if (syncError) console.error('[CadastroCliente] sync_cliente_email falhou:', syncError);
       }
 
       // Passo 3 — Criar usuário no Auth
