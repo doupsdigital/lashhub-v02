@@ -108,6 +108,13 @@ export default function CadastroCliente() {
         if (clientError) {
           throw new Error(`Erro ao registrar dados do cliente: ${clientError.message}`);
         }
+      } else {
+        // Cliente existente encontrada pelo telefone — sincroniza o email se estava vazio
+        await supabase
+          .from('clientes')
+          .update({ email: form.email.trim().toLowerCase() })
+          .eq('id', clientId)
+          .is('email', null);
       }
 
       // Passo 3 — Criar usuário no Auth

@@ -565,12 +565,6 @@ export default function PerfilCliente() {
               <h2 className="font-title font-semibold text-2xl text-text-primary">
                 {cliente.nome} {cliente.sobrenome}
               </h2>
-              <span className={`text-[10px] font-sans font-semibold px-2.5 py-0.5 rounded-full uppercase tracking-wider ${cliente.ativo 
-                ? 'bg-green-100 text-green-800' 
-                : 'bg-gray-100 text-gray-500'}`}
-              >
-                {cliente.ativo ? 'Ativa' : 'Inativa'}
-              </span>
             </div>
             
             <div className="flex items-center gap-2 mt-1">
