@@ -115,6 +115,23 @@ export default function CadastroProfissional() {
 
       if (updateError) throw updateError;
 
+      // Seed dos horários padrão (Seg–Sex, 09:00–18:00) para o novo estabelecimento
+      const { data: userProfile } = await supabase
+        .from('usuarios')
+        .select('estabelecimento_id')
+        .eq('id', data.user.id)
+        .maybeSingle();
+
+      if (userProfile?.estabelecimento_id) {
+        const defaultHorarios = [1, 2, 3, 4, 5].map(dia => ({
+          estabelecimento_id: userProfile.estabelecimento_id,
+          dia_semana: dia,
+          hora_inicio: '09:00',
+          hora_fim: '18:00',
+        }));
+        await supabase.from('horarios_atendimento').insert(defaultHorarios);
+      }
+
       setSuccess(true);
     } catch (err: unknown) {
       setErrorMsg(err instanceof Error ? err.message : 'Ocorreu um erro ao criar seu cadastro. Tente novamente.');

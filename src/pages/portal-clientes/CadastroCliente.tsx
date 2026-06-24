@@ -114,7 +114,7 @@ export default function CadastroCliente() {
           .from('clientes')
           .update({ email: form.email.trim().toLowerCase() })
           .eq('id', clientId)
-          .is('email', null);
+          .or('email.is.null,email.eq.');
       }
 
       // Passo 3 — Criar usuário no Auth
