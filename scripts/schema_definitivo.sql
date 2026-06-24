@@ -300,31 +300,31 @@ BEGIN
     -- 5. Criar serviços padrão — Extensão de Cílios
     INSERT INTO public.servicos (estabelecimento_id, categoria_id, nome, descricao, duracao_minutos, valor, ativo, imagem_url)
     VALUES
-      (new_est_id, cat_ext_id, 'Fio a Fio Clássico', 'Um fio sintético acoplado a cada cílio natural. Efeito natural e discreto para o dia a dia.', 120, 150.00, true, 'https://acsjornxtcjaufprsbuw.supabase.co/storage/v1/object/public/servicos-imagens/508cda55-2819-427d-9a11-bc0f17e680f4/servico-1782255826335.jpg'),
-      (new_est_id, cat_ext_id, 'Volume Russo', 'Fans artesanais de 3 a 6 fios super finos aplicados em cada cílio. Efeito volumoso, denso e marcante.', 150, 200.00, true, 'https://acsjornxtcjaufprsbuw.supabase.co/storage/v1/object/public/servicos-imagens/508cda55-2819-427d-9a11-bc0f17e680f4/servico-1782255890760.jpg'),
-      (new_est_id, cat_ext_id, 'Volume Híbrido', 'Mescla perfeita de Fio a Fio com Volume Russo. Oferece volume com textura e leveza.', 135, 180.00, true, 'https://acsjornxtcjaufprsbuw.supabase.co/storage/v1/object/public/servicos-imagens/508cda55-2819-427d-9a11-bc0f17e680f4/servico-1782255869354.jpg'),
-      (new_est_id, cat_ext_id, 'Volume Brasileiro (Cílios Y)', 'Extensões em formato de Y aplicadas individualmente. Proporciona olhar preenchido e moderno.', 120, 160.00, true, 'https://acsjornxtcjaufprsbuw.supabase.co/storage/v1/object/public/servicos-imagens/508cda55-2819-427d-9a11-bc0f17e680f4/servico-1782255852596.jpg');
+      (new_est_id, cat_ext_id, 'Fio a Fio Clássico', 'Um fio sintético acoplado a cada cílio natural. Efeito natural e discreto para o dia a dia.', 120, 150.00, true, 'https://vgolovxcrsxnpcecvoyi.supabase.co/storage/v1/object/public/servicos-imagens/defaults/Fio%20a%20Fio%20Classico.png'),
+      (new_est_id, cat_ext_id, 'Volume Russo', 'Fans artesanais de 3 a 6 fios super finos aplicados em cada cílio. Efeito volumoso, denso e marcante.', 150, 200.00, true, 'https://vgolovxcrsxnpcecvoyi.supabase.co/storage/v1/object/public/servicos-imagens/defaults/Volume%20Russo.png'),
+      (new_est_id, cat_ext_id, 'Volume Híbrido', 'Mescla perfeita de Fio a Fio com Volume Russo. Oferece volume com textura e leveza.', 135, 180.00, true, 'https://vgolovxcrsxnpcecvoyi.supabase.co/storage/v1/object/public/servicos-imagens/defaults/Volume%20Hibrido.png'),
+      (new_est_id, cat_ext_id, 'Volume Brasileiro (Cílios Y)', 'Extensões em formato de Y aplicadas individualmente. Proporciona olhar preenchido e moderno.', 120, 160.00, true, 'https://vgolovxcrsxnpcecvoyi.supabase.co/storage/v1/object/public/servicos-imagens/defaults/Volume%20Brasileiro%20(Cilios%20Y).png');
 
     -- 5b. Serviços padrão — Lash Lifting & Tratamentos
     INSERT INTO public.servicos (estabelecimento_id, categoria_id, nome, descricao, duracao_minutos, valor, ativo, imagem_url)
     VALUES
-      (new_est_id, cat_lift_id, 'Lash Lifting Completo', 'Curvatura natural e elevação dos cílios com aplicação de nutrição (Lash Botox) e tintura escura.', 60, 120.00, true, 'https://acsjornxtcjaufprsbuw.supabase.co/storage/v1/object/public/servicos-imagens/508cda55-2819-427d-9a11-bc0f17e680f4/servico-1782255909251.jpg'),
-      (new_est_id, cat_lift_id, 'Spa de Cílios', 'Higienização profunda dos fios, hidratação terapêutica e massagem relaxante na área dos olhos.', 30, 50.00, true, 'https://acsjornxtcjaufprsbuw.supabase.co/storage/v1/object/public/servicos-imagens/508cda55-2819-427d-9a11-bc0f17e680f4/servico-1782255924503.jpg');
+      (new_est_id, cat_lift_id, 'Lash Lifting Completo', 'Curvatura natural e elevação dos cílios com aplicação de nutrição (Lash Botox) e tintura escura.', 60, 120.00, true, 'https://vgolovxcrsxnpcecvoyi.supabase.co/storage/v1/object/public/servicos-imagens/defaults/Lash%20Lifting%20%20Completo.png'),
+      (new_est_id, cat_lift_id, 'Spa de Cílios', 'Higienização profunda dos fios, hidratação terapêutica e massagem relaxante na área dos olhos.', 30, 50.00, true, 'https://vgolovxcrsxnpcecvoyi.supabase.co/storage/v1/object/public/servicos-imagens/defaults/Spa%20de%20Cilios.png');
 
     -- 5c. Serviços padrão — Design de Sobrancelhas
     INSERT INTO public.servicos (estabelecimento_id, categoria_id, nome, descricao, duracao_minutos, valor, ativo, imagem_url)
     VALUES
-      (new_est_id, cat_des_id, 'Design de Sobrancelhas Simples', 'Modelagem personalizada respeitando a simetria e visagismo facial. Feito com pinça/linha.', 45, 50.00, true, 'https://acsjornxtcjaufprsbuw.supabase.co/storage/v1/object/public/servicos-imagens/508cda55-2819-427d-9a11-bc0f17e680f4/servico-1782256014481.jpg'),
-      (new_est_id, cat_des_id, 'Design com Henna', 'Modelagem personalizada com aplicação de Henna de alta fixação para preencher falhas e destacar o design.', 60, 70.00, true, 'https://acsjornxtcjaufprsbuw.supabase.co/storage/v1/object/public/servicos-imagens/508cda55-2819-427d-9a11-bc0f17e680f4/servico-1782256001778.jpg'),
-      (new_est_id, cat_des_id, 'Brow Lamination', 'Procedimento de alinhamento, estilização e nutrição química dos fios naturais das sobrancelhas.', 60, 130.00, true, 'https://acsjornxtcjaufprsbuw.supabase.co/storage/v1/object/public/servicos-imagens/508cda55-2819-427d-9a11-bc0f17e680f4/servico-1782255982713.jpg');
+      (new_est_id, cat_des_id, 'Design de Sobrancelhas Simples', 'Modelagem personalizada respeitando a simetria e visagismo facial. Feito com pinça/linha.', 45, 50.00, true, 'https://vgolovxcrsxnpcecvoyi.supabase.co/storage/v1/object/public/servicos-imagens/defaults/Design%20de%20Sobrancelhas%20Simples.png'),
+      (new_est_id, cat_des_id, 'Design com Henna', 'Modelagem personalizada com aplicação de Henna de alta fixação para preencher falhas e destacar o design.', 60, 70.00, true, 'https://vgolovxcrsxnpcecvoyi.supabase.co/storage/v1/object/public/servicos-imagens/defaults/Design%20com%20Henna.png'),
+      (new_est_id, cat_des_id, 'Brow Lamination', 'Procedimento de alinhamento, estilização e nutrição química dos fios naturais das sobrancelhas.', 60, 130.00, true, 'https://vgolovxcrsxnpcecvoyi.supabase.co/storage/v1/object/public/servicos-imagens/defaults/Brow%20Lamination.png');
 
     -- 5d. Serviços padrão — Manutenções e Remoções
     INSERT INTO public.servicos (estabelecimento_id, categoria_id, nome, descricao, duracao_minutos, valor, ativo, imagem_url)
-    VALUES (new_est_id, cat_man_id, 'Manutenção de Extensão', 'Reposição dos fios crescidos ou caídos. Válido até 20 dias após a aplicação original.', 90, 100.00, true, 'https://acsjornxtcjaufprsbuw.supabase.co/storage/v1/object/public/servicos-imagens/508cda55-2819-427d-9a11-bc0f17e680f4/servico-1782255946912.jpg')
+    VALUES (new_est_id, cat_man_id, 'Manutenção de Extensão', 'Reposição dos fios crescidos ou caídos. Válido até 20 dias após a aplicação original.', 90, 100.00, true, 'https://vgolovxcrsxnpcecvoyi.supabase.co/storage/v1/object/public/servicos-imagens/defaults/Manutencao%20de%20Extensao.png')
     RETURNING id INTO srv_man_id;
 
     INSERT INTO public.servicos (estabelecimento_id, categoria_id, nome, descricao, duracao_minutos, valor, ativo, imagem_url)
-    VALUES (new_est_id, cat_man_id, 'Remoção de Extensão', 'Retirada segura e indolor de extensões antigas usando removedor em gel profissional.', 45, 40.00, true, 'https://acsjornxtcjaufprsbuw.supabase.co/storage/v1/object/public/servicos-imagens/508cda55-2819-427d-9a11-bc0f17e680f4/servico-1782255957203.jpg');
+    VALUES (new_est_id, cat_man_id, 'Remoção de Extensão', 'Retirada segura e indolor de extensões antigas usando removedor em gel profissional.', 45, 40.00, true, 'https://vgolovxcrsxnpcecvoyi.supabase.co/storage/v1/object/public/servicos-imagens/defaults/Remocao%20de%20Extensao.png');
 
     -- 6. Variações da Manutenção de Extensão
     INSERT INTO public.variacoes_servico (servico_id, nome, duracao_minutos, valor)
@@ -760,10 +760,10 @@ RETURNS TRIGGER LANGUAGE plpgsql SECURITY DEFINER AS $$
 BEGIN
   IF NEW.status = 'pendente' AND NEW.origem = 'portal' THEN
     PERFORM net.http_post(
-      url     := 'https://acsjornxtcjaufprsbuw.supabase.co/functions/v1/send-push',
+      url     := 'https://vgolovxcrsxnpcecvoyi.supabase.co/functions/v1/send-push',
       headers := jsonb_build_object(
         'Content-Type', 'application/json',
-        'x-webhook-secret', 'WEBHOOK_SECRET_AQUI'
+        'x-webhook-secret', 'd6e4c59aaef5a02b3ab38961f834d6bafe819a4a51b891e56a91ab2309592934'
       ),
       body    := jsonb_build_object('record', row_to_json(NEW))
     );
