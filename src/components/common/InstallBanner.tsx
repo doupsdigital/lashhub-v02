@@ -54,7 +54,7 @@ export default function InstallBanner({ inline = false }: InstallBannerProps) {
 
   const handleAndroidInstall = async () => {
     await triggerInstall();
-    dismiss();
+    setVisible(false);
   };
 
   if (!visible || !device) return null;
