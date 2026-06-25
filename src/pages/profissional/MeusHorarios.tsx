@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import { useOnboarding } from '../../hooks/useOnboarding';
@@ -549,8 +550,8 @@ export default function MeusHorarios() {
       />
 
       {/* WEEKLY SCHEDULE SUCCESS MODAL */}
-      {horariosSuccess && (
-        <div className="fixed inset-0 bg-black/45 backdrop-blur-sm z-[100] flex items-center justify-center p-4 overflow-y-auto animate-fade-in">
+      {horariosSuccess && createPortal(
+        <div className="fixed inset-0 bg-black/45 backdrop-blur-sm z-[200] flex items-center justify-center p-4 overflow-y-auto animate-fade-in">
           <div className="bg-white rounded-[14px] border border-border shadow-xl w-full max-w-sm p-6 text-center animate-slide-up space-y-4">
             <div className="mx-auto w-16 h-16 rounded-full bg-green-50 border border-green-200 flex items-center justify-center text-green-600 animate-pulse">
               <CheckCircle className="w-9 h-9" />
@@ -569,12 +570,11 @@ export default function MeusHorarios() {
               </button>
             </div>
           </div>
-        </div>
-      )}
+        </div>, document.body)}
 
       {/* BLOCKING SUCCESS MODAL */}
-      {bloqueioSuccess && (
-        <div className="fixed inset-0 bg-black/45 backdrop-blur-sm z-[100] flex items-center justify-center p-4 overflow-y-auto animate-fade-in">
+      {bloqueioSuccess && createPortal(
+        <div className="fixed inset-0 bg-black/45 backdrop-blur-sm z-[200] flex items-center justify-center p-4 overflow-y-auto animate-fade-in">
           <div className="bg-white rounded-[14px] border border-border shadow-xl w-full max-w-sm p-6 text-center animate-slide-up space-y-4">
             <div className="mx-auto w-16 h-16 rounded-full bg-green-50 border border-green-200 flex items-center justify-center text-green-600 animate-pulse">
               <CheckCircle className="w-9 h-9" />
@@ -593,8 +593,7 @@ export default function MeusHorarios() {
               </button>
             </div>
           </div>
-        </div>
-      )}
+        </div>, document.body)}
     </div>
   );
 }
