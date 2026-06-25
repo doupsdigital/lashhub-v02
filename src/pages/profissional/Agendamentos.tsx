@@ -1954,38 +1954,25 @@ export default function Agendamentos() {
                     return (
                       <div key={srv.id} className={`p-2.5 rounded-lg border transition-all ${isChecked ? 'bg-rose-50/15 border-rose-300' : 'bg-white border-border/60 hover:bg-bg/20'}`}>
                         <div className="flex items-center justify-between gap-3">
-                          <label className="flex items-center gap-3 cursor-pointer flex-1">
-                            <input 
+                          <label className="flex items-center gap-3 cursor-pointer flex-1 min-w-0">
+                            <input
                               type="checkbox"
                               checked={isChecked}
                               onChange={(e) => handleToggleServiceCheckbox(srv, e.target.checked)}
-                              className="w-4.5 h-4.5 accent-rose-600 cursor-pointer"
+                              className="w-4.5 h-4.5 accent-rose-600 cursor-pointer shrink-0"
                             />
-                            <div className="text-xs">
-                              <p className="font-bold text-text-primary">{srv.nome}</p>
+                            <div className="text-xs min-w-0">
+                              <p className="font-bold text-text-primary truncate">{srv.nome}</p>
                               <p className="text-[10px] text-text-secondary mt-0.5">{srv.duracao_minutos} min • R$ {Number(srv.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                             </div>
                           </label>
 
-                          {/* Variation Selection dropdown */}
-                          {isChecked && srv.variacoes_servico && srv.variacoes_servico.length > 0 && (
-                            <select
-                              value={selectedServices[srv.id].variacao_id}
-                              onChange={(e) => handleFormVariationChange(srv.id, e.target.value)}
-                              className="px-2 py-1 border border-border rounded text-[10px] bg-white text-text-primary cursor-pointer max-w-[130px] focus:outline-none"
-                            >
-                              {srv.variacoes_servico.map(v => (
-                                <option key={v.id} value={v.id}>{v.nome}</option>
-                              ))}
-                            </select>
-                          )}
-
                           {/* Price Input */}
                           {isChecked && (
-                            <div className="flex items-center gap-1">
+                            <div className="flex items-center gap-1 shrink-0">
                               <span className="text-[10px] text-text-muted">R$</span>
-                              <input 
-                                type="number" 
+                              <input
+                                type="number"
                                 step="0.01"
                                 value={selectedServices[srv.id].valor}
                                 onChange={(e) => handleServicePriceChange(srv.id, parseFloat(e.target.value) || 0)}
@@ -1994,6 +1981,21 @@ export default function Agendamentos() {
                             </div>
                           )}
                         </div>
+
+                        {/* Variation dropdown — linha separada para não comprimir o preço */}
+                        {isChecked && srv.variacoes_servico && srv.variacoes_servico.length > 0 && (
+                          <div className="mt-2 ml-7">
+                            <select
+                              value={selectedServices[srv.id].variacao_id}
+                              onChange={(e) => handleFormVariationChange(srv.id, e.target.value)}
+                              className="w-full px-2 py-1 border border-border rounded text-[10px] bg-white text-text-primary cursor-pointer focus:outline-none"
+                            >
+                              {srv.variacoes_servico.map(v => (
+                                <option key={v.id} value={v.id}>{v.nome}</option>
+                              ))}
+                            </select>
+                          </div>
+                        )}
                       </div>
                     );
                   })}
