@@ -4,17 +4,19 @@ import { useInstallPrompt } from '../../contexts/InstallPromptContext';
 
 const STORAGE_KEY = 'lashhub-install-banner-dismissed';
 
-type DeviceType = 'ios-safari' | 'ios-chrome' | 'android' | null;
+type DeviceType = 'ios-safari' | 'ios-chrome' | 'android-chrome' | 'android' | null;
 
-function detectDevice(): 'ios-safari' | 'ios-chrome' | 'android' | 'other' {
+function detectDevice(): 'ios-safari' | 'ios-chrome' | 'android-chrome' | 'android' | 'other' {
   const ua = navigator.userAgent;
   const isIOS = /iphone|ipad|ipod/i.test(ua);
   const isSafari = /safari/i.test(ua) && !/chrome|crios|fxios|edgios/i.test(ua);
   const isChromeIOS = /crios/i.test(ua);
   const isAndroid = /android/i.test(ua);
+  const isChrome = /chrome/i.test(ua) && !/edge|opr|samsung/i.test(ua);
 
   if (isIOS && isSafari) return 'ios-safari';
   if (isIOS && isChromeIOS) return 'ios-chrome';
+  if (isAndroid && isChrome) return 'android-chrome';
   if (isAndroid) return 'android';
   return 'other';
 }
@@ -41,7 +43,7 @@ export default function InstallBanner({ inline = false }: InstallBannerProps) {
 
     const detected = detectDevice();
 
-    if (detected === 'ios-safari' || detected === 'ios-chrome' || detected === 'android') {
+    if (detected !== 'other') {
       setDevice(detected);
       setVisible(true);
     }
@@ -70,7 +72,7 @@ export default function InstallBanner({ inline = false }: InstallBannerProps) {
       </div>
 
       <div className="flex-1 min-w-0">
-        {device === 'android' ? (
+        {device === 'android-chrome' ? (
           deferredPrompt ? (
             <>
               <p className="text-sm font-semibold text-text-primary leading-snug">
@@ -100,6 +102,17 @@ export default function InstallBanner({ inline = false }: InstallBannerProps) {
               </p>
             </>
           )
+        ) : device === 'android' ? (
+          <>
+            <p className="text-sm font-semibold text-text-primary leading-snug">
+              Instale o Lash Hub no seu celular
+            </p>
+            <p className="text-xs text-text-secondary mt-1 leading-relaxed">
+              Procure a opção{' '}
+              <span className="font-semibold text-text-primary">"Adicionar à tela inicial"</span>
+              {' '}no menu do seu navegador.
+            </p>
+          </>
         ) : device === 'ios-safari' ? (
           <>
             <p className="text-sm font-semibold text-text-primary leading-snug">
