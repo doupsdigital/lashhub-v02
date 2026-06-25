@@ -1,6 +1,6 @@
 ﻿import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { AlertCircle, CheckCircle2, Eye, EyeOff } from 'lucide-react';
+import { AlertCircle, Eye, EyeOff, CalendarCheck, ClipboardList, Smartphone } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { usePortal } from '../../contexts/PortalContext';
 import InstallBanner from '../../components/common/InstallBanner';
@@ -16,7 +16,7 @@ function applyPhoneMask(value: string): string {
 
 export default function CadastroCliente() {
   const navigate = useNavigate();
-  const { establishmentId, slug } = usePortal();
+  const { establishmentId, slug, nomeNegocio } = usePortal();
   const [form, setForm] = useState({
     nome: '',
     sobrenome: '',
@@ -339,21 +339,66 @@ export default function CadastroCliente() {
         </p>
       </div>
 
-      {successModal && (<div className="fixed inset-0 bg-black/45 backdrop-blur-sm z-[200] flex items-center justify-center p-4 animate-fade-in">
-          <div className="bg-white rounded-[14px] border border-border shadow-xl w-full max-w-sm p-6 text-center animate-slide-up space-y-4">
-            <div className="mx-auto w-16 h-16 rounded-full bg-green-50 border border-green-200 flex items-center justify-center text-green-600">
-              <CheckCircle2 className="w-9 h-9" />
+      {successModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[200] flex items-center justify-center p-4 animate-fade-in">
+          <div className="bg-white rounded-[24px] shadow-2xl w-full max-w-md p-8 flex flex-col items-center text-center animate-slide-up">
+
+            <div className="w-20 h-20 rounded-2xl bg-gradient-to-tr from-rose-600 to-rose-400 flex items-center justify-center shadow-lg mb-5 overflow-hidden">
+              <img
+                src="/logo-login.png"
+                alt="Lash Hub"
+                className="w-full h-full object-contain"
+              />
             </div>
-            <div>
-              <h3 className="text-lg font-bold text-text-primary">Cadastro realizado!</h3>
-              <p className="text-sm text-text-secondary mt-1">Bem-vinda! Sua conta foi criada com sucesso.</p>
+
+            <h2 className="font-title font-bold text-2xl text-text-primary mb-1">
+              Bem-vinda, {form.nome}!
+            </h2>
+            <p className="text-sm text-text-secondary mb-6 leading-relaxed">
+              Sua conta no portal{' '}
+              <span className="font-semibold text-rose-600">{nomeNegocio}</span>{' '}
+              foi criada. Agora você pode agendar online com facilidade.
+            </p>
+
+            <div className="w-full space-y-3 mb-5 text-left">
+              <div className="flex items-start gap-3 bg-rose-50/50 border border-rose-100 rounded-xl p-3.5">
+                <div className="w-8 h-8 rounded-lg bg-rose-100 flex items-center justify-center flex-shrink-0">
+                  <CalendarCheck className="w-4 h-4 text-rose-600" />
+                </div>
+                <div>
+                  <p className="text-xs font-semibold text-text-primary">Agende seus horários</p>
+                  <p className="text-[11px] text-text-secondary mt-0.5">Escolha o serviço, data e horário diretamente pelo portal, sem precisar ligar.</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3 bg-rose-50/50 border border-rose-100 rounded-xl p-3.5">
+                <div className="w-8 h-8 rounded-lg bg-rose-100 flex items-center justify-center flex-shrink-0">
+                  <ClipboardList className="w-4 h-4 text-rose-600" />
+                </div>
+                <div>
+                  <p className="text-xs font-semibold text-text-primary">Acompanhe seus agendamentos</p>
+                  <p className="text-[11px] text-text-secondary mt-0.5">Veja seus próximos atendimentos e cancele quando precisar.</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3 bg-rose-50/50 border border-rose-100 rounded-xl p-3.5">
+                <div className="w-8 h-8 rounded-lg bg-rose-100 flex items-center justify-center flex-shrink-0">
+                  <Smartphone className="w-4 h-4 text-rose-600" />
+                </div>
+                <div>
+                  <p className="text-xs font-semibold text-text-primary">Acesse quando quiser</p>
+                  <p className="text-[11px] text-text-secondary mt-0.5">Instale o app na tela do seu celular e agende com um toque, a qualquer hora.</p>
+                </div>
+              </div>
             </div>
-            <InstallBanner inline />
+
+            <div className="w-full mb-4">
+              <InstallBanner inline />
+            </div>
+
             <button
               onClick={() => navigate(`/portal/${slug}/catalogo`, { replace: true })}
-              className="w-full py-2.5 bg-rose-600 hover:bg-rose-800 text-white rounded-xl text-sm font-semibold transition-all duration-300 shadow-md cursor-pointer"
+              className="w-full py-3.5 bg-rose-600 hover:bg-rose-800 text-white rounded-xl text-sm font-semibold transition-all shadow-md cursor-pointer"
             >
-              Concluir e Fechar
+              Ver catálogo de serviços
             </button>
           </div>
         </div>
