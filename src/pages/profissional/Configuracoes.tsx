@@ -1042,7 +1042,7 @@ export default function Configuracoes() {
       </div>
 
       {/* Section 4: Configurações de Agendamento */}
-      <div className="bg-white border border-border rounded-[14px] p-6 shadow-sm">
+      <div id="ob-config-agendamento" className="bg-white border border-border rounded-[14px] p-6 shadow-sm">
         <h3 className="font-title font-bold text-lg text-text-primary flex items-center gap-2 border-b border-border pb-3">
           <CalendarClock className="w-5 h-5 text-rose-600" />
           Configurações de Agendamento

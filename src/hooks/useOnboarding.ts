@@ -307,6 +307,13 @@ const STEPS: Record<OnboardingPageKey, DriveStep[]> = {
         description: 'Escolha a paleta de cores do sistema e faça upload da logo do seu estúdio. O portal das clientes vai refletir a sua identidade.',
       },
     },
+    {
+      element: '#ob-config-agendamento',
+      popover: {
+        title: 'Configurações de Agendamento',
+        description: 'Defina se os agendamentos feitos pelo portal ficam confirmados automaticamente ou aguardam sua aprovação. Personalize também a mensagem que sua cliente recebe ao agendar.',
+      },
+    },
   ],
 
   // ── PORTAL DA CLIENTE ──────────────────────────────────────────────────────
