@@ -30,9 +30,10 @@ function isAlreadyInstalled(): boolean {
 
 interface InstallBannerProps {
   inline?: boolean;
+  onVisibilityChange?: (visible: boolean) => void;
 }
 
-export default function InstallBanner({ inline = false }: InstallBannerProps) {
+export default function InstallBanner({ inline = false, onVisibilityChange }: InstallBannerProps) {
   const { deferredPrompt, triggerInstall } = useInstallPrompt();
   const [visible, setVisible] = useState(false);
   const [device, setDevice] = useState<DeviceType>(null);
@@ -46,17 +47,20 @@ export default function InstallBanner({ inline = false }: InstallBannerProps) {
     if (detected !== 'other') {
       setDevice(detected);
       setVisible(true);
+      onVisibilityChange?.(true);
     }
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const dismiss = () => {
     localStorage.setItem(STORAGE_KEY, '1');
     setVisible(false);
+    onVisibilityChange?.(false);
   };
 
   const handleAndroidInstall = async () => {
     await triggerInstall();
     setVisible(false);
+    onVisibilityChange?.(false);
   };
 
   if (!visible || !device) return null;

@@ -1,6 +1,6 @@
 import { Link, NavLink, Outlet, useNavigate, useLocation, useParams } from 'react-router-dom';
 import { BookOpen, Calendar, ClipboardList, User, LogOut, MessageCircle } from 'lucide-react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { usePortal } from '../../contexts/PortalContext';
 import PortalFloatingHelpButton from '../common/PortalFloatingHelpButton';
@@ -14,6 +14,8 @@ export default function PortalLayout() {
   const { nomeNegocio, logoUrl, slug, loading, nomeProfissional, plano, telefoneProfissional, descricao, instagram, endereco } = usePortal();
   const isBasico = plano === 'basico';
   const isAuthPage = location.pathname.endsWith('/login') || location.pathname.endsWith('/cadastro');
+
+  const [installBannerVisible, setInstallBannerVisible] = useState(false);
 
   useEffect(() => {
     if (isProfissional) {
@@ -149,7 +151,7 @@ export default function PortalLayout() {
         <Outlet />
       </main>
 
-      {!isAuthPage && user && <InstallBanner />}
+      {!isAuthPage && user && <InstallBanner onVisibilityChange={setInstallBannerVisible} />}
 
       {/* Bottom nav (mobile) */}
       {!isAuthPage && (
@@ -183,7 +185,7 @@ export default function PortalLayout() {
           href={`https://wa.me/55${telefoneProfissional.replace(/\D/g, '')}?text=${encodeURIComponent('Olá! Vi seu catálogo e gostaria de mais informações.')}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="fixed bottom-20 md:bottom-6 right-4 z-40 w-13 h-13 bg-green-500 hover:bg-green-600 text-white rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-110 active:scale-95"
+          className={`fixed ${installBannerVisible ? 'bottom-28' : 'bottom-20'} md:bottom-6 right-4 z-40 bg-green-500 hover:bg-green-600 text-white rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-110 active:scale-95`}
           title="Falar no WhatsApp"
           style={{ width: '52px', height: '52px' }}
         >
