@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import { driver } from 'driver.js';
 import 'driver.js/dist/driver.css';
 import { useAuth } from '../contexts/AuthContext';
@@ -488,18 +489,24 @@ const DRIVER_CONFIG = (onComplete: () => void, doneBtnText = 'Concluir ✓') =>
 export function useOnboarding(pageKey: OnboardingPageKey, options?: { studioName?: string | null }) {
   const { isPaginaVista, markPageSeen, loading } = useAuth();
 
+  // Ref garante que startTour sempre lê o studioName mais recente,
+  // mesmo quando chamado dentro de um setTimeout com closure desatualizado.
+  const optionsRef = useRef(options);
+  optionsRef.current = options;
+
   const startTour = () => {
     let steps = STEPS[pageKey];
     if (!steps?.length) return;
 
     // Personaliza o primeiro passo com o nome do estúdio quando disponível
-    if (options?.studioName && steps[0]?.popover) {
+    const studioName = optionsRef.current?.studioName;
+    if (studioName && steps[0]?.popover) {
       steps = [
         {
           ...steps[0],
           popover: {
             ...steps[0].popover,
-            title: `Bem-vinda ao portal da ${options.studioName}! \u{1F44B}`,
+            title: `Bem-vinda ao portal da ${studioName}! \u{1F44B}`,
           },
         },
         ...steps.slice(1),
