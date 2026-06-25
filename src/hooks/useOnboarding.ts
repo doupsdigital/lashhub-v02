@@ -438,15 +438,29 @@ const DRIVER_CONFIG = (onComplete: () => void, doneBtnText = 'Concluir ✓') =>
     onDestroyed: onComplete,
   } as Parameters<typeof driver>[0]);
 
-export function useOnboarding(pageKey: OnboardingPageKey) {
+export function useOnboarding(pageKey: OnboardingPageKey, options?: { studioName?: string | null }) {
   const { isPaginaVista, markPageSeen, loading } = useAuth();
 
   const startTour = () => {
-    const steps = STEPS[pageKey];
+    let steps = STEPS[pageKey];
     if (!steps?.length) return;
 
+    // Personaliza o primeiro passo com o nome do estúdio quando disponível
+    if (options?.studioName && steps[0]?.popover) {
+      steps = [
+        {
+          ...steps[0],
+          popover: {
+            ...steps[0].popover,
+            title: `Bem-vinda ao portal da ${options.studioName}! \u{1F44B}`,
+          },
+        },
+        ...steps.slice(1),
+      ];
+    }
+
     const isLastPage = pageKey === 'meu_estudio';
-    const doneBtnText = isLastPage ? 'Começar a usar 🎉' : 'Concluir ✓';
+    const doneBtnText = isLastPage ? 'Começar a usar \u{1F389}' : 'Concluir ✓';
 
     const driverObj = driver({
       ...DRIVER_CONFIG(() => markPageSeen(pageKey), doneBtnText),

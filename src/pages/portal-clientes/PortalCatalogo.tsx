@@ -195,7 +195,7 @@ function ServicoCard({ servico, onAgendar, isBasico, nomeNegocio, telefoneProfis
 export default function PortalCatalogo() {
   const navigate = useNavigate();
   const { establishmentId, slug, plano, nomeNegocio, logoUrl, descricao, instagram, endereco, telefoneProfissional } = usePortal();
-  const { autoStart, loading: onboardingLoading } = useOnboarding('portal_catalogo');
+  const { autoStart, loading: onboardingLoading } = useOnboarding('portal_catalogo', { studioName: nomeNegocio });
   useEffect(() => { autoStart(); }, [onboardingLoading]); // eslint-disable-line react-hooks/exhaustive-deps
   const [categorias, setCategorias] = useState<CategoriaComServicos[]>([]);
   const [loading, setLoading] = useState(true);
