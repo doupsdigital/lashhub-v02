@@ -729,10 +729,10 @@ export default function Agendamentos() {
     const firstName = appt.cliente?.nome || 'cliente';
     let msg: string;
     if (tipo === 'aprovado') {
-      msg = `Olá ${firstName}! 🎉 Seu agendamento foi *confirmado*!\n\n📅 *Data:* ${dateStr}\n🕐 *Horário:* ${timeStr}\n💆 *Serviço:* ${servicos}\n\nTe esperamos! 😊`;
+      msg = `Olá ${firstName}! \u{1F389} Seu agendamento foi *confirmado*!\n\n\u{1F4C5} *Data:* ${dateStr}\n\u{1F550} *Horário:* ${timeStr}\n\u{1F486} *Serviço:* ${servicos}\n\nTe esperamos! \u{1F60A}`;
     } else {
       const motivoLinha = motivo?.trim() ? `\n\n_${motivo.trim()}_` : '';
-      msg = `Olá ${firstName}! Infelizmente precisamos recusar seu agendamento de *${dateStr} às ${timeStr}*.${motivoLinha}\n\nEntre em contato para reagendarmos. 💗`;
+      msg = `Olá ${firstName}! Infelizmente precisamos recusar seu agendamento de *${dateStr} às ${timeStr}*.${motivoLinha}\n\nEntre em contato para reagendarmos. \u{1F497}`;
     }
     window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
   };
