@@ -1690,8 +1690,8 @@ export default function Agendamentos() {
       {concludeAppt && (() => {
         const totalServicos = concludeAppt.agendamento_servicos?.reduce((sum, s) => sum + Number(s.valor_cobrado || 0), 0) || 0;
         const clientName = concludeAppt.cliente ? `${concludeAppt.cliente.nome} ${concludeAppt.cliente.sobrenome}` : 'Cliente';
-        return (
-          <div className="fixed inset-0 bg-black/45 backdrop-blur-sm z-[60] flex items-center justify-center p-4 overflow-y-auto animate-fade-in">
+        return createPortal(
+          <div className="fixed inset-0 bg-black/45 backdrop-blur-sm z-[300] flex items-center justify-center p-4 overflow-y-auto animate-fade-in">
             <div className="bg-white rounded-[14px] border border-border shadow-xl w-full max-w-md flex flex-col max-h-[calc(100vh-2rem)] overflow-hidden animate-slide-up">
               {/* Header */}
               <div className="px-6 py-4 border-b border-border flex items-center justify-between bg-green-50/30 flex-shrink-0">
@@ -1812,7 +1812,8 @@ export default function Agendamentos() {
                 </div>
               </div>
             </div>
-          </div>
+          </div>,
+          document.body
         );
       })()}
 
