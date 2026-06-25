@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AlertCircle, Eye, EyeOff, Mail, Lock, User, Sparkles, Calendar, Link2, Phone } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import InstallBanner from '../../components/common/InstallBanner';
 
 export default function CadastroProfissional() {
   const navigate = useNavigate();
@@ -358,7 +359,7 @@ export default function CadastroProfissional() {
               Seu espaço <span className="font-semibold text-rose-600">{form.nome}</span> foi criado com sucesso. Agora é só configurar e começar a receber agendamentos.
             </p>
 
-            <div className="w-full space-y-3 mb-7 text-left">
+            <div className="w-full space-y-3 mb-4 text-left">
               <div className="flex items-start gap-3 bg-rose-50/50 border border-rose-100 rounded-xl p-3.5">
                 <div className="w-8 h-8 rounded-lg bg-rose-100 flex items-center justify-center flex-shrink-0">
                   <Sparkles className="w-4 h-4 text-rose-600" />
@@ -386,6 +387,10 @@ export default function CadastroProfissional() {
                   <p className="text-[11px] text-text-secondary mt-0.5">Envie o link do portal para suas clientes agendarem online.</p>
                 </div>
               </div>
+            </div>
+
+            <div className="w-full mb-4">
+              <InstallBanner inline />
             </div>
 
             <button

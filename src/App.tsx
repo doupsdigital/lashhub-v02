@@ -31,7 +31,7 @@ import PlanGuard from './components/common/PlanGuard';
 import BillingGuard from './components/common/BillingGuard';
 import Faturamento from './pages/profissional/Faturamento';
 import Relatorios from './pages/profissional/Relatorios';
-import InstallBanner from './components/common/InstallBanner';
+import { InstallPromptProvider } from './contexts/InstallPromptContext';
 
 export default function App() {
   useEffect(() => {
@@ -78,8 +78,8 @@ export default function App() {
   }, []);
 
   return (
+    <InstallPromptProvider>
     <AuthProvider>
-      <InstallBanner />
       <BrowserRouter>
         <Routes>
           {/* Públicas */}
@@ -151,5 +151,6 @@ export default function App() {
         </Routes>
       </BrowserRouter>
     </AuthProvider>
+    </InstallPromptProvider>
   );
 }

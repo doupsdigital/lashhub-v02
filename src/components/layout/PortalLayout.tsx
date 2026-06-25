@@ -3,6 +3,7 @@ import { BookOpen, Calendar, ClipboardList, User, LogOut, MessageCircle } from '
 import { useAuth } from '../../contexts/AuthContext';
 import { usePortal } from '../../contexts/PortalContext';
 import PortalFloatingHelpButton from '../common/PortalFloatingHelpButton';
+import InstallBanner from '../common/InstallBanner';
 
 export default function PortalLayout() {
   const navigate = useNavigate();
@@ -136,6 +137,8 @@ export default function PortalLayout() {
       <main className="flex-1 p-4 md:p-8 pb-24 md:pb-8 max-w-[1200px] w-full mx-auto">
         <Outlet />
       </main>
+
+      {!isAuthPage && user && <InstallBanner />}
 
       {/* Bottom nav (mobile) */}
       {!isAuthPage && (

@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { AlertCircle, CheckCircle2, Eye, EyeOff } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { usePortal } from '../../contexts/PortalContext';
+import InstallBanner from '../../components/common/InstallBanner';
 
 function applyPhoneMask(value: string): string {
   const digits = value.replace(/\D/g, '');
@@ -347,6 +348,7 @@ export default function CadastroCliente() {
               <h3 className="text-lg font-bold text-text-primary">Cadastro realizado!</h3>
               <p className="text-sm text-text-secondary mt-1">Bem-vinda! Sua conta foi criada com sucesso.</p>
             </div>
+            <InstallBanner inline />
             <button
               onClick={() => navigate(`/portal/${slug}/catalogo`, { replace: true })}
               className="w-full py-2.5 bg-rose-600 hover:bg-rose-800 text-white rounded-xl text-sm font-semibold transition-all duration-300 shadow-md cursor-pointer"
