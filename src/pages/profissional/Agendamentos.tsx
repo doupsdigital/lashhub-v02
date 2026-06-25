@@ -200,8 +200,8 @@ export default function Agendamentos() {
     const phoneDigits = appt.cliente?.whatsapp ? appt.cliente.whatsapp.replace(/\D/g, '') : '';
     
     // Construct WhatsApp message
-    const message = `Olá, ${appt.cliente?.nome || 'cliente'}! Seu agendamento para *${servicesList}* no dia *${dateStr}* às *${timeStr}* está confirmado. Te aguardamos! 💖`;
-    const whatsappLink = phoneDigits ? `https://wa.me/55${phoneDigits}?text=${encodeURIComponent(message)}` : undefined;
+    const message = `Olá, ${appt.cliente?.nome || 'cliente'}! Seu agendamento para *${servicesList}* no dia *${dateStr}* às *${timeStr}* está confirmado. Te aguardamos! \u{1F497}`;
+    const whatsappLink = phoneDigits ? `https://api.whatsapp.com/send?phone=55${phoneDigits}&text=${encodeURIComponent(message)}` : undefined;
 
     setSuccessModal({
       isOpen: true,
@@ -734,7 +734,7 @@ export default function Agendamentos() {
       const motivoLinha = motivo?.trim() ? `\n\n_${motivo.trim()}_` : '';
       msg = `Olá ${firstName}! Infelizmente precisamos recusar seu agendamento de *${dateStr} às ${timeStr}*.${motivoLinha}\n\nEntre em contato para reagendarmos. \u{1F497}`;
     }
-    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
+    window.open(`https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(msg)}`, '_blank');
   };
 
   const handleOpenRejectModal = (appt: AgendamentoWithRelations) => {
