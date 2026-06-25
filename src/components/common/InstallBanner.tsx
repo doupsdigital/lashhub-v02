@@ -41,14 +41,11 @@ export default function InstallBanner({ inline = false }: InstallBannerProps) {
 
     const detected = detectDevice();
 
-    if (detected === 'ios-safari' || detected === 'ios-chrome') {
+    if (detected === 'ios-safari' || detected === 'ios-chrome' || detected === 'android') {
       setDevice(detected);
       setVisible(true);
-    } else if (detected === 'android' && deferredPrompt) {
-      setDevice('android');
-      setVisible(true);
     }
-  }, [deferredPrompt]);
+  }, []);
 
   const dismiss = () => {
     localStorage.setItem(STORAGE_KEY, '1');
@@ -74,21 +71,35 @@ export default function InstallBanner({ inline = false }: InstallBannerProps) {
 
       <div className="flex-1 min-w-0">
         {device === 'android' ? (
-          <>
-            <p className="text-sm font-semibold text-text-primary leading-snug">
-              Instale o Lash Hub no seu celular
-            </p>
-            <p className="text-xs text-text-secondary mt-1 leading-relaxed">
-              Adicione à tela de início para acesso rápido, sem precisar abrir o navegador.
-            </p>
-            <button
-              onClick={handleAndroidInstall}
-              className="mt-2 flex items-center gap-1.5 px-3 py-1.5 bg-rose-600 hover:bg-rose-800 text-white text-xs font-semibold rounded-lg transition-all cursor-pointer"
-            >
-              <Download className="w-3.5 h-3.5" />
-              Instalar agora
-            </button>
-          </>
+          deferredPrompt ? (
+            <>
+              <p className="text-sm font-semibold text-text-primary leading-snug">
+                Instale o Lash Hub no seu celular
+              </p>
+              <p className="text-xs text-text-secondary mt-1 leading-relaxed">
+                Adicione à tela de início para acesso rápido, sem precisar abrir o navegador.
+              </p>
+              <button
+                onClick={handleAndroidInstall}
+                className="mt-2 flex items-center gap-1.5 px-3 py-1.5 bg-rose-600 hover:bg-rose-800 text-white text-xs font-semibold rounded-lg transition-all cursor-pointer"
+              >
+                <Download className="w-3.5 h-3.5" />
+                Instalar agora
+              </button>
+            </>
+          ) : (
+            <>
+              <p className="text-sm font-semibold text-text-primary leading-snug">
+                Instale o Lash Hub no seu celular
+              </p>
+              <p className="text-xs text-text-secondary mt-1 leading-relaxed">
+                Toque no menu{' '}
+                <span className="font-semibold text-text-primary">⋮</span>
+                {' '}do Chrome e depois em{' '}
+                <span className="font-semibold text-text-primary">"Adicionar à tela inicial"</span>.
+              </p>
+            </>
+          )
         ) : device === 'ios-safari' ? (
           <>
             <p className="text-sm font-semibold text-text-primary leading-snug">
