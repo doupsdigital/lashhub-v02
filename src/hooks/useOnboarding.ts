@@ -172,7 +172,7 @@ const STEPS: Record<OnboardingPageKey, DriveStep[]> = {
     {
       popover: {
         title: 'Seus serviços 💅',
-        description: 'Aqui você cadastra e organiza todos os serviços que oferece. Eles aparecem no portal para suas clientes.',
+        description: 'Aqui você cadastra e organiza todos os serviços que oferece. Já deixamos alguns serviços pré-cadastrados com categorias e imagens para te dar uma base — fique à vontade para editar nomes, preços e durações conforme a sua realidade. Se preferir usar fotos suas no lugar das imagens padrão, é só substituir em cada serviço.',
         side: 'over' as any, align: 'center',
       },
     },
