@@ -141,7 +141,7 @@ const STEPS: Record<OnboardingPageKey, DriveStep[]> = {
     {
       popover: {
         title: 'Suas clientes 👩',
-        description: 'Aqui você gerencia toda a sua base de clientes — dados pessoais, histórico e ficha clínica.',
+        description: 'Aqui você gerencia toda a sua base de clientes — dados pessoais, histórico e Ficha Clínica (Anamnese).',
         side: 'over' as any, align: 'center',
       },
     },
@@ -156,7 +156,7 @@ const STEPS: Record<OnboardingPageKey, DriveStep[]> = {
       element: '#ob-clientes-add-btn',
       popover: {
         title: 'Cadastrar cliente',
-        description: 'Adicione uma nova cliente manualmente com nome, WhatsApp e e-mail. Depois você pode complementar com CPF, data de nascimento e ficha clínica.',
+        description: 'Adicione uma nova cliente manualmente com nome e WhatsApp — e-mail, CPF, data de nascimento e Ficha Clínica (Anamnese) são opcionais e podem ser preenchidos depois.',
       },
     },
     {
