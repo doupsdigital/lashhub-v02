@@ -402,9 +402,9 @@ export default function Relatorios() {
 
             <div className="bg-white border border-border rounded-[14px] p-5 flex items-center justify-between shadow-sm">
               <div className="space-y-1">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-text-secondary">Novos Clientes</span>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-text-secondary">Novas Clientes</span>
                 <p className="text-3xl font-title font-semibold text-text-primary">{totalClients}</p>
-                <p className="text-[10px] text-text-muted">Cadastrados no período</p>
+                <p className="text-[10px] text-text-muted">Cadastradas no período</p>
               </div>
               <div className="w-12 h-12 rounded-full bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-600">
                 <Users className="w-5 h-5" />
