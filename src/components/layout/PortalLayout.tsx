@@ -1,5 +1,6 @@
-import { Link, NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
+import { Link, NavLink, Outlet, useNavigate, useLocation, useParams } from 'react-router-dom';
 import { BookOpen, Calendar, ClipboardList, User, LogOut, MessageCircle } from 'lucide-react';
+import { useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { usePortal } from '../../contexts/PortalContext';
 import PortalFloatingHelpButton from '../common/PortalFloatingHelpButton';
@@ -8,10 +9,19 @@ import InstallBanner from '../common/InstallBanner';
 export default function PortalLayout() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, profile, signOut } = useAuth();
+  const { slug: slugParam } = useParams<{ slug: string }>();
+  const { user, profile, isProfissional, signOut } = useAuth();
   const { nomeNegocio, logoUrl, slug, loading, nomeProfissional, plano, telefoneProfissional, descricao, instagram, endereco } = usePortal();
   const isBasico = plano === 'basico';
   const isAuthPage = location.pathname.endsWith('/login') || location.pathname.endsWith('/cadastro');
+
+  useEffect(() => {
+    if (isProfissional) {
+      signOut().then(() => {
+        navigate(`/portal/${slugParam}/catalogo`, { replace: true });
+      });
+    }
+  }, [isProfissional]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSignOut = async () => {
     await signOut();
