@@ -54,7 +54,7 @@ export default function Header({ setMobileOpen }: HeaderProps) {
   const { title, subtitle, Icon } = getPageInfo(location.pathname);
 
   return (
-    <header className="h-[60px] bg-white border-b border-border sticky top-0 z-30">
+    <header className="h-[60px] bg-white border-b border-border sticky top-0 z-[1]">
 
       {/* ── MOBILE ── */}
       <div className="flex md:hidden items-center justify-between px-4 h-full relative">

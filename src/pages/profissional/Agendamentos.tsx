@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { Link, useLocation } from 'react-router-dom';
 import { useOnboarding } from '../../hooks/useOnboarding';
 import { supabase } from '../../lib/supabase';
@@ -1054,7 +1055,7 @@ export default function Agendamentos() {
     <div className="space-y-6">
       {/* Floating Toasts */}
       {errorMessage && (
-        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[100] w-full max-w-lg px-4 pointer-events-none">
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[9999] w-full max-w-lg px-4 pointer-events-none">
           <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg flex items-center gap-3 shadow-lg animate-fade-in pointer-events-auto">
             <AlertCircle className="w-5 h-5 flex-shrink-0 text-red-600" />
             <p className="text-sm font-medium">{errorMessage}</p>
@@ -1062,7 +1063,7 @@ export default function Agendamentos() {
         </div>
       )}
       {successMessage && (
-        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[100] w-full max-w-lg px-4 pointer-events-none">
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[9999] w-full max-w-lg px-4 pointer-events-none">
           <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg flex items-center gap-3 shadow-lg animate-fade-in pointer-events-auto">
             <Sparkles className="w-5 h-5 flex-shrink-0 text-green-600" />
             <p className="text-sm font-medium">{successMessage}</p>
@@ -1496,8 +1497,8 @@ export default function Agendamentos() {
       )}
 
       {/* DETAIL MODAL / PANEL */}
-      {isDetailOpen && selectedAppt && (
-        <div className="fixed inset-0 bg-black/45 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto animate-fade-in">
+      {isDetailOpen && selectedAppt && createPortal(
+        <div className="fixed inset-0 bg-black/45 backdrop-blur-sm z-[200] flex items-center justify-center p-4 overflow-y-auto animate-fade-in">
           <div className="bg-white rounded-[14px] border border-border shadow-xl w-full max-w-md flex flex-col max-h-[calc(100vh-2rem)] overflow-hidden animate-slide-up">
             
             {/* Header */}
@@ -1683,8 +1684,7 @@ export default function Agendamentos() {
               </div>
             </div>
           </div>
-        </div>
-      )}
+        </div>, document.body)}
 
       {/* CONCLUDE MODAL */}
       {concludeAppt && (() => {
@@ -1817,8 +1817,8 @@ export default function Agendamentos() {
       })()}
 
       {/* FORM MODAL (CREATE OR EDIT) */}
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-black/45 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto animate-fade-in">
+      {isModalOpen && createPortal(
+        <div className="fixed inset-0 bg-black/45 backdrop-blur-sm z-[200] flex items-center justify-center p-4 overflow-y-auto animate-fade-in">
           <div className="bg-white rounded-[14px] border border-border shadow-xl w-full max-w-lg flex flex-col max-h-[calc(100vh-2rem)] overflow-hidden my-8 animate-slide-up">
             
             {/* Header */}
@@ -2057,11 +2057,10 @@ export default function Agendamentos() {
               </div>
             </form>
           </div>
-        </div>
-      )}
+        </div>, document.body)}
 
       {/* SUCCESS CONFIRMATION MODAL */}
-      {successModal && successModal.isOpen && (
+      {successModal && successModal.isOpen && createPortal(
         <div className="fixed inset-0 bg-black/45 backdrop-blur-sm z-[100] flex items-center justify-center p-4 overflow-y-auto animate-fade-in">
           <div className="bg-white rounded-[14px] border border-border shadow-xl w-full max-w-md animate-slide-up overflow-hidden">
 
@@ -2131,8 +2130,7 @@ export default function Agendamentos() {
             </div>
 
           </div>
-        </div>
-      )}
+        </div>, document.body)}
 
       <ConfirmModal
         isOpen={confirmModalOpen}
@@ -2147,7 +2145,7 @@ export default function Agendamentos() {
       />
 
       {/* Approve Modal */}
-      {approveModalAppt && (
+      {approveModalAppt && createPortal(
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 space-y-5">
             <div className="flex items-start justify-between">
@@ -2198,11 +2196,10 @@ export default function Agendamentos() {
               </button>
             </div>
           </div>
-        </div>
-      )}
+        </div>, document.body)}
 
       {/* Reject Modal */}
-      {rejectModalAppt && (
+      {rejectModalAppt && createPortal(
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 space-y-5">
             <div className="flex items-start justify-between">
@@ -2261,8 +2258,7 @@ export default function Agendamentos() {
               </button>
             </div>
           </div>
-        </div>
-      )}
+        </div>, document.body)}
     </div>
   );
 }

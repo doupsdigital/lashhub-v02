@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useOnboarding } from '../../hooks/useOnboarding';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
@@ -741,8 +742,7 @@ export default function Servicos() {
       )}
 
       {/* CATEGORIA MODAL */}
-      {isCategoriaModalOpen && (
-        <div className="fixed inset-0 bg-black/45 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
+      {isCategoriaModalOpen && createPortal(<div className="fixed inset-0 bg-black/45 backdrop-blur-sm z-[200] flex items-center justify-center p-4 animate-fade-in">
           <div className="bg-white rounded-[14px] border border-border shadow-xl w-full max-w-md overflow-hidden animate-slide-up">
             <div className="px-6 py-4 border-b border-border flex items-center justify-between bg-rose-50/10">
               <h4 className="font-title font-semibold text-lg text-text-primary">
@@ -795,12 +795,10 @@ export default function Servicos() {
               </div>
             </form>
           </div>
-        </div>
-      )}
+        </div>, document.body)}
 
       {/* SERVICO MODAL */}
-      {isServicoModalOpen && (
-        <div className="fixed inset-0 bg-black/45 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto animate-fade-in">
+      {isServicoModalOpen && createPortal(<div className="fixed inset-0 bg-black/45 backdrop-blur-sm z-[200] flex items-center justify-center p-4 overflow-y-auto animate-fade-in">
           <div className="bg-white rounded-[14px] border border-border shadow-xl w-full max-w-4xl flex flex-col max-h-[calc(100vh-2rem)] overflow-hidden my-8 animate-slide-up">
             <div className="px-6 py-4 border-b border-border flex items-center justify-between bg-rose-50/10 flex-shrink-0">
               <h4 className="font-title font-semibold text-lg text-text-primary">
@@ -1085,8 +1083,7 @@ export default function Servicos() {
               </div>
             </div>
           </div>
-        </div>
-      )}
+        </div>, document.body)}
 
       <ConfirmModal
         isOpen={confirmModalOpen}

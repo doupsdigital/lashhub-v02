@@ -338,8 +338,7 @@ export default function CadastroCliente() {
         </p>
       </div>
 
-      {successModal && (
-        <div className="fixed inset-0 bg-black/45 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
+      {successModal && (<div className="fixed inset-0 bg-black/45 backdrop-blur-sm z-[200] flex items-center justify-center p-4 animate-fade-in">
           <div className="bg-white rounded-[14px] border border-border shadow-xl w-full max-w-sm p-6 text-center animate-slide-up space-y-4">
             <div className="mx-auto w-16 h-16 rounded-full bg-green-50 border border-green-200 flex items-center justify-center text-green-600">
               <CheckCircle2 className="w-9 h-9" />

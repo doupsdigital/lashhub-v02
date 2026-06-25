@@ -1,4 +1,5 @@
 import { AlertTriangle, Trash2, CheckCircle2, X } from 'lucide-react';
+import Modal from './Modal';
 
 interface ConfirmModalProps {
   isOpen: boolean;
@@ -66,6 +67,7 @@ export default function ConfirmModal({
   };
 
   return (
+    <Modal>
     <div className="fixed inset-0 bg-black/45 backdrop-blur-sm z-[70] flex items-center justify-center p-4 overflow-y-auto animate-fade-in">
       <div 
         className="bg-white rounded-[14px] border border-border shadow-xl w-full max-w-sm overflow-hidden p-6 flex flex-col items-center text-center animate-slide-up relative"
@@ -124,5 +126,6 @@ export default function ConfirmModal({
         </div>
       </div>
     </div>
+    </Modal>
   );
 }

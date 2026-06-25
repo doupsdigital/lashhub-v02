@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { X, Sparkles, Check, ChevronRight } from 'lucide-react';
+import Modal from './Modal';
 
 interface UpgradeModalProps {
   onClose: () => void;
@@ -9,6 +10,7 @@ export default function UpgradeModal({ onClose }: UpgradeModalProps) {
   const navigate = useNavigate();
 
   return (
+    <Modal>
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 animate-fade-in">
       <div className="bg-white rounded-2xl border border-rose-100 shadow-2xl w-full max-w-md overflow-hidden animate-slide-up relative">
         {/* Background decorative gradients */}
@@ -83,5 +85,6 @@ export default function UpgradeModal({ onClose }: UpgradeModalProps) {
         </div>
       </div>
     </div>
+    </Modal>
   );
 }

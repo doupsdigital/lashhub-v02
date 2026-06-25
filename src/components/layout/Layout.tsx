@@ -62,7 +62,7 @@ export default function Layout() {
       {/* Main Content Area */}
       <div
         className={`
-          flex-1 flex flex-col min-w-0 transition-all duration-300 ease-in-out
+          flex-1 flex flex-col min-w-0 transition-[padding-left] duration-300 ease-in-out
           ${collapsed ? 'md:pl-[64px]' : 'md:pl-[220px]'}
         `}
       >

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useOnboarding } from '../../hooks/useOnboarding';
@@ -571,8 +572,7 @@ export default function Clientes() {
       )}
 
       {/* CREATE MODAL */}
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-black/45 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto animate-fade-in">
+      {isModalOpen && createPortal(<div className="fixed inset-0 bg-black/45 backdrop-blur-sm z-[200] flex items-center justify-center p-4 overflow-y-auto animate-fade-in">
           <div className="bg-white rounded-[14px] border border-border shadow-xl w-full max-w-lg flex flex-col max-h-[calc(100vh-2rem)] overflow-hidden my-8 animate-slide-up">
             <div className="px-6 py-4 border-b border-border flex items-center justify-between bg-rose-50/10 flex-shrink-0">
               <h4 className="font-title font-semibold text-lg text-text-primary flex items-center gap-2">
@@ -724,12 +724,10 @@ export default function Clientes() {
               </div>
             </form>
           </div>
-        </div>
-      )}
+        </div>, document.body)}
 
       {/* DELETE CONFIRMATION MODAL */}
-      {clientToDelete && (
-        <div className="fixed inset-0 bg-black/45 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto animate-fade-in">
+      {clientToDelete && (<div className="fixed inset-0 bg-black/45 backdrop-blur-sm z-[200] flex items-center justify-center p-4 overflow-y-auto animate-fade-in">
           <div className="bg-white rounded-[14px] border border-border shadow-xl w-full max-w-md flex flex-col p-6 animate-scale-in">
             <div className="flex items-start gap-4">
               <div className="w-10 h-10 rounded-full bg-red-50 border border-red-200 text-red-600 flex items-center justify-center flex-shrink-0">
@@ -769,8 +767,7 @@ export default function Clientes() {
       )}
 
       {/* SUCCESS CONFIRMATION MODAL */}
-      {successClient && (
-        <div className="fixed inset-0 bg-black/45 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto animate-fade-in">
+      {successClient && (<div className="fixed inset-0 bg-black/45 backdrop-blur-sm z-[200] flex items-center justify-center p-4 overflow-y-auto animate-fade-in">
           <div className="bg-white rounded-[14px] border border-border shadow-xl w-full max-w-sm p-6 text-center animate-slide-up space-y-4">
             
             {/* Animated Check Icon */}
