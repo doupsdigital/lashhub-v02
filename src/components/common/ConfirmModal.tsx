@@ -59,7 +59,7 @@ export default function ConfirmModal({
       case 'warning':
         return 'bg-amber-600 hover:bg-amber-800 text-white';
       case 'success':
-        return 'bg-green-600 hover:bg-green-800 text-white';
+        return 'bg-rose-600 hover:bg-rose-800 text-white';
       case 'danger':
       default:
         return 'bg-rose-600 hover:bg-rose-800 text-white'; // Uses Rose theme color for deletes
