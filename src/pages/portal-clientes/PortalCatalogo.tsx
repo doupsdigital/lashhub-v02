@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useOnboarding } from '../../hooks/useOnboarding';
+import { useAuth } from '../../contexts/AuthContext';
 import { Clock, Tag, Calendar, AlertCircle, Sparkles, RefreshCw, MessageSquare, ChevronDown, HelpCircle, MapPin, AtSign } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import type { CategoriaServico, Servico, VariacaoServico } from '../../types';
@@ -194,8 +195,10 @@ function ServicoCard({ servico, onAgendar, isBasico, nomeNegocio, telefoneProfis
 
 export default function PortalCatalogo() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { establishmentId, slug, plano, nomeNegocio, logoUrl, descricao, instagram, endereco, telefoneProfissional } = usePortal();
-  const { autoStart, loading: onboardingLoading } = useOnboarding('portal_catalogo', { studioName: nomeNegocio });
+  const catalogoKey = user ? 'portal_catalogo' : 'portal_catalogo_anonimo';
+  const { autoStart, loading: onboardingLoading } = useOnboarding(catalogoKey, { studioName: nomeNegocio });
   useEffect(() => { autoStart(); }, [onboardingLoading]); // eslint-disable-line react-hooks/exhaustive-deps
   const [categorias, setCategorias] = useState<CategoriaComServicos[]>([]);
   const [loading, setLoading] = useState(true);

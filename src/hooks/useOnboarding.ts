@@ -12,6 +12,7 @@ export type OnboardingPageKey =
   | 'link_agendamento'
   | 'configuracoes'
   | 'portal_catalogo'
+  | 'portal_catalogo_anonimo'
   | 'portal_agendar'
   | 'portal_agendamentos'
   | 'portal_perfil';
@@ -337,6 +338,45 @@ const STEPS: Record<OnboardingPageKey, DriveStep[]> = {
       popover: {
         title: 'Navegação',
         description: 'Pelo menu você acessa o catálogo, agenda um horário, vê seus agendamentos e atualiza seu perfil.',
+      },
+    },
+  ],
+
+  portal_catalogo_anonimo: [
+    {
+      popover: {
+        title: 'Bem-vinda ao portal! 👋',
+        description: 'Aqui você encontra todos os serviços disponíveis com preços e duração. Para agendar, é só criar uma conta gratuita — leva menos de 1 minuto!',
+        side: 'over' as any, align: 'center',
+      },
+    },
+    {
+      element: '#ob-portal-filtros',
+      popover: {
+        title: 'Filtrar por categoria',
+        description: 'Use esses botões para ver só os serviços de uma categoria específica — como extensão de cílios ou design de sobrancelhas.',
+      },
+    },
+    {
+      element: '#ob-portal-servicos-grid',
+      popover: {
+        title: 'Catálogo de serviços',
+        description: 'Cada card mostra o serviço com foto, preço e duração. Clique em "Agendar" no serviço que te interessar — você será direcionada para entrar ou criar sua conta.',
+      },
+    },
+    {
+      element: '#ob-portal-entrar',
+      popover: {
+        title: 'Entrar ou se cadastrar',
+        description: 'Clique aqui para acessar o portal. Se for sua primeira vez, clique em "Cadastre-se aqui" na próxima tela para criar seu acesso gratuito. Se já tem conta, basta digitar e-mail e senha.',
+        side: 'bottom' as any, align: 'end',
+      },
+    },
+    {
+      element: '#ob-portal-nav',
+      popover: {
+        title: 'Menu do portal',
+        description: 'Por enquanto só o Catálogo está disponível. Após entrar com sua conta, você verá também: Agendar, Meus Agendamentos e Meu Perfil.',
       },
     },
   ],

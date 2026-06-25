@@ -113,6 +113,7 @@ export default function PortalLayout() {
             </>
           ) : (
             <Link
+              id="ob-portal-entrar"
               to={`/portal/${slug}/login`}
               className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-white bg-rose-600 hover:bg-rose-800 rounded-xl transition-all shadow-md cursor-pointer"
             >

@@ -1,9 +1,10 @@
 import { useLocation } from 'react-router-dom';
 import { HelpCircle } from 'lucide-react';
 import { useOnboarding, type OnboardingPageKey } from '../../hooks/useOnboarding';
+import { useAuth } from '../../contexts/AuthContext';
 
-function getPortalPageKey(pathname: string): OnboardingPageKey | null {
-  if (pathname.endsWith('/catalogo')) return 'portal_catalogo';
+function getPortalPageKey(pathname: string, isLoggedIn: boolean): OnboardingPageKey | null {
+  if (pathname.endsWith('/catalogo')) return isLoggedIn ? 'portal_catalogo' : 'portal_catalogo_anonimo';
   if (pathname.endsWith('/agendar') || pathname.includes('/agendar?')) return 'portal_agendar';
   if (pathname.endsWith('/meus-agendamentos')) return 'portal_agendamentos';
   if (pathname.endsWith('/perfil')) return 'portal_perfil';
@@ -26,7 +27,8 @@ function HelpButtonInner({ pageKey }: { pageKey: OnboardingPageKey }) {
 
 export default function PortalFloatingHelpButton() {
   const { pathname } = useLocation();
-  const pageKey = getPortalPageKey(pathname);
+  const { user } = useAuth();
+  const pageKey = getPortalPageKey(pathname, !!user);
   if (!pageKey) return null;
   return <HelpButtonInner pageKey={pageKey} />;
 }

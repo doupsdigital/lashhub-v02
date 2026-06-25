@@ -42,6 +42,7 @@ Os dados contemplam todos os campos do sistema: **Nome, Sobrenome, WhatsApp, E-m
 ## 👤 2. Estúdio: **Amanda Sobrancelhas Studio** (Profissional: Amanda Santos)
 * **Tema:** Nude Clássico | **Agendamento:** Aprovação Manual
 * **Foco:** Micropigmentação, Design de Sobrancelhas e Brow Lamination.
+email: amanda.santos@lashhub.com
 
 ### Lista de Clientes para Cadastro
 
