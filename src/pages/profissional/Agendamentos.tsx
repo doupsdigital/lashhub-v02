@@ -1392,7 +1392,7 @@ export default function Agendamentos() {
                         </p>
                       )}
                       {/* Linha 3: Duração e Status */}
-                      {height >= 45 && (
+                      {height >= 60 && (
                         <div className="flex items-center justify-between mt-auto w-full text-[10px]">
                           {height >= 70 ? (
                             <p className="text-[10px] opacity-50 font-medium leading-none">
