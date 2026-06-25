@@ -471,7 +471,7 @@ export default function PortalAgendar() {
         throw err;
       }
 
-      setMensagemPos(msg);
+      setMensagemPos(aprovAuto ? 'Seu agendamento foi confirmado!' : msg);
       setFoiConfirmado(aprovAuto);
       setEtapa('sucesso');
     } catch (err: unknown) {
@@ -527,7 +527,7 @@ export default function PortalAgendar() {
           <h2 className="font-title text-2xl font-bold text-text-primary">{mensagemPos}</h2>
           <p className={`text-sm font-medium ${foiConfirmado ? 'text-green-600' : 'text-amber-600'}`}>
             {foiConfirmado
-              ? 'Seu agendamento está confirmado!'
+              ? 'Acompanhe os detalhes em Meus Agendamentos.'
               : 'Seu agendamento está pendente de confirmação.'}
           </p>
         </div>
