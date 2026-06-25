@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
@@ -1155,7 +1156,7 @@ export default function PerfilCliente() {
       </div>
 
       {/* REGISTRAR ATENDIMENTO MODAL */}
-      {isAtendimentoModalOpen && (<div className="fixed inset-0 bg-black/45 backdrop-blur-sm z-[200] flex items-center justify-center p-4 overflow-y-auto animate-fade-in">
+      {isAtendimentoModalOpen && createPortal(<div className="fixed inset-0 bg-black/45 backdrop-blur-sm z-[200] flex items-center justify-center p-4 overflow-y-auto animate-fade-in">
           <div className="bg-white rounded-[14px] border border-border shadow-xl w-full max-w-lg flex flex-col max-h-[calc(100vh-2rem)] overflow-hidden my-8 animate-slide-up">
             <div className="px-6 py-4 border-b border-border flex items-center justify-between bg-rose-50/10 flex-shrink-0">
               <h4 className="font-title font-semibold text-lg text-text-primary flex items-center gap-2">
@@ -1273,8 +1274,7 @@ export default function PerfilCliente() {
               </div>
             </form>
           </div>
-        </div>
-      )}
+        </div>, document.body)}
     </div>
   );
 }

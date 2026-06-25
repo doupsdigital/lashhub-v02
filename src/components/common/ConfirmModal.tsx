@@ -68,7 +68,7 @@ export default function ConfirmModal({
 
   return (
     <Modal>
-    <div className="fixed inset-0 bg-black/45 backdrop-blur-sm z-[70] flex items-center justify-center p-4 overflow-y-auto animate-fade-in">
+    <div className="fixed inset-0 bg-black/45 backdrop-blur-sm z-[300] flex items-center justify-center p-4 overflow-y-auto animate-fade-in">
       <div 
         className="bg-white rounded-[14px] border border-border shadow-xl w-full max-w-sm overflow-hidden p-6 flex flex-col items-center text-center animate-slide-up relative"
         onClick={(e) => e.stopPropagation()}
