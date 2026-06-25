@@ -727,7 +727,7 @@ export default function Clientes() {
         </div>, document.body)}
 
       {/* DELETE CONFIRMATION MODAL */}
-      {clientToDelete && (<div className="fixed inset-0 bg-black/45 backdrop-blur-sm z-[200] flex items-center justify-center p-4 overflow-y-auto animate-fade-in">
+      {clientToDelete && createPortal(<div className="fixed inset-0 bg-black/45 backdrop-blur-sm z-[200] flex items-center justify-center p-4 overflow-y-auto animate-fade-in">
           <div className="bg-white rounded-[14px] border border-border shadow-xl w-full max-w-md flex flex-col p-6 animate-scale-in">
             <div className="flex items-start gap-4">
               <div className="w-10 h-10 rounded-full bg-red-50 border border-red-200 text-red-600 flex items-center justify-center flex-shrink-0">
@@ -763,11 +763,10 @@ export default function Clientes() {
               </button>
             </div>
           </div>
-        </div>
-      )}
+        </div>, document.body)}
 
       {/* SUCCESS CONFIRMATION MODAL */}
-      {successClient && (<div className="fixed inset-0 bg-black/45 backdrop-blur-sm z-[200] flex items-center justify-center p-4 overflow-y-auto animate-fade-in">
+      {successClient && createPortal(<div className="fixed inset-0 bg-black/45 backdrop-blur-sm z-[200] flex items-center justify-center p-4 overflow-y-auto animate-fade-in">
           <div className="bg-white rounded-[14px] border border-border shadow-xl w-full max-w-sm p-6 text-center animate-slide-up space-y-4">
             
             {/* Animated Check Icon */}
@@ -814,8 +813,7 @@ export default function Clientes() {
             </div>
 
           </div>
-        </div>
-      )}
+        </div>, document.body)}
     </div>
   );
 }
