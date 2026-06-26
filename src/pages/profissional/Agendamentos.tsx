@@ -2159,10 +2159,10 @@ export default function Agendamentos() {
       {/* Approve Modal */}
       {approveModalAppt && createPortal(
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-slide-up">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-slide-up max-h-[90vh] flex flex-col">
 
             {/* Header rose */}
-            <div className="bg-gradient-to-br from-rose-600 to-rose-500 px-6 pt-5 pb-5">
+            <div className="bg-gradient-to-br from-rose-600 to-rose-500 px-6 pt-3.5 pb-3.5 flex-shrink-0">
               <div className="flex items-start justify-between">
                 <h3 className="font-title font-bold text-lg text-white">Confirmar agendamento</h3>
                 <button onClick={() => setApproveModalAppt(null)} className="text-rose-200 hover:text-white cursor-pointer mt-0.5">
@@ -2172,7 +2172,7 @@ export default function Agendamentos() {
             </div>
 
             {/* Content */}
-            <div className="p-6 space-y-4">
+            <div className="p-6 space-y-4 overflow-y-auto">
               <div className="bg-rose-50 border border-rose-100 rounded-xl px-4 py-4 space-y-3">
                 <div>
                   <p className="text-[10px] font-bold uppercase tracking-wider text-rose-400">Cliente</p>
