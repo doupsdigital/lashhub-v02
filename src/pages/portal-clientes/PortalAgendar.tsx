@@ -893,8 +893,7 @@ export default function PortalAgendar() {
       )}
 
       {/* ─── BARRA DE AÇÃO FIXA ───────────────────────────────────────────────── */}
-      {etapa !== 'sucesso' && (
-        <div
+      <div
           className="fixed left-0 right-0 z-20 bg-white border-t border-border flex items-center justify-between gap-3 px-4"
           style={{
             bottom: 'calc(60px + env(safe-area-inset-bottom, 0px))',
@@ -952,7 +951,6 @@ export default function PortalAgendar() {
             </button>
           )}
         </div>
-      )}
     </div>
   );
 }
