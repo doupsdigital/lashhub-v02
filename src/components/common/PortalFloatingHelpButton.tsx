@@ -2,6 +2,7 @@ import { useLocation } from 'react-router-dom';
 import { HelpCircle } from 'lucide-react';
 import { useOnboarding, type OnboardingPageKey } from '../../hooks/useOnboarding';
 import { useAuth } from '../../contexts/AuthContext';
+import { usePortal } from '../../contexts/PortalContext';
 
 function getPortalPageKey(pathname: string, isLoggedIn: boolean): OnboardingPageKey | null {
   if (pathname.endsWith('/catalogo')) return isLoggedIn ? 'portal_catalogo' : 'portal_catalogo_anonimo';
@@ -11,8 +12,8 @@ function getPortalPageKey(pathname: string, isLoggedIn: boolean): OnboardingPage
   return null;
 }
 
-function HelpButtonInner({ pageKey }: { pageKey: OnboardingPageKey }) {
-  const { startTour } = useOnboarding(pageKey);
+function HelpButtonInner({ pageKey, studioName }: { pageKey: OnboardingPageKey; studioName?: string | null }) {
+  const { startTour } = useOnboarding(pageKey, { studioName });
   return (
     <button
       onClick={startTour}
@@ -28,7 +29,8 @@ function HelpButtonInner({ pageKey }: { pageKey: OnboardingPageKey }) {
 export default function PortalFloatingHelpButton() {
   const { pathname } = useLocation();
   const { user } = useAuth();
+  const { nomeNegocio } = usePortal();
   const pageKey = getPortalPageKey(pathname, !!user);
   if (!pageKey) return null;
-  return <HelpButtonInner pageKey={pageKey} />;
+  return <HelpButtonInner pageKey={pageKey} studioName={nomeNegocio} />;
 }
