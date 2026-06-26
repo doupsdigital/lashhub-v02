@@ -189,19 +189,22 @@ export default function Agendamentos() {
     setTimeout(() => setSuccessMessage(null), 4000);
   };
 
-  const showSuccessFeedback = (appt: { data_hora: string; cliente?: { nome: string; sobrenome?: string | null; whatsapp?: string | null } | null; agendamento_servicos?: { servico?: { nome: string } }[] }, isNew: boolean) => {
+  const showSuccessFeedback = (appt: { data_hora: string; cliente?: { nome: string; sobrenome?: string | null; whatsapp?: string | null } | null; agendamento_servicos?: { servico?: { nome: string } }[] }, isNew: boolean, externalWhatsappLink?: string) => {
     const clientName = appt.cliente ? `${appt.cliente.nome} ${appt.cliente.sobrenome || ''}`.trim() : 'Cliente';
     const dateObj = new Date(appt.data_hora);
     const dateStr = dateObj.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
     const timeStr = dateObj.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
     const servicesList = appt.agendamento_servicos?.map(s => s.servico?.nome).join(', ') || 'Procedimento';
 
-    // Format phone for WhatsApp: only numbers
-    const phoneDigits = appt.cliente?.whatsapp ? appt.cliente.whatsapp.replace(/\D/g, '') : '';
-    
-    // Construct WhatsApp message
-    const message = `Olá, ${appt.cliente?.nome || 'cliente'}! Seu agendamento para *${servicesList}* no dia *${dateStr}* às *${timeStr}* está confirmado. Te aguardamos! \u{1F497}`;
-    const whatsappLink = phoneDigits ? `https://api.whatsapp.com/send?phone=55${phoneDigits}&text=${encodeURIComponent(message)}` : undefined;
+    // Se vier um link externo (ex: do fluxo de aprovação), usa ele; senão monta um genérico
+    let whatsappLink = externalWhatsappLink;
+    if (!whatsappLink) {
+      const phoneDigits = appt.cliente?.whatsapp ? appt.cliente.whatsapp.replace(/\D/g, '') : '';
+      if (phoneDigits) {
+        const message = `Olá, ${appt.cliente?.nome || 'cliente'}! Seu agendamento para *${servicesList}* no dia *${dateStr}* às *${timeStr}* está confirmado. Te aguardamos! \u{1F497}`;
+        whatsappLink = `https://wa.me/55${phoneDigits}?text=${encodeURIComponent(message)}`;
+      }
+    }
 
     setSuccessModal({
       isOpen: true,
@@ -734,7 +737,7 @@ export default function Agendamentos() {
       const motivoLinha = motivo?.trim() ? `\n\n_${motivo.trim()}_` : '';
       msg = `Olá ${firstName}! Infelizmente precisamos recusar seu agendamento de *${dateStr} às ${timeStr}*.${motivoLinha}\n\nEntre em contato para reagendarmos. \u{1F497}`;
     }
-    window.open(`https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(msg)}`, '_blank');
+    return `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
   };
 
   const handleOpenRejectModal = (appt: AgendamentoWithRelations) => {
@@ -758,7 +761,7 @@ export default function Agendamentos() {
       setRejectModalAppt(null);
       setIsDetailOpen(false);
       fetchAppointments();
-      if (sendWhatsApp) openWhatsApp(appt, 'recusado', rejectMotivo);
+      const waLink = sendWhatsApp ? openWhatsApp(appt, 'recusado', rejectMotivo) : undefined;
       const dateObj = new Date(appt.data_hora);
       setSuccessModal({
         isOpen: true,
@@ -767,7 +770,7 @@ export default function Agendamentos() {
         services: appt.agendamento_servicos?.map(s => s.servico?.nome).join(', ') || '—',
         dateStr: dateObj.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' }),
         timeStr: dateObj.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
-        whatsappLink: undefined,
+        whatsappLink: waLink,
       });
     } catch (err) {
       console.error(err);
@@ -796,9 +799,9 @@ export default function Agendamentos() {
       await registrarLog('editou', 'agendamento', appt.id, `Confirmou agendamento de "${clientName}"`);
       setApproveModalAppt(null);
       setIsDetailOpen(false);
-      showSuccessFeedback(appt, false);
+      const waLink = sendWhatsApp ? openWhatsApp(appt, 'aprovado') : undefined;
+      showSuccessFeedback(appt, false, waLink);
       fetchAppointments();
-      if (sendWhatsApp) openWhatsApp(appt, 'aprovado');
     } catch (err) {
       console.error(err);
       showTemporaryError('Falha ao confirmar agendamento.');
@@ -2118,6 +2121,21 @@ export default function Agendamentos() {
                   <span className="font-semibold text-text-primary">{successModal.timeStr}</span>
                 </div>
               </div>
+
+              {successModal.whatsappLink && (
+                <a
+                  href={successModal.whatsappLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full py-2.5 rounded-lg text-xs font-semibold bg-green-500 hover:bg-green-600 text-white flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                >
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+                    <path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.126 1.534 5.856L0 24l6.335-1.51A11.955 11.955 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 0 1-5.006-1.372l-.36-.214-3.726.888.929-3.618-.235-.372A9.818 9.818 0 0 1 2.182 12C2.182 6.57 6.57 2.182 12 2.182S21.818 6.57 21.818 12 17.43 21.818 12 21.818z"/>
+                  </svg>
+                  Notificar pelo WhatsApp
+                </a>
+              )}
 
               <button
                 type="button"
