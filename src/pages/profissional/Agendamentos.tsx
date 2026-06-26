@@ -888,6 +888,10 @@ export default function Agendamentos() {
       cancelText: 'Voltar',
       type: 'warning',
       onConfirm: async () => {
+        // Abre WhatsApp ANTES de qualquer await para manter contexto de gesto (iOS)
+        const waUrl = appt.status === 'pendente' ? openWhatsApp(appt, 'recusado') : undefined;
+        if (waUrl) window.open(waUrl, '_blank');
+
         try {
           const { error } = await supabase
             .from('agendamentos')
@@ -907,7 +911,6 @@ export default function Agendamentos() {
           setIsDetailOpen(false);
           showTemporarySuccess(`Agendamento cancelado!`);
           fetchAppointments();
-          if (appt.status === 'pendente') openWhatsApp(appt, 'recusado');
         } catch (err) {
           console.error(err);
           showTemporaryError(`Falha ao alterar status do agendamento.`);
