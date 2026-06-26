@@ -90,7 +90,13 @@ export function PortalProvider({ children }: { children: React.ReactNode }) {
         if (!profError && profData) {
           setNomeProfissional(profData.nome);
           setTelefoneProfissional(profData.telefone || null);
+        } else if (profError) {
+          // Erro na RPC (rede, permissão, etc.) — loga para diagnóstico
+          console.error('[PortalContext] Erro ao buscar dados da profissional:', profError.message);
+          setNomeProfissional(null);
+          setTelefoneProfissional(null);
         } else {
+          // Sem erro e sem dados — profissional não encontrada para este estabelecimento
           setNomeProfissional(null);
           setTelefoneProfissional(null);
         }
