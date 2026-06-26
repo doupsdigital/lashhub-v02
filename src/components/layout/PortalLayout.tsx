@@ -185,9 +185,15 @@ export default function PortalLayout() {
           href={`https://wa.me/55${telefoneProfissional.replace(/\D/g, '')}?text=${encodeURIComponent('Olá! Vi seu catálogo e gostaria de mais informações.')}`}
           target="_blank"
           rel="noopener noreferrer"
-          className={`fixed ${installBannerVisible ? 'bottom-36' : 'bottom-20'} md:bottom-6 right-4 z-40 bg-green-500 hover:bg-green-600 text-white rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-110 active:scale-95`}
+          className="fixed right-4 z-40 bg-green-500 hover:bg-green-600 text-white rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-110 active:scale-95 md:bottom-6"
           title="Falar no WhatsApp"
-          style={{ width: '52px', height: '52px' }}
+          style={{
+            width: '52px',
+            height: '52px',
+            bottom: installBannerVisible
+              ? 'calc(9rem + env(safe-area-inset-bottom, 0px))'
+              : 'calc(5rem + env(safe-area-inset-bottom, 0px))',
+          }}
         >
           <MessageCircle className="w-6 h-6" />
         </a>

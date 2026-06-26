@@ -18,7 +18,11 @@ function HelpButtonInner({ pageKey, studioName, bannerVisible }: { pageKey: Onbo
     <button
       onClick={startTour}
       title="Ajuda — ver tutorial desta tela"
-      className={`fixed ${bannerVisible ? 'bottom-52' : 'bottom-36'} md:bottom-20 right-4 z-50 flex items-center gap-1.5 px-3 py-2 bg-white border border-border rounded-full shadow-md text-text-secondary hover:text-rose-600 hover:border-rose-300 text-xs font-medium transition-all hover:shadow-lg cursor-pointer`}
+      className="fixed right-4 z-50 flex items-center gap-1.5 px-3 py-2 bg-white border border-border rounded-full shadow-md text-text-secondary hover:text-rose-600 hover:border-rose-300 text-xs font-medium transition-all hover:shadow-lg cursor-pointer md:bottom-20"
+      style={{ bottom: bannerVisible
+        ? 'calc(13rem + env(safe-area-inset-bottom, 0px))'
+        : 'calc(9rem + env(safe-area-inset-bottom, 0px))'
+      }}
     >
       <HelpCircle className="w-4 h-4" />
       <span>Ajuda</span>
