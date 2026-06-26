@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { User, Phone, Mail, Lock, ShieldAlert, Loader2, CheckCircle2, AlertCircle, Camera, Trash2 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
+import InstallAppCard from '../../components/common/InstallAppCard';
 import { useOnboarding } from '../../hooks/useOnboarding';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -530,6 +531,8 @@ export default function PortalPerfil() {
           </div>
         </form>
       </section>
+
+      <InstallAppCard />
 
       {/* AVISO DE PRIVACIDADE EXCLUSIVO DO PORTAL */}
       <div className="flex items-start gap-2.5 p-4 bg-rose-50/30 border border-rose-100 rounded-xl text-xs text-text-secondary leading-relaxed">

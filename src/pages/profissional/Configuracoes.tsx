@@ -5,6 +5,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useOnboarding } from '../../hooks/useOnboarding';
 import { PALETTES_LIST, applyPalette } from '../../utils/theme';
 import ConfirmModal from '../../components/common/ConfirmModal';
+import InstallAppCard from '../../components/common/InstallAppCard';
 import {
   Camera,
   Trash2,
@@ -1148,6 +1149,8 @@ export default function Configuracoes() {
           </button>
         </div>
       </div>
+
+      <InstallAppCard />
 
       <ConfirmModal
         isOpen={successModal.isOpen}
