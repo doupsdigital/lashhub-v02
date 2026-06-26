@@ -519,7 +519,7 @@ export default function PortalAgendar() {
 
   if (etapa === 'sucesso') {
     return (
-      <div className="flex flex-col items-center justify-center py-16 text-center gap-5 max-w-md mx-auto">
+      <div className="flex flex-col items-center justify-center text-center gap-5 max-w-md mx-auto w-full" style={{ minHeight: 'calc(100svh - 9rem)' }}>
         <div className="w-16 h-16 rounded-full bg-rose-100 flex items-center justify-center">
           <Heart className="w-8 h-8 text-rose-600 fill-rose-600" />
         </div>
