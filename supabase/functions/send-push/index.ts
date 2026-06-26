@@ -78,7 +78,7 @@ serve(async (req) => {
     });
 
     const results = await Promise.allSettled(
-      subs.map(sub =>
+      subs.map((sub: any) =>
         webpush.sendNotification(
           { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
           payload,
@@ -86,13 +86,30 @@ serve(async (req) => {
       )
     );
 
-    results.forEach((r, i) => {
+    const invalidEndpoints: string[] = [];
+    results.forEach((r: any, i: number) => {
       if (r.status === 'rejected') {
-        console.error(`Push falhou para subscription ${i}:`, r.reason);
+        const statusCode = r.reason?.statusCode;
+        console.error(`Push falhou para subscription ${i} (status ${statusCode}):`, r.reason?.message);
+        if (statusCode === 410 || statusCode === 404) {
+          invalidEndpoints.push(subs[i].endpoint);
+        }
       } else {
         console.log(`Push enviado para subscription ${i}: status ${r.value.statusCode}`);
       }
     });
+
+    if (invalidEndpoints.length > 0) {
+      const { error: deleteError } = await supabase
+        .from('push_subscriptions')
+        .delete()
+        .in('endpoint', invalidEndpoints);
+      if (deleteError) {
+        console.error('Erro ao remover subscriptions inválidas:', deleteError.message);
+      } else {
+        console.log(`${invalidEndpoints.length} subscription(s) inválida(s) removida(s).`);
+      }
+    }
 
     return new Response('enviado', { status: 200 });
   } catch (err) {
