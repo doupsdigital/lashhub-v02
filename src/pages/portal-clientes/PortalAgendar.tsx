@@ -942,7 +942,6 @@ export default function PortalAgendar() {
               Continuar
             </button>
           )}
-          {etapa === 2 && <div />}
           {etapa === 3 && slots.length > 0 && (
             <button
               disabled={!horarioSelecionado}
