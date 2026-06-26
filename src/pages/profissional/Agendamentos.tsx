@@ -2164,14 +2164,7 @@ export default function Agendamentos() {
             {/* Header rose */}
             <div className="bg-gradient-to-br from-rose-600 to-rose-500 px-6 pt-5 pb-5">
               <div className="flex items-start justify-between">
-                <div>
-                  <h3 className="font-title font-bold text-lg text-white">Confirmar agendamento</h3>
-                  <p className="text-rose-100 text-sm mt-0.5">
-                    {approveModalAppt.cliente?.nome} {approveModalAppt.cliente?.sobrenome} —{' '}
-                    {new Date(approveModalAppt.data_hora).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long' })} às{' '}
-                    {new Date(approveModalAppt.data_hora).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
-                  </p>
-                </div>
+                <h3 className="font-title font-bold text-lg text-white">Confirmar agendamento</h3>
                 <button onClick={() => setApproveModalAppt(null)} className="text-rose-200 hover:text-white cursor-pointer mt-0.5">
                   <X className="w-5 h-5" />
                 </button>
@@ -2180,12 +2173,22 @@ export default function Agendamentos() {
 
             {/* Content */}
             <div className="p-6 space-y-4">
-              <div className="bg-rose-50 border border-rose-100 rounded-xl px-4 py-3 text-sm text-rose-900 space-y-1">
-                <p className="text-[10px] font-bold uppercase tracking-wider text-rose-400">Serviço(s)</p>
-                <p className="font-semibold">{approveModalAppt.agendamento_servicos?.map(s => s.servico?.nome).filter(Boolean).join(', ') || '—'}</p>
-                {approveModalAppt.observacoes && (
-                  <p className="text-rose-700 italic text-xs mt-1">"{approveModalAppt.observacoes}"</p>
-                )}
+              <div className="bg-rose-50 border border-rose-100 rounded-xl px-4 py-4 space-y-3">
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-rose-400">Cliente</p>
+                  <p className="font-semibold text-sm text-rose-900 mt-0.5">
+                    {approveModalAppt.cliente?.nome} {approveModalAppt.cliente?.sobrenome} —{' '}
+                    {new Date(approveModalAppt.data_hora).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long' })} às{' '}
+                    {new Date(approveModalAppt.data_hora).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                  </p>
+                </div>
+                <div className="border-t border-rose-100 pt-3">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-rose-400">Serviço(s)</p>
+                  <p className="font-semibold text-sm text-rose-900 mt-0.5">{approveModalAppt.agendamento_servicos?.map(s => s.servico?.nome).filter(Boolean).join(', ') || '—'}</p>
+                  {approveModalAppt.observacoes && (
+                    <p className="text-rose-700 italic text-xs mt-1">"{approveModalAppt.observacoes}"</p>
+                  )}
+                </div>
               </div>
 
               <div className="flex flex-col gap-2">
