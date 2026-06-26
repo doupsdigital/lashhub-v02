@@ -13,7 +13,7 @@ interface InstallPromptContextType {
 
 const InstallPromptContext = createContext<InstallPromptContextType>({
   deferredPrompt: null,
-  triggerInstall: async () => {},
+  triggerInstall: async () => 'unavailable',
 });
 
 export function InstallPromptProvider({ children }: { children: ReactNode }) {
