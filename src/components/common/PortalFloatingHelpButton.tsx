@@ -12,13 +12,13 @@ function getPortalPageKey(pathname: string, isLoggedIn: boolean): OnboardingPage
   return null;
 }
 
-function HelpButtonInner({ pageKey, studioName }: { pageKey: OnboardingPageKey; studioName?: string | null }) {
+function HelpButtonInner({ pageKey, studioName, bannerVisible }: { pageKey: OnboardingPageKey; studioName?: string | null; bannerVisible?: boolean }) {
   const { startTour } = useOnboarding(pageKey, { studioName });
   return (
     <button
       onClick={startTour}
       title="Ajuda — ver tutorial desta tela"
-      className="fixed bottom-36 md:bottom-20 right-4 z-50 flex items-center gap-1.5 px-3 py-2 bg-white border border-border rounded-full shadow-md text-text-secondary hover:text-rose-600 hover:border-rose-300 text-xs font-medium transition-all hover:shadow-lg cursor-pointer"
+      className={`fixed ${bannerVisible ? 'bottom-52' : 'bottom-36'} md:bottom-20 right-4 z-50 flex items-center gap-1.5 px-3 py-2 bg-white border border-border rounded-full shadow-md text-text-secondary hover:text-rose-600 hover:border-rose-300 text-xs font-medium transition-all hover:shadow-lg cursor-pointer`}
     >
       <HelpCircle className="w-4 h-4" />
       <span>Ajuda</span>
@@ -26,11 +26,11 @@ function HelpButtonInner({ pageKey, studioName }: { pageKey: OnboardingPageKey; 
   );
 }
 
-export default function PortalFloatingHelpButton() {
+export default function PortalFloatingHelpButton({ bannerVisible }: { bannerVisible?: boolean }) {
   const { pathname } = useLocation();
   const { user } = useAuth();
   const { nomeNegocio } = usePortal();
   const pageKey = getPortalPageKey(pathname, !!user);
   if (!pageKey) return null;
-  return <HelpButtonInner pageKey={pageKey} studioName={nomeNegocio} />;
+  return <HelpButtonInner pageKey={pageKey} studioName={nomeNegocio} bannerVisible={bannerVisible} />;
 }
