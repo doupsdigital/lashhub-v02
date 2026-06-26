@@ -56,6 +56,9 @@ export default function InstallBanner({ inline = false, onVisibilityChange }: In
       setVisible(true);
       onVisibilityChange?.(true);
     }
+
+    // Cleanup: notifica o pai quando o componente desmonta (ex: navegação para login)
+    return () => { onVisibilityChange?.(false); };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const dismiss = () => {
@@ -79,6 +82,10 @@ export default function InstallBanner({ inline = false, onVisibilityChange }: In
     const outcome = await triggerInstall();
     if (outcome === 'accepted') {
       setInstallState('installing');
+      // Fallback: se appinstalled não disparar em 30s, volta para idle e mostra o X
+      setTimeout(() => {
+        setInstallState(prev => prev === 'installing' ? 'idle' : prev);
+      }, 30000);
     } else {
       // Usuário cancelou o diálogo nativo — esconde só nesta sessão (sem snooze)
       setVisible(false);
