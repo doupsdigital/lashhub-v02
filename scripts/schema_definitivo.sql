@@ -775,7 +775,7 @@ CREATE EXTENSION IF NOT EXISTS pg_net;
 CREATE OR REPLACE FUNCTION public.notify_new_agendamento()
 RETURNS TRIGGER LANGUAGE plpgsql SECURITY DEFINER AS $$
 BEGIN
-  IF NEW.status = 'pendente' AND NEW.origem = 'portal' THEN
+  IF NEW.status IN ('pendente', 'confirmado') AND NEW.origem = 'portal' THEN
     PERFORM net.http_post(
       url     := 'https://vgolovxcrsxnpcecvoyi.supabase.co/functions/v1/send-push',
       headers := jsonb_build_object(

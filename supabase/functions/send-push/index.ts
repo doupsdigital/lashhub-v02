@@ -22,7 +22,8 @@ serve(async (req) => {
     const body = await req.json();
     const record = body.record;
 
-    if (!record || record.status !== 'pendente' || record.origem !== 'portal') {
+    const statusValidos = ['pendente', 'confirmado'];
+    if (!record || !statusValidos.includes(record.status) || record.origem !== 'portal') {
       return new Response('ignorado', { status: 200 });
     }
 
@@ -66,8 +67,12 @@ serve(async (req) => {
       ? `${nomeCliente} • ${nomeServicos} • ${dataHora}`
       : `${nomeCliente} agendou para ${dataHora}`;
 
+    const title = record.status === 'confirmado'
+      ? '✅ Novo agendamento confirmado!'
+      : '📅 Novo agendamento pendente!';
+
     const payload = JSON.stringify({
-      title: '📅 Novo agendamento!',
+      title,
       body: bodyText,
       url: '/agendamentos',
     });
