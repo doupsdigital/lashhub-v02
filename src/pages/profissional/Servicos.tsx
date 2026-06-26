@@ -671,10 +671,10 @@ export default function Servicos() {
                   {cat.servicos.map(serv => (
                     <div 
                       key={serv.id} 
-                      className={`px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-colors duration-150 hover:bg-bg/10 last:rounded-b-[14px] ${!serv.ativo ? 'opacity-50' : ''}`}
+                      className={`px-6 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-colors duration-150 hover:bg-bg/10 last:rounded-b-[14px] ${!serv.ativo ? 'opacity-50' : ''}`}
                     >
                       {/* Left: Info */}
-                      <div className="flex-1 min-w-0 space-y-1.5">
+                      <div className="flex-1 min-w-0 space-y-1">
                         <div className="flex items-center gap-2.5">
                           <p className="font-semibold text-text-primary text-base truncate">{serv.nome}</p>
                           {!serv.ativo && (
