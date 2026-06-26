@@ -747,6 +747,11 @@ export default function Agendamentos() {
 
   const handleRejectConfirm = async (sendWhatsApp: boolean) => {
     if (!rejectModalAppt) return;
+
+    // window.open ANTES de qualquer await — único jeito de funcionar no iOS Safari
+    const waUrl = sendWhatsApp ? openWhatsApp(rejectModalAppt, 'recusado', rejectMotivo) : undefined;
+    if (waUrl) window.open(waUrl, '_blank');
+
     setRejectSaving(true);
     const appt = rejectModalAppt;
     const clientName = appt.cliente ? `${appt.cliente.nome} ${appt.cliente.sobrenome}` : 'Cliente';
@@ -761,17 +766,7 @@ export default function Agendamentos() {
       setRejectModalAppt(null);
       setIsDetailOpen(false);
       fetchAppointments();
-      const waLink = sendWhatsApp ? openWhatsApp(appt, 'recusado', rejectMotivo) : undefined;
-      const dateObj = new Date(appt.data_hora);
-      setSuccessModal({
-        isOpen: true,
-        title: 'Agendamento Recusado',
-        clientName: appt.cliente ? `${appt.cliente.nome} ${appt.cliente.sobrenome || ''}`.trim() : 'Cliente',
-        services: appt.agendamento_servicos?.map(s => s.servico?.nome).join(', ') || '—',
-        dateStr: dateObj.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' }),
-        timeStr: dateObj.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
-        whatsappLink: waLink,
-      });
+      showSuccessFeedback(appt, false);
     } catch (err) {
       console.error(err);
       showTemporaryError('Falha ao recusar agendamento.');
@@ -2161,7 +2156,7 @@ export default function Agendamentos() {
 
       {/* Approve Modal */}
       {approveModalAppt && createPortal(
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-fade-in">
+        <div className="fixed inset-0 z-[250] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-fade-in">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-slide-up max-h-[90vh] flex flex-col">
 
             {/* Header rose */}
@@ -2226,7 +2221,7 @@ export default function Agendamentos() {
 
       {/* Reject Modal */}
       {rejectModalAppt && createPortal(
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[250] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 space-y-5">
             <div className="flex items-start justify-between">
               <div>
