@@ -518,6 +518,23 @@ $$;
 
 GRANT EXECUTE ON FUNCTION public.sync_cliente_email TO anon;
 
+-- Função RPC para leitura pública dos dados da profissional no portal.
+-- SECURITY DEFINER: contorna RLS (anon não tem SELECT em usuarios).
+CREATE OR REPLACE FUNCTION public.get_portal_profissional_info(p_estabelecimento_id UUID)
+RETURNS TABLE(nome TEXT, telefone TEXT)
+LANGUAGE sql STABLE
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT nome, telefone
+  FROM public.usuarios
+  WHERE estabelecimento_id = p_estabelecimento_id
+    AND role = 'profissional'
+  LIMIT 1;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.get_portal_profissional_info TO anon, authenticated;
+
 -- CATEGORIAS DE SERVIÇO
 CREATE POLICY "categorias_public_select"
   ON public.categorias_servico FOR SELECT TO anon, authenticated

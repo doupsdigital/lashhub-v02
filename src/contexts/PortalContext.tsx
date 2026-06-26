@@ -81,14 +81,11 @@ export function PortalProvider({ children }: { children: React.ReactNode }) {
           applyPalette('rosa_rose', false);
         }
 
-        // 3. Buscar nome e telefone da profissional
-        const { data: profData, error: profError } = await supabase
-          .from('usuarios')
-          .select('nome, telefone')
-          .eq('estabelecimento_id', est.id)
-          .eq('role', 'profissional')
-          .limit(1)
-          .maybeSingle();
+        // 3. Buscar nome e telefone da profissional via RPC (contorna RLS para anon)
+        const { data: profRows, error: profError } = await supabase
+          .rpc('get_portal_profissional_info', { p_estabelecimento_id: est.id });
+
+        const profData = profRows?.[0] ?? null;
 
         if (!profError && profData) {
           setNomeProfissional(profData.nome);
