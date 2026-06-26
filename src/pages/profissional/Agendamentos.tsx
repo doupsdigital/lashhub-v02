@@ -766,7 +766,16 @@ export default function Agendamentos() {
       setRejectModalAppt(null);
       setIsDetailOpen(false);
       fetchAppointments();
-      showSuccessFeedback(appt, false);
+      const dateObj = new Date(appt.data_hora);
+      setSuccessModal({
+        isOpen: true,
+        title: 'Agendamento Recusado',
+        clientName: clientName,
+        services: appt.agendamento_servicos?.map(s => s.servico?.nome).join(', ') || '—',
+        dateStr: dateObj.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' }),
+        timeStr: dateObj.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+        whatsappLink: undefined,
+      });
     } catch (err) {
       console.error(err);
       showTemporaryError('Falha ao recusar agendamento.');
