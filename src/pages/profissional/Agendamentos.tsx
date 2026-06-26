@@ -2221,63 +2221,73 @@ export default function Agendamentos() {
 
       {/* Reject Modal */}
       {rejectModalAppt && createPortal(
-        <div className="fixed inset-0 z-[250] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 space-y-5">
-            <div className="flex items-start justify-between">
-              <div>
-                <h3 className="font-title font-semibold text-lg text-text-primary">Recusar agendamento</h3>
-                <p className="text-sm text-text-secondary mt-0.5">
-                  {rejectModalAppt.cliente?.nome} {rejectModalAppt.cliente?.sobrenome} —{' '}
-                  {new Date(rejectModalAppt.data_hora).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long' })} às{' '}
-                  {new Date(rejectModalAppt.data_hora).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
-                </p>
-              </div>
-              <button onClick={() => setRejectModalAppt(null)} className="text-text-muted hover:text-text-primary cursor-pointer">
+        <div className="fixed inset-0 z-[250] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-slide-up max-h-[90vh] flex flex-col">
+
+            {/* Header rose */}
+            <div className="bg-gradient-to-br from-rose-600 to-rose-500 px-6 pt-3.5 pb-3.5 flex items-start justify-between flex-shrink-0">
+              <h3 className="font-title font-bold text-lg text-white">Recusar agendamento</h3>
+              <button onClick={() => setRejectModalAppt(null)} className="text-rose-200 hover:text-white cursor-pointer mt-0.5">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
-                Motivo <span className="font-normal normal-case text-text-muted">(opcional)</span>
-              </label>
-              <textarea
-                value={rejectMotivo}
-                onChange={e => setRejectMotivo(e.target.value)}
-                placeholder="Ex: Desculpe, não vou conseguir atender nesse horário :("
-                rows={3}
-                className="w-full border border-border rounded-lg px-3 py-2.5 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-rose-300 resize-none"
-              />
-              <p className="text-[11px] text-text-muted">
-                Se preenchido, o motivo será incluído na mensagem enviada pelo WhatsApp.
-              </p>
+            {/* Content */}
+            <div className="p-6 space-y-4 overflow-y-auto">
+              <div className="bg-rose-50 border border-rose-100 rounded-xl px-4 py-4 space-y-3">
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-rose-400">Cliente</p>
+                  <p className="font-semibold text-sm text-rose-900 mt-0.5">
+                    {rejectModalAppt.cliente?.nome} {rejectModalAppt.cliente?.sobrenome} —{' '}
+                    {new Date(rejectModalAppt.data_hora).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long' })} às{' '}
+                    {new Date(rejectModalAppt.data_hora).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
+                  Motivo <span className="font-normal normal-case text-text-muted">(opcional)</span>
+                </label>
+                <textarea
+                  value={rejectMotivo}
+                  onChange={e => setRejectMotivo(e.target.value)}
+                  placeholder="Ex: Desculpe, não vou conseguir atender nesse horário :("
+                  rows={3}
+                  className="w-full border border-border rounded-xl px-3 py-2.5 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-rose-300 resize-none"
+                />
+                <p className="text-[11px] text-text-muted">
+                  Se preenchido, o motivo será incluído na mensagem enviada pelo WhatsApp.
+                </p>
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <button
+                  onClick={() => handleRejectConfirm(true)}
+                  disabled={rejectSaving}
+                  className="flex items-center justify-center gap-2 w-full py-2.5 bg-red-500 hover:bg-red-600 disabled:opacity-60 text-white rounded-xl text-sm font-semibold transition-colors cursor-pointer"
+                >
+                  <XCircle className="w-4 h-4" />
+                  {rejectSaving ? 'Recusando...' : 'Recusar e notificar pelo WhatsApp'}
+                </button>
+                <button
+                  onClick={() => handleRejectConfirm(false)}
+                  disabled={rejectSaving}
+                  className="flex items-center justify-center gap-2 w-full py-2.5 bg-rose-600 hover:bg-rose-800 disabled:opacity-60 text-white rounded-xl text-sm font-semibold transition-colors cursor-pointer"
+                >
+                  <XCircle className="w-4 h-4" />
+                  {rejectSaving ? 'Recusando...' : 'Recusar sem notificar'}
+                </button>
+                <button
+                  onClick={() => setRejectModalAppt(null)}
+                  disabled={rejectSaving}
+                  className="w-full py-2.5 border border-border hover:bg-bg text-text-secondary rounded-xl text-sm font-semibold transition-colors cursor-pointer"
+                >
+                  Voltar
+                </button>
+              </div>
             </div>
 
-            <div className="flex flex-col gap-2 pt-1">
-              <button
-                onClick={() => handleRejectConfirm(true)}
-                disabled={rejectSaving}
-                className="flex items-center justify-center gap-2 w-full py-2.5 bg-red-500 hover:bg-red-600 disabled:opacity-60 text-white rounded-lg text-sm font-semibold transition-colors cursor-pointer"
-              >
-                <XCircle className="w-4 h-4" />
-                {rejectSaving ? 'Recusando...' : 'Recusar e notificar pelo WhatsApp'}
-              </button>
-              <button
-                onClick={() => handleRejectConfirm(false)}
-                disabled={rejectSaving}
-                className="flex items-center justify-center gap-2 w-full py-2.5 border border-red-200 text-red-600 hover:bg-red-50 disabled:opacity-60 rounded-lg text-sm font-semibold transition-colors cursor-pointer"
-              >
-                <XCircle className="w-4 h-4" />
-                {rejectSaving ? 'Recusando...' : 'Recusar sem notificar'}
-              </button>
-              <button
-                onClick={() => setRejectModalAppt(null)}
-                disabled={rejectSaving}
-                className="w-full py-2.5 border border-border hover:bg-bg text-text-secondary rounded-lg text-sm font-semibold transition-colors cursor-pointer"
-              >
-                Voltar
-              </button>
-            </div>
           </div>
         </div>, document.body)}
     </div>
