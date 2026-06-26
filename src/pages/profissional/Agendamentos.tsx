@@ -1511,13 +1511,13 @@ export default function Agendamentos() {
           <div className="bg-white rounded-[14px] border border-border shadow-xl w-full max-w-md flex flex-col max-h-[calc(100vh-2rem)] overflow-hidden animate-slide-up">
             
             {/* Header */}
-            <div className="px-6 py-4 border-b border-border flex items-center justify-between bg-rose-50/10 flex-shrink-0">
-              <h4 className="font-title font-semibold text-lg text-text-primary">
+            <div className="bg-gradient-to-br from-rose-600 to-rose-500 px-6 py-4 flex items-center justify-between flex-shrink-0">
+              <h4 className="font-title font-bold text-lg text-white">
                 Detalhes do Agendamento
               </h4>
-              <button 
+              <button
                 onClick={() => setIsDetailOpen(false)}
-                className="text-text-secondary hover:text-rose-600 cursor-pointer"
+                className="text-rose-200 hover:text-white cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1703,14 +1703,14 @@ export default function Agendamentos() {
           <div className="fixed inset-0 bg-black/45 backdrop-blur-sm z-[300] flex items-center justify-center p-4 overflow-y-auto animate-fade-in">
             <div className="bg-white rounded-[14px] border border-border shadow-xl w-full max-w-md flex flex-col max-h-[calc(100vh-2rem)] overflow-hidden animate-slide-up">
               {/* Header */}
-              <div className="px-6 py-4 border-b border-border flex items-center justify-between bg-green-50/30 flex-shrink-0">
-                <h4 className="font-title font-semibold text-lg text-text-primary flex items-center gap-2">
-                  <CheckCircle className="w-5 h-5 text-green-600" />
+              <div className="bg-gradient-to-br from-emerald-600 to-emerald-500 px-6 py-4 flex items-center justify-between flex-shrink-0">
+                <h4 className="font-title font-bold text-lg text-white flex items-center gap-2">
+                  <CheckCircle className="w-5 h-5 text-emerald-100" />
                   Concluir Atendimento
                 </h4>
                 <button
                   onClick={() => setConcludeAppt(null)}
-                  className="text-text-secondary hover:text-rose-600 cursor-pointer"
+                  className="text-emerald-200 hover:text-white cursor-pointer"
                 >
                   <X className="w-5 h-5" />
                 </button>
