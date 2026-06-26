@@ -344,7 +344,16 @@ export default function PortalAgendar() {
           });
 
         const blocksForDay = bloqueios.filter(b => dataSelecionada >= b.data_inicio && dataSelecionada <= b.data_fim);
-        setSlots(gerarSlots(horarioDia.hora_inicio, horarioDia.hora_fim, duracaoTotal, agData || [], blocksForDay));
+        let slotsDosDia = gerarSlots(horarioDia.hora_inicio, horarioDia.hora_fim, duracaoTotal, agData || [], blocksForDay);
+
+        // Filtra slots passados quando a data for hoje (buffer de 30 min de antecedência)
+        if (dataSelecionada === dateToStr(new Date())) {
+          const agora = new Date();
+          const limiteMin = agora.getHours() * 60 + agora.getMinutes() + 30;
+          slotsDosDia = slotsDosDia.filter(slot => toMin(slot) > limiteMin);
+        }
+
+        setSlots(slotsDosDia);
       } finally {
         setLoadingSlots(false);
       }
@@ -500,7 +509,13 @@ export default function PortalAgendar() {
         const horarioDiaErr = horarios.find(h => h.dia_semana === diaSemErr);
         if (horarioDiaErr) {
           const blocksErr = bloqueios.filter(b => (dataSelecionada as string) >= b.data_inicio && (dataSelecionada as string) <= b.data_fim);
-          setSlots(gerarSlots(horarioDiaErr.hora_inicio, horarioDiaErr.hora_fim, duracaoTotal, agErr || [], blocksErr));
+          let slotsErr = gerarSlots(horarioDiaErr.hora_inicio, horarioDiaErr.hora_fim, duracaoTotal, agErr || [], blocksErr);
+          if ((dataSelecionada as string) === dateToStr(new Date())) {
+            const agora = new Date();
+            const limiteMin = agora.getHours() * 60 + agora.getMinutes() + 30;
+            slotsErr = slotsErr.filter(slot => toMin(slot) > limiteMin);
+          }
+          setSlots(slotsErr);
         }
         setHorarioSelecionado(null);
         setErroSalvar('race');
