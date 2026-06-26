@@ -2158,55 +2158,63 @@ export default function Agendamentos() {
 
       {/* Approve Modal */}
       {approveModalAppt && createPortal(
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 space-y-5">
-            <div className="flex items-start justify-between">
-              <div>
-                <h3 className="font-title font-semibold text-lg text-text-primary">Confirmar agendamento</h3>
-                <p className="text-sm text-text-secondary mt-0.5">
-                  {approveModalAppt.cliente?.nome} {approveModalAppt.cliente?.sobrenome} —{' '}
-                  {new Date(approveModalAppt.data_hora).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long' })} às{' '}
-                  {new Date(approveModalAppt.data_hora).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
-                </p>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-slide-up">
+
+            {/* Header rose */}
+            <div className="bg-gradient-to-br from-rose-600 to-rose-500 px-6 pt-5 pb-5">
+              <div className="flex items-start justify-between">
+                <div>
+                  <h3 className="font-title font-bold text-lg text-white">Confirmar agendamento</h3>
+                  <p className="text-rose-100 text-sm mt-0.5">
+                    {approveModalAppt.cliente?.nome} {approveModalAppt.cliente?.sobrenome} —{' '}
+                    {new Date(approveModalAppt.data_hora).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long' })} às{' '}
+                    {new Date(approveModalAppt.data_hora).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                  </p>
+                </div>
+                <button onClick={() => setApproveModalAppt(null)} className="text-rose-200 hover:text-white cursor-pointer mt-0.5">
+                  <X className="w-5 h-5" />
+                </button>
               </div>
-              <button onClick={() => setApproveModalAppt(null)} className="text-text-muted hover:text-text-primary cursor-pointer">
-                <X className="w-5 h-5" />
-              </button>
             </div>
 
-            <div className="bg-emerald-50 border border-emerald-100 rounded-lg px-4 py-3 text-sm text-emerald-800 space-y-1">
-              <p className="font-semibold">Serviço(s):</p>
-              <p>{approveModalAppt.agendamento_servicos?.map(s => s.servico?.nome).filter(Boolean).join(', ') || '—'}</p>
-              {approveModalAppt.observacoes && (
-                <p className="text-emerald-700 italic text-xs mt-1">"{approveModalAppt.observacoes}"</p>
-              )}
+            {/* Content */}
+            <div className="p-6 space-y-4">
+              <div className="bg-rose-50 border border-rose-100 rounded-xl px-4 py-3 text-sm text-rose-900 space-y-1">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-rose-400">Serviço(s)</p>
+                <p className="font-semibold">{approveModalAppt.agendamento_servicos?.map(s => s.servico?.nome).filter(Boolean).join(', ') || '—'}</p>
+                {approveModalAppt.observacoes && (
+                  <p className="text-rose-700 italic text-xs mt-1">"{approveModalAppt.observacoes}"</p>
+                )}
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <button
+                  onClick={() => handleApproveConfirm(true)}
+                  disabled={approveSaving}
+                  className="flex items-center justify-center gap-2 w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60 text-white rounded-xl text-sm font-semibold transition-colors cursor-pointer"
+                >
+                  <CheckCircle className="w-4 h-4" />
+                  {approveSaving ? 'Confirmando...' : 'Confirmar e enviar pelo WhatsApp'}
+                </button>
+                <button
+                  onClick={() => handleApproveConfirm(false)}
+                  disabled={approveSaving}
+                  className="flex items-center justify-center gap-2 w-full py-2.5 bg-rose-600 hover:bg-rose-800 disabled:opacity-60 text-white rounded-xl text-sm font-semibold transition-colors cursor-pointer"
+                >
+                  <CheckCircle className="w-4 h-4" />
+                  {approveSaving ? 'Confirmando...' : 'Confirmar sem enviar'}
+                </button>
+                <button
+                  onClick={() => setApproveModalAppt(null)}
+                  disabled={approveSaving}
+                  className="w-full py-2.5 border border-border hover:bg-bg text-text-secondary rounded-xl text-sm font-semibold transition-colors cursor-pointer"
+                >
+                  Voltar
+                </button>
+              </div>
             </div>
 
-            <div className="flex flex-col gap-2 pt-1">
-              <button
-                onClick={() => handleApproveConfirm(true)}
-                disabled={approveSaving}
-                className="flex items-center justify-center gap-2 w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60 text-white rounded-lg text-sm font-semibold transition-colors cursor-pointer"
-              >
-                <CheckCircle className="w-4 h-4" />
-                {approveSaving ? 'Confirmando...' : 'Confirmar e enviar pelo WhatsApp'}
-              </button>
-              <button
-                onClick={() => handleApproveConfirm(false)}
-                disabled={approveSaving}
-                className="flex items-center justify-center gap-2 w-full py-2.5 border border-emerald-200 text-emerald-700 hover:bg-emerald-50 disabled:opacity-60 rounded-lg text-sm font-semibold transition-colors cursor-pointer"
-              >
-                <CheckCircle className="w-4 h-4" />
-                {approveSaving ? 'Confirmando...' : 'Confirmar sem enviar'}
-              </button>
-              <button
-                onClick={() => setApproveModalAppt(null)}
-                disabled={approveSaving}
-                className="w-full py-2.5 border border-border hover:bg-bg text-text-secondary rounded-lg text-sm font-semibold transition-colors cursor-pointer"
-              >
-                Voltar
-              </button>
-            </div>
           </div>
         </div>, document.body)}
 
