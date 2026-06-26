@@ -63,6 +63,7 @@ export default function Servicos() {
 
   // Form states - Servico
   const [servicoNome, setServicoNome] = useState('');
+  const [servicoDescricao, setServicoDescricao] = useState('');
   const [servicoCategoriaId, setServicoCategoriaId] = useState('');
   const [servicoDuracao, setServicoDuracao] = useState<number | ''>(30);
   const [servicoValor, setServicoValor] = useState<number | ''>(100.0);
@@ -267,6 +268,7 @@ export default function Servicos() {
     if (serv) {
       setEditingServico(serv);
       setServicoNome(serv.nome);
+      setServicoDescricao(serv.descricao ?? '');
       setServicoCategoriaId(serv.categoria_id ?? '');
       setServicoDuracao(serv.duracao_minutos);
       setServicoValor(Number(serv.valor));
@@ -281,6 +283,7 @@ export default function Servicos() {
     } else {
       setEditingServico(null);
       setServicoNome('');
+      setServicoDescricao('');
       setServicoCategoriaId(categorias.length > 0 ? categorias[0].id : '');
       setServicoDuracao(30);
       setServicoValor(100.0);
@@ -369,6 +372,7 @@ export default function Servicos() {
       if (editingServico) {
         const updatePayload: Record<string, unknown> = {
           nome: servicoNome,
+          descricao: servicoDescricao.trim() || null,
           categoria_id: servicoCategoriaId,
           duracao_minutos: duracaoFinal,
           valor: valorFinal,
@@ -388,6 +392,7 @@ export default function Servicos() {
           .from('servicos')
           .insert({
             nome: servicoNome,
+            descricao: servicoDescricao.trim() || null,
             categoria_id: servicoCategoriaId,
             duracao_minutos: duracaoFinal,
             valor: valorFinal,
@@ -828,6 +833,22 @@ export default function Servicos() {
                     onChange={(e) => setServicoNome(e.target.value)}
                     className="w-full px-3 py-2 border border-border rounded-lg bg-bg text-text-primary text-sm focus:outline-none focus:ring-1 focus:ring-rose-400 placeholder:text-text-muted"
                   />
+                </div>
+
+                {/* Descrição */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
+                    Descrição <span className="text-text-muted font-normal normal-case">(aparece no portal da cliente)</span>
+                  </label>
+                  <textarea
+                    rows={3}
+                    placeholder="Ex: Fio sintético aplicado cílio a cílio. Efeito natural e discreto para o dia a dia."
+                    value={servicoDescricao}
+                    onChange={(e) => setServicoDescricao(e.target.value)}
+                    maxLength={300}
+                    className="w-full px-3 py-2 border border-border rounded-lg bg-bg text-text-primary text-sm focus:outline-none focus:ring-1 focus:ring-rose-400 placeholder:text-text-muted resize-none"
+                  />
+                  <p className="text-[11px] text-text-muted text-right">{servicoDescricao.length}/300</p>
                 </div>
 
                 {/* Categoria */}
