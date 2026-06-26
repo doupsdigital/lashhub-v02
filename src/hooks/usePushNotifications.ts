@@ -28,6 +28,42 @@ export function usePushNotifications() {
     setPermission(Notification.permission as PushPermissionState);
   }, [isSupported]);
 
+  // Auto-sync: quando permission já é 'granted', garante que a subscription
+  // atual do browser está no banco. Cobre reinstalação do PWA (novo SW = novo endpoint).
+  useEffect(() => {
+    if (!isSupported || !user || role !== 'profissional' || !estabelecimentoId) return;
+    if (Notification.permission !== 'granted') return;
+
+    (async () => {
+      try {
+        const reg = await navigator.serviceWorker.ready;
+        let sub = await reg.pushManager.getSubscription();
+
+        // Sem subscription ativa (ex: após reinstalar) → cria uma nova automaticamente
+        if (!sub) {
+          sub = await reg.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY).buffer as ArrayBuffer,
+          });
+        }
+
+        if (sub) {
+          const json = sub.toJSON();
+          const keys = json.keys as { p256dh: string; auth: string };
+          await supabase.from('push_subscriptions').upsert({
+            user_id: user.id,
+            estabelecimento_id: estabelecimentoId,
+            endpoint: sub.endpoint,
+            p256dh: keys.p256dh,
+            auth: keys.auth,
+          }, { onConflict: 'user_id,endpoint' });
+        }
+      } catch (err) {
+        console.error('[usePushNotifications] auto-sync falhou:', err);
+      }
+    })();
+  }, [user?.id, estabelecimentoId, role]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const subscribe = async (): Promise<boolean> => {
     if (!isSupported || !user || !estabelecimentoId || role !== 'profissional') return false;
     setLoading(true);
