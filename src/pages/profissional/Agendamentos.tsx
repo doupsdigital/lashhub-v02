@@ -172,9 +172,11 @@ export default function Agendamentos() {
   const [rejectModalAppt, setRejectModalAppt] = useState<AgendamentoWithRelations | null>(null);
   const [rejectMotivo, setRejectMotivo] = useState('');
   const [rejectSaving, setRejectSaving] = useState(false);
+  const rejectSavingRef = useRef(false);
 
   const [approveModalAppt, setApproveModalAppt] = useState<AgendamentoWithRelations | null>(null);
   const [approveSaving, setApproveSaving] = useState(false);
+  const approveSavingRef = useRef(false);
   
   // Selected services in the form
   const [selectedServices, setSelectedServices] = useState<Record<string, AgendamentoServicoInput>>({});
@@ -746,7 +748,8 @@ export default function Agendamentos() {
   };
 
   const handleRejectConfirm = async (sendWhatsApp: boolean) => {
-    if (!rejectModalAppt) return;
+    if (!rejectModalAppt || rejectSavingRef.current) return;
+    rejectSavingRef.current = true;
 
     // window.open ANTES de qualquer await — único jeito de funcionar no iOS Safari
     const waUrl = sendWhatsApp ? openWhatsApp(rejectModalAppt, 'recusado', rejectMotivo) : undefined;
@@ -780,6 +783,7 @@ export default function Agendamentos() {
       console.error(err);
       showTemporaryError('Falha ao recusar agendamento.');
     } finally {
+      rejectSavingRef.current = false;
       setRejectSaving(false);
     }
   };
@@ -789,7 +793,8 @@ export default function Agendamentos() {
   };
 
   const handleApproveConfirm = async (sendWhatsApp: boolean) => {
-    if (!approveModalAppt) return;
+    if (!approveModalAppt || approveSavingRef.current) return;
+    approveSavingRef.current = true;
 
     // window.open ANTES de qualquer await — único jeito de funcionar no iOS Safari
     if (sendWhatsApp) {
@@ -816,6 +821,7 @@ export default function Agendamentos() {
       console.error(err);
       showTemporaryError('Falha ao confirmar agendamento.');
     } finally {
+      approveSavingRef.current = false;
       setApproveSaving(false);
     }
   };
