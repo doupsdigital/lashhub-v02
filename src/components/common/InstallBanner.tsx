@@ -79,6 +79,10 @@ export default function InstallBanner({ inline = false, onVisibilityChange }: In
     const outcome = await triggerInstall();
     if (outcome === 'accepted') {
       setInstallState('installing');
+    } else {
+      // Usuário cancelou o diálogo nativo — esconde só nesta sessão (sem snooze)
+      setVisible(false);
+      onVisibilityChange?.(false);
     }
   };
 
