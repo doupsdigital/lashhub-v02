@@ -147,7 +147,7 @@ export default function PortalLayout() {
       )}
 
       {/* Content */}
-      <main className="flex-1 p-4 md:p-8 pb-24 md:pb-8 max-w-[1200px] w-full mx-auto">
+      <main className="flex-1 p-4 md:p-8 md:pb-8 max-w-[1200px] w-full mx-auto" style={{ paddingBottom: 'calc(1rem + 60px + env(safe-area-inset-bottom, 0px))' }}>
         <Outlet />
       </main>
 
@@ -155,24 +155,30 @@ export default function PortalLayout() {
 
       {/* Bottom nav (mobile) */}
       {!isAuthPage && (
-        <nav id="ob-portal-nav" className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-border flex z-30">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            return (
-              <NavLink
-                key={item.path}
-                to={item.path}
-                className={({ isActive }) =>
-                  `flex-1 flex flex-col items-center justify-center py-2 gap-0.5 text-[10px] font-medium transition-colors ${
-                    isActive ? 'text-rose-600' : 'text-text-muted hover:text-rose-400'
-                  }`
-                }
-              >
-                <Icon className="w-5 h-5" />
-                <span>{item.shortName}</span>
-              </NavLink>
-            );
-          })}
+        <nav
+          id="ob-portal-nav"
+          className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-border z-30"
+          style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+        >
+          <div className="flex items-stretch h-[60px]">
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              return (
+                <NavLink
+                  key={item.path}
+                  to={item.path}
+                  className={({ isActive }) =>
+                    `flex-1 flex flex-col items-center justify-center gap-0.5 text-[10px] font-medium transition-colors ${
+                      isActive ? 'text-rose-600' : 'text-text-muted hover:text-rose-400'
+                    }`
+                  }
+                >
+                  <Icon className="w-5 h-5" />
+                  <span>{item.shortName}</span>
+                </NavLink>
+              );
+            })}
+          </div>
         </nav>
       )}
 
