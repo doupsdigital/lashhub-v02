@@ -943,9 +943,9 @@ export default function PortalAgendar() {
             </button>
           )}
           {etapa === 2 && <div />}
-          {etapa === 3 && (
+          {etapa === 3 && slots.length > 0 && (
             <button
-              disabled={!horarioSelecionado || slots.length === 0}
+              disabled={!horarioSelecionado}
               onClick={() => { setErroSalvar(null); setEtapa(4); }}
               className="px-6 py-2.5 bg-rose-600 hover:bg-rose-800 disabled:bg-rose-200 disabled:cursor-not-allowed text-white rounded-xl text-sm font-semibold transition-colors cursor-pointer"
             >
