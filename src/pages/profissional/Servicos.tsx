@@ -617,14 +617,17 @@ export default function Servicos() {
           {filteredCategorias.map(cat => (
             <div
               key={cat.id}
-              className="bg-white border border-border rounded-[14px] shadow-sm"
+              className="bg-white border border-border border-l-4 border-l-rose-500 rounded-[14px] shadow-sm"
             >
               {/* Category Header */}
-              <div className="bg-rose-50/20 border-b border-border px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-t-[14px]">
+              <div className="bg-rose-50 border-b border-border px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-t-[14px]">
                 <div className="flex items-center gap-3">
-                  <h3 className="font-title font-semibold text-xl text-text-primary flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-rose-100 flex items-center justify-center flex-shrink-0">
+                    <Tag className="w-4 h-4 text-rose-600" />
+                  </div>
+                  <h3 className="font-title font-semibold text-lg text-rose-700 flex items-center gap-2">
                     {cat.nome}
-                    <span className="text-xs font-sans font-medium px-2 py-0.5 rounded-full bg-rose-100 text-rose-800">
+                    <span className="text-xs font-sans font-medium px-2 py-0.5 rounded-full bg-rose-200/70 text-rose-800">
                       {cat.servicos.length} {cat.servicos.length === 1 ? 'serviço' : 'serviços'}
                     </span>
                   </h3>
