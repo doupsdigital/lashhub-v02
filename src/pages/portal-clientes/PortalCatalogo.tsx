@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useOnboarding } from '../../hooks/useOnboarding';
 import { useAuth } from '../../contexts/AuthContext';
@@ -199,7 +199,14 @@ export default function PortalCatalogo() {
   const { establishmentId, slug, plano, nomeNegocio, logoUrl, descricao, instagram, endereco, telefoneProfissional } = usePortal();
   const catalogoKey = user ? 'portal_catalogo' : 'portal_catalogo_anonimo';
   const { autoStart, loading: onboardingLoading } = useOnboarding(catalogoKey, { studioName: nomeNegocio });
-  useEffect(() => { autoStart(); }, [onboardingLoading]); // eslint-disable-line react-hooks/exhaustive-deps
+  const tourStartedRef = useRef(false);
+  useEffect(() => {
+    if (onboardingLoading) return;         // aguarda auth
+    if (!nomeNegocio) return;              // aguarda portal carregar o nome
+    if (tourStartedRef.current) return;    // garante disparo único
+    tourStartedRef.current = true;
+    autoStart();
+  }, [onboardingLoading, nomeNegocio]); // eslint-disable-line react-hooks/exhaustive-deps
   const [categorias, setCategorias] = useState<CategoriaComServicos[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
