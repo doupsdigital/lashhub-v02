@@ -550,7 +550,7 @@ export default function PortalAgendar() {
   }
 
   return (
-    <div className="space-y-6 max-w-3xl mx-auto">
+    <div className="space-y-6 max-w-3xl mx-auto pb-20">
       <h1 className="font-title font-bold text-3xl text-text-primary">Agendar Serviço</h1>
 
       <IndicadorProgresso etapaAtual={etapa as number} />
@@ -691,15 +691,6 @@ export default function PortalAgendar() {
             </>
           )}
 
-          <div className="flex justify-end pt-2">
-            <button
-              disabled={!podeAvancar1}
-              onClick={() => setEtapa(2)}
-              className="px-6 py-2.5 bg-rose-600 hover:bg-rose-800 disabled:bg-rose-200 disabled:cursor-not-allowed text-white rounded-xl text-sm font-semibold transition-colors cursor-pointer"
-            >
-              Continuar
-            </button>
-          </div>
         </div>
       )}
 
@@ -780,14 +771,6 @@ export default function PortalAgendar() {
             )}
           </div>
 
-          <div className="flex justify-between pt-2">
-            <button
-              onClick={() => setEtapa(1)}
-              className="flex items-center gap-1.5 px-4 py-2.5 border border-border text-text-secondary hover:bg-bg rounded-xl text-sm font-semibold transition-colors cursor-pointer"
-            >
-              <ChevronLeft className="w-4 h-4" /> Voltar
-            </button>
-          </div>
         </div>
       )}
 
@@ -838,23 +821,6 @@ export default function PortalAgendar() {
             </div>
           )}
 
-          <div className="flex justify-between pt-2">
-            <button
-              onClick={() => { setErroSalvar(null); setEtapa(2); }}
-              className="flex items-center gap-1.5 px-4 py-2.5 border border-border text-text-secondary hover:bg-bg rounded-xl text-sm font-semibold transition-colors cursor-pointer"
-            >
-              <ChevronLeft className="w-4 h-4" /> Voltar
-            </button>
-            {slots.length > 0 && (
-              <button
-                disabled={!horarioSelecionado}
-                onClick={() => { setErroSalvar(null); setEtapa(4); }}
-                className="px-6 py-2.5 bg-rose-600 hover:bg-rose-800 disabled:bg-rose-200 disabled:cursor-not-allowed text-white rounded-xl text-sm font-semibold transition-colors cursor-pointer"
-              >
-                Continuar
-              </button>
-            )}
-          </div>
         </div>
       )}
 
@@ -923,13 +889,56 @@ export default function PortalAgendar() {
             </div>
           )}
 
-          <div className="flex justify-between pt-2">
+        </div>
+      )}
+
+      {/* ─── BARRA DE AÇÃO FIXA ───────────────────────────────────────────────── */}
+      {etapa !== 'sucesso' && (
+        <div
+          className="fixed left-0 right-0 z-20 bg-white border-t border-border flex items-center justify-between gap-3 px-4"
+          style={{
+            bottom: 'calc(60px + env(safe-area-inset-bottom, 0px))',
+            paddingTop: '12px',
+            paddingBottom: '12px',
+          }}
+        >
+          {/* Voltar */}
+          {etapa === 1 ? (
+            <div />
+          ) : (
             <button
-              onClick={() => setEtapa(3)}
+              onClick={() => {
+                if (etapa === 2) setEtapa(1);
+                else if (etapa === 3) { setErroSalvar(null); setEtapa(2); }
+                else if (etapa === 4) setEtapa(3);
+              }}
               className="flex items-center gap-1.5 px-4 py-2.5 border border-border text-text-secondary hover:bg-bg rounded-xl text-sm font-semibold transition-colors cursor-pointer"
             >
               <ChevronLeft className="w-4 h-4" /> Voltar
             </button>
+          )}
+
+          {/* Ação primária */}
+          {etapa === 1 && (
+            <button
+              disabled={!podeAvancar1}
+              onClick={() => setEtapa(2)}
+              className="px-6 py-2.5 bg-rose-600 hover:bg-rose-800 disabled:bg-rose-200 disabled:cursor-not-allowed text-white rounded-xl text-sm font-semibold transition-colors cursor-pointer"
+            >
+              Continuar
+            </button>
+          )}
+          {etapa === 2 && <div />}
+          {etapa === 3 && (
+            <button
+              disabled={!horarioSelecionado || slots.length === 0}
+              onClick={() => { setErroSalvar(null); setEtapa(4); }}
+              className="px-6 py-2.5 bg-rose-600 hover:bg-rose-800 disabled:bg-rose-200 disabled:cursor-not-allowed text-white rounded-xl text-sm font-semibold transition-colors cursor-pointer"
+            >
+              Continuar
+            </button>
+          )}
+          {etapa === 4 && (
             <button
               disabled={salvando}
               onClick={confirmarAgendamento}
@@ -941,7 +950,7 @@ export default function PortalAgendar() {
                 <><CheckCircle className="w-4 h-4" /> Confirmar Agendamento</>
               )}
             </button>
-          </div>
+          )}
         </div>
       )}
     </div>

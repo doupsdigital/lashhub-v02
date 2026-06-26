@@ -14,6 +14,7 @@ export default function PortalLayout() {
   const { nomeNegocio, logoUrl, slug, loading, nomeProfissional, plano, telefoneProfissional, descricao, instagram, endereco } = usePortal();
   const isBasico = plano === 'basico';
   const isAuthPage = location.pathname.endsWith('/login') || location.pathname.endsWith('/cadastro');
+  const isAgendar = location.pathname.endsWith('/agendar') || location.pathname.includes('/agendar?');
 
   const [installBannerVisible, setInstallBannerVisible] = useState(false);
 
@@ -186,7 +187,7 @@ export default function PortalLayout() {
       {!isAuthPage && <PortalFloatingHelpButton bannerVisible={installBannerVisible} />}
 
       {/* Botão flutuante de WhatsApp */}
-      {!isAuthPage && telefoneProfissional && (
+      {!isAuthPage && !isAgendar && telefoneProfissional && (
         <a
           href={`https://wa.me/55${telefoneProfissional.replace(/\D/g, '')}?text=${encodeURIComponent('Olá! Vi seu catálogo e gostaria de mais informações.')}`}
           target="_blank"
