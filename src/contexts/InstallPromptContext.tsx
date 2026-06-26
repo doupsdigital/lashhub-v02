@@ -8,7 +8,7 @@ interface BeforeInstallPromptEvent extends Event {
 
 interface InstallPromptContextType {
   deferredPrompt: BeforeInstallPromptEvent | null;
-  triggerInstall: () => Promise<void>;
+  triggerInstall: () => Promise<'accepted' | 'dismissed' | 'unavailable'>;
 }
 
 const InstallPromptContext = createContext<InstallPromptContextType>({
@@ -36,11 +36,12 @@ export function InstallPromptProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  const triggerInstall = async () => {
-    if (!deferredPrompt) return;
+  const triggerInstall = async (): Promise<'accepted' | 'dismissed' | 'unavailable'> => {
+    if (!deferredPrompt) return 'unavailable';
     await deferredPrompt.prompt();
-    await deferredPrompt.userChoice;
+    const { outcome } = await deferredPrompt.userChoice;
     setDeferredPrompt(null);
+    return outcome;
   };
 
   return (

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, Download } from 'lucide-react';
+import { X, Download, CheckCircle, Loader2 } from 'lucide-react';
 import { useInstallPrompt } from '../../contexts/InstallPromptContext';
 
 const STORAGE_KEY = 'lashhub-install-banner-snoozed';
@@ -38,6 +38,7 @@ export default function InstallBanner({ inline = false, onVisibilityChange }: In
   const { deferredPrompt, triggerInstall } = useInstallPrompt();
   const [visible, setVisible] = useState(false);
   const [device, setDevice] = useState<DeviceType>(null);
+  const [installState, setInstallState] = useState<'idle' | 'installing' | 'installed'>('idle');
 
   useEffect(() => {
     if (isAlreadyInstalled()) return;
@@ -68,10 +69,17 @@ export default function InstallBanner({ inline = false, onVisibilityChange }: In
     onVisibilityChange?.(false);
   };
 
+  useEffect(() => {
+    const onInstalled = () => setInstallState('installed');
+    window.addEventListener('appinstalled', onInstalled);
+    return () => window.removeEventListener('appinstalled', onInstalled);
+  }, []);
+
   const handleAndroidInstall = async () => {
-    await triggerInstall();
-    setVisible(false);
-    onVisibilityChange?.(false);
+    const outcome = await triggerInstall();
+    if (outcome === 'accepted') {
+      setInstallState('installing');
+    }
   };
 
   if (!visible || !device) return null;
@@ -88,7 +96,27 @@ export default function InstallBanner({ inline = false, onVisibilityChange }: In
 
       <div className="flex-1 min-w-0">
         {device === 'android-chrome' ? (
-          deferredPrompt ? (
+          installState === 'installed' ? (
+            <>
+              <p className="text-sm font-semibold text-green-700 leading-snug flex items-center gap-1.5">
+                <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0" />
+                App instalado com sucesso!
+              </p>
+              <p className="text-xs text-text-secondary mt-1 leading-relaxed">
+                Agora você pode abrir o <span className="font-semibold text-text-primary">Lash Hub</span> direto pela tela inicial do seu celular, sem precisar do navegador.
+              </p>
+            </>
+          ) : installState === 'installing' ? (
+            <>
+              <p className="text-sm font-semibold text-text-primary leading-snug flex items-center gap-1.5">
+                <Loader2 className="w-4 h-4 text-rose-600 flex-shrink-0 animate-spin" />
+                Instalando o app...
+              </p>
+              <p className="text-xs text-text-secondary mt-1 leading-relaxed">
+                Pode levar alguns segundos. Em breve o <span className="font-semibold text-text-primary">Lash Hub</span> aparecerá na sua tela inicial 📲
+              </p>
+            </>
+          ) : deferredPrompt ? (
             <>
               <p className="text-sm font-semibold text-text-primary leading-snug">
                 Instale o Lash Hub no seu celular
@@ -162,12 +190,14 @@ export default function InstallBanner({ inline = false, onVisibilityChange }: In
         )}
       </div>
 
-      <button
-        onClick={dismiss}
-        className="text-text-muted hover:text-text-primary flex-shrink-0 p-0.5 cursor-pointer"
-      >
-        <X className="w-4 h-4" />
-      </button>
+      {installState === 'idle' && (
+        <button
+          onClick={dismiss}
+          className="text-text-muted hover:text-text-primary flex-shrink-0 p-0.5 cursor-pointer"
+        >
+          <X className="w-4 h-4" />
+        </button>
+      )}
     </div>
   );
 
