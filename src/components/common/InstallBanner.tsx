@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { X, Download } from 'lucide-react';
 import { useInstallPrompt } from '../../contexts/InstallPromptContext';
 
-const STORAGE_KEY = 'lashhub-install-banner-dismissed';
+const STORAGE_KEY = 'lashhub-install-banner-snoozed';
+const SNOOZE_DAYS = 3;
 
 type DeviceType = 'ios-safari' | 'ios-chrome' | 'android-chrome' | 'android' | null;
 
@@ -40,7 +41,12 @@ export default function InstallBanner({ inline = false, onVisibilityChange }: In
 
   useEffect(() => {
     if (isAlreadyInstalled()) return;
-    if (localStorage.getItem(STORAGE_KEY)) return;
+
+    // Floating banner respeita snooze com prazo; inline sempre aparece
+    if (!inline) {
+      const snoozedUntil = localStorage.getItem(STORAGE_KEY);
+      if (snoozedUntil && Date.now() < Number(snoozedUntil)) return;
+    }
 
     const detected = detectDevice();
 
@@ -52,7 +58,12 @@ export default function InstallBanner({ inline = false, onVisibilityChange }: In
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const dismiss = () => {
-    localStorage.setItem(STORAGE_KEY, '1');
+    // Inline: só esconde visualmente, sem salvar — o modal é único
+    // Floating: snooze por SNOOZE_DAYS dias
+    if (!inline) {
+      const until = Date.now() + SNOOZE_DAYS * 24 * 60 * 60 * 1000;
+      localStorage.setItem(STORAGE_KEY, String(until));
+    }
     setVisible(false);
     onVisibilityChange?.(false);
   };
